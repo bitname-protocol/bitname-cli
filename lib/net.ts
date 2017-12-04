@@ -1,0 +1,60 @@
+import {
+    revHex,
+} from 'bcoin/lib/utils/util';
+import {
+    Script,
+} from 'bcoin/lib/script';
+import {
+    Coin,
+} from 'bcoin/lib/primitives';
+
+import fetch from 'node-fetch';
+
+import { config } from '../config';
+const NETWORK = config.network;
+
+async function fundTx(addr, target) {
+    const coins: Coin[] = [];
+
+    const url = `https://testnet-api.smartbit.com.au/v1/blockchain/address/${addr}/unspent?limit=1000`;
+
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    const txs = data.unspent;
+
+    if (typeof txs === 'undefined') {
+        throw new Error(`No unspent txs found for ${addr}`);
+    }
+
+    const addrString = addr.toBase58(NETWORK);
+
+    txs.sort((a, b) => {
+        return a - b;
+    });
+
+    let totalVal = 0;
+
+    for (const tx of txs) {
+        const coinOpts = {
+            version: 1,
+            height: -1,
+            value: tx.value_int,
+            script: Script.fromAddress(addr),
+            hash: revHex(tx.txid),
+            index: tx.n,
+        };
+
+        coins.push(new Coin(coinOpts));
+
+        totalVal += coinOpts.value;
+
+        if (totalVal >= target) {
+            break;
+        }
+    }
+
+    return coins;
+}
+
+export { fundTx };
