@@ -7,7 +7,7 @@ const NETWORK = config.network;
 
 // const asdf = genLockTx()
 async function main() {
-    const LOCKTIME = 1;
+    const LOCKTIME = 5;
     console.log(`Locking for ${LOCKTIME} blocks`);
 
     const masterKey = keyFromPass('correct horse stapler battery');

@@ -17,12 +17,15 @@ import {
     Amount,
 } from 'bcoin/lib/btc';
 
-function makeEncumberScript(pubkey, rlocktime) {
+function makeEncumberScript(userPubkey, servicePubkey, rlocktime) {
     const script = new Script(null);
-    script.pushData(pubkey);
+
+    script.pushSym('OP_IF');
+
+    script.pushData(userPubkey);
     script.pushSym('OP_CHECKSIG');
-    script.pushSym('OP_DROP');
-    script.pushSym('OP_1');
+
+    script.pushSym('OP_ELSE');
 
     const num = I64(rlocktime);
 
@@ -39,13 +42,19 @@ function makeEncumberScript(pubkey, rlocktime) {
     script.pushData(numBuff.slice(0, min));
     script.pushSym('OP_CHECKSEQUENCEVERIFY');
     script.pushSym('OP_DROP');
+
+    script.pushData(servicePubkey);
+    script.pushSym('OP_CHECKSIG');
+
+    script.pushSym('OP_ENDIF');
+
     script.compile();
 
     return script;
 }
 
 function genRedeemScript(ring, locktime) {
-    return makeEncumberScript(ring.getPublicKey(), locktime);
+    return makeEncumberScript(ring.getPublicKey(), ring.getPublicKey(), locktime);
 }
 
 function genP2shAddr(redeemScript) {
@@ -119,6 +128,7 @@ function genUnlockTx(ring, lockTx, locktime, redeemScript) {
 
     const unlockScript = new Script();
     unlockScript.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
+    unlockScript.pushInt(0);
     unlockScript.pushData(redeemScript.toRaw());
     unlockScript.compile();
 
