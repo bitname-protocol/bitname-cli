@@ -1,5 +1,5 @@
 import { genLockTx, genUnlockTx, genRedeemScript, genP2shAddr } from './lib/txs';
-import { fundTx } from './lib/net';
+import { fundTx, getFeesSatoshiPerKB } from './lib/net';
 import { keyFromPass } from './lib/crypto';
 import { KeyRing } from 'bcoin/lib/primitives';
 import { config } from './config';
@@ -24,11 +24,17 @@ async function main() {
 
     const addr = ring.getAddress();
 
+    const feeRate = await getFeesSatoshiPerKB();
+    const upfrontFee = 1000000;
+    const delayFee   = 1000000;
+    // const delayFee =    100000;
+
     // const coin = await getBiggestUTXO(addr);
-    const coins = await fundTx(addr, 2000000);
+    // Fund up to a 2 KB transaction
+    const coins = await fundTx(addr, upfrontFee + delayFee + 2 * feeRate);
 
     // const lockTx = genLockTx(ring, coins, 1000000, 100000, p2shAddr);
-    const lockTx = genLockTx(ring, coins, 'test', 1, 1000000, 100000, ring.getAddress(), p2shAddr);
+    const lockTx = genLockTx(ring, coins, 'test', upfrontFee, delayFee, feeRate, ring.getAddress(), p2shAddr);
     console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
 
     const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript);

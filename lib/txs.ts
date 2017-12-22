@@ -64,7 +64,7 @@ function genP2shAddr(redeemScript) {
     return p2shAddr;
 }
 
-function genLockTx(ring, coins, name, upfrontFee, lockedFee, netFee, serviceAddr, p2shAddr) {
+function genLockTx(ring, coins, name, upfrontFee, lockedFee, feeRate, serviceAddr, p2shAddr) {
     const lockTx = new MTX(null);
 
     const total = coins.reduce((acc, cur) => acc + cur.value, 0);
@@ -75,10 +75,10 @@ function genLockTx(ring, coins, name, upfrontFee, lockedFee, netFee, serviceAddr
 
     const opRetVal = 1;
 
-    console.log(total, opRetVal, upfrontFee, lockedFee, netFee);
-    console.log(opRetVal + upfrontFee + lockedFee + netFee);
+    // console.log(total, opRetVal, upfrontFee, lockedFee, netFee);
+    // console.log(opRetVal + upfrontFee + lockedFee + netFee);
 
-    const changeVal = total - opRetVal - upfrontFee - lockedFee - netFee;
+    const changeVal = total - opRetVal - upfrontFee - lockedFee;
 
     // Add change output as 0
     lockTx.addOutput({
@@ -108,6 +108,9 @@ function genLockTx(ring, coins, name, upfrontFee, lockedFee, netFee, serviceAddr
         lockTx.signInput(i, coin, ring, Script.hashType.ALL);
     }
 
+    const virtSize = lockTx.getVirtualSize();
+    lockTx.subtractFee(Math.ceil(virtSize / 1000 * feeRate), 0);
+
     return lockTx.toTX();
 }
 
@@ -134,7 +137,9 @@ function genUnlockTx(ring, lockTx, locktime, redeemScript) {
 
     unlockTx.inputs[0].script = unlockScript;
 
-    console.log(unlockTx.getMinFee());
+    console.log(unlockTx.outputs);
+
+    console.log('size: ', unlockTx.getVirtualSize());
 
     return unlockTx.toTX();
 }

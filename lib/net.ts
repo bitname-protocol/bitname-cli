@@ -13,6 +13,19 @@ import fetch from 'node-fetch';
 import { config } from '../config';
 const NETWORK = config.network;
 
+async function getFeesSatoshiPerKB() {
+    let netSuffix = 'main';
+    if (NETWORK === 'testnet') {
+        netSuffix = 'test3';
+    }
+    const url = `https://api.blockcypher.com/v1/btc/${netSuffix}`;
+
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    return data.medium_fee_per_kb;
+}
+
 async function fundTx(addr, target) {
     const coins: Coin[] = [];
 
@@ -57,4 +70,4 @@ async function fundTx(addr, target) {
     return coins;
 }
 
-export { fundTx };
+export { getFeesSatoshiPerKB, fundTx };
