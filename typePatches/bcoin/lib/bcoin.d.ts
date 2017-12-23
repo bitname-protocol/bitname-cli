@@ -6,12 +6,20 @@ declare module 'bcoin' {
     const keyring: any;
     const coin: any;
     const util: any;
-    const crypto: any;
-    const hd: any;
+    // const crypto: any;
 
     class address {
-        toBase58(string): string;
-        static fromScript(string): address;
+        toBase58(network: string): string;
+        static fromScript(script: string): address;
+    }
+
+    class hd {
+        static fromSeed(data: Buffer, network: string): hd;
+        derivePath(path: string): hd;
+    }
+
+    class crypto {
+        static sha256(data: Buffer): Buffer;
     }
 
     export {

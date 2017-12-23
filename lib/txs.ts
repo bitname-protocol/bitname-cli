@@ -1,22 +1,5 @@
 import { I64 } from 'n64';
 
-// import {
-//     Script,
-// } from 'bcoin/lib/script';
-
-// import {
-//     Address,
-//     Output,
-// } from 'bcoin/lib/primitives';
-
-// import {
-//     MTX,
-// } from 'bcoin/lib/primitives/mtx';
-
-// import {
-//     Amount,
-// } from 'bcoin/lib/btc';
-
 import {
     script as Script,
     address as Address,
@@ -78,8 +61,8 @@ function genLockTx(ring: any,
                    upfrontFee: number,
                    lockedFee: number,
                    feeRate: number,
-                   serviceAddr: string,
-                   p2shAddr: string) {
+                   serviceAddr: Address,
+                   p2shAddr: Address) {
     const lockTx = new MTX(null);
 
     const total = coins.reduce((acc, cur) => acc + cur.value, 0);
