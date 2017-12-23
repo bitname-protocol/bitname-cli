@@ -1,7 +1,10 @@
 import { genLockTx, genUnlockTx, genRedeemScript, genP2shAddr } from './lib/txs';
 import { fundTx, getFeesSatoshiPerKB } from './lib/net';
 import { keyFromPass } from './lib/crypto';
-import { KeyRing } from 'bcoin/lib/primitives';
+// import { KeyRing } from 'bcoin/lib/primitives';
+import {
+    keyring as KeyRing,
+} from 'bcoin';
 import { config } from './config';
 const NETWORK = config.network;
 

@@ -1,23 +1,31 @@
 import { I64 } from 'n64';
 
-import {
-    Script,
-} from 'bcoin/lib/script';
+// import {
+//     Script,
+// } from 'bcoin/lib/script';
+
+// import {
+//     Address,
+//     Output,
+// } from 'bcoin/lib/primitives';
+
+// import {
+//     MTX,
+// } from 'bcoin/lib/primitives/mtx';
+
+// import {
+//     Amount,
+// } from 'bcoin/lib/btc';
 
 import {
-    Address,
-    Output,
-} from 'bcoin/lib/primitives';
+    script as Script,
+    address as Address,
+    output as Output,
+    mtx as MTX,
+    amount as Amount,
+} from 'bcoin';
 
-import {
-    MTX,
-} from 'bcoin/lib/primitives/mtx';
-
-import {
-    Amount,
-} from 'bcoin/lib/btc';
-
-function makeEncumberScript(userPubkey, servicePubkey, rlocktime) {
+function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number) {
     const script = new Script(null);
 
     script.pushSym('OP_IF');
@@ -53,18 +61,25 @@ function makeEncumberScript(userPubkey, servicePubkey, rlocktime) {
     return script;
 }
 
-function genRedeemScript(ring, locktime) {
+function genRedeemScript(ring: any, locktime: number) {
     return makeEncumberScript(ring.getPublicKey(), ring.getPublicKey(), locktime);
 }
 
-function genP2shAddr(redeemScript) {
+function genP2shAddr(redeemScript: any) {
     const outputScript = Script.fromScripthash(redeemScript.hash160());
     const p2shAddr = Address.fromScript(outputScript);
 
     return p2shAddr;
 }
 
-function genLockTx(ring, coins, name, upfrontFee, lockedFee, feeRate, serviceAddr, p2shAddr) {
+function genLockTx(ring: any,
+                   coins: any[],
+                   name: string,
+                   upfrontFee: number,
+                   lockedFee: number,
+                   feeRate: number,
+                   serviceAddr: string,
+                   p2shAddr: string) {
     const lockTx = new MTX(null);
 
     const total = coins.reduce((acc, cur) => acc + cur.value, 0);
@@ -124,7 +139,7 @@ function genLockTx(ring, coins, name, upfrontFee, lockedFee, feeRate, serviceAdd
     return lockTx.toTX();
 }
 
-function genUnlockTx(ring, lockTx, locktime, redeemScript, feeRate) {
+function genUnlockTx(ring: any, lockTx: any, locktime: number, redeemScript: any, feeRate: number) {
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({
         version: 2,

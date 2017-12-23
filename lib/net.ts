@@ -1,12 +1,10 @@
 import {
-    revHex,
-} from 'bcoin/lib/utils/util';
-import {
-    Script,
-} from 'bcoin/lib/script';
-import {
-    Coin,
-} from 'bcoin/lib/primitives';
+    script as Script,
+    coin as Coin,
+    util,
+} from 'bcoin';
+
+const revHex = util.revHex;
 
 import fetch from 'node-fetch';
 
@@ -26,8 +24,8 @@ async function getFeesSatoshiPerKB() {
     return data.medium_fee_per_kb;
 }
 
-async function fundTx(addr, target) {
-    const coins: Coin[] = [];
+async function fundTx(addr: any, target: number) {
+    const coins: any[] = [];
 
     const url = `https://testnet-api.smartbit.com.au/v1/blockchain/address/${addr}/unspent?limit=1000`;
 
@@ -42,7 +40,7 @@ async function fundTx(addr, target) {
 
     const addrString = addr.toBase58(NETWORK);
 
-    txs.sort((a, b) => {
+    txs.sort((a: number, b: number) => {
         return a - b;
     });
 
