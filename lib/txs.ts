@@ -105,41 +105,65 @@ function genLockTx(ring, coins, name, upfrontFee, lockedFee, feeRate, serviceAdd
     for (let i = 0; i < coins.length; ++i) {
         const coin = coins[i];
         lockTx.scriptInput(i, coin, ring);
+        // lockTx.signInput(i, coin, ring, Script.hashType.ALL);
+    }
+
+    // Each signature is 72 bytes long
+    const virtSize = lockTx.getVirtualSize() + coins.length * 72;
+    lockTx.subtractFee(Math.ceil(virtSize / 1000 * feeRate), 0);
+
+    for (let i = 0; i < coins.length; ++i) {
+        const coin = coins[i];
+        // lockTx.scriptInput(i, coin, ring);
         lockTx.signInput(i, coin, ring, Script.hashType.ALL);
     }
 
-    const virtSize = lockTx.getVirtualSize();
-    lockTx.subtractFee(Math.ceil(virtSize / 1000 * feeRate), 0);
+    // const virtSize = lockTx.getVirtualSize();
+    // lockTx.subtractFee(Math.ceil(virtSize / 1000 * feeRate), 0);
 
     return lockTx.toTX();
 }
 
-function genUnlockTx(ring, lockTx, locktime, redeemScript) {
+function genUnlockTx(ring, lockTx, locktime, redeemScript, feeRate) {
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({
         version: 2,
     });
     unlockTx.addTX(lockTx, 3);
-    unlockTx.setSequence(0, locktime);
+    // unlockTx.setSequence(0, locktime);
 
     // console.log(val);
 
     unlockTx.addOutput({
         address: ring.getAddress(),
-        value: val - 100000,
+        value: val,
     });
 
     const unlockScript = new Script();
     unlockScript.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
-    unlockScript.pushInt(0);
+    unlockScript.pushInt(1);
     unlockScript.pushData(redeemScript.toRaw());
     unlockScript.compile();
 
     unlockTx.inputs[0].script = unlockScript;
 
-    console.log(unlockTx.outputs);
+    // console.log(unlockTx.outputs);
 
-    console.log('size: ', unlockTx.getVirtualSize());
+    // console.log('size: ', unlockTx.getVirtualSize());
+
+    const virtSize = unlockTx.getVirtualSize();
+    const fee = Math.ceil(virtSize / 1000 * feeRate);
+    console.log(fee, unlockTx.outputs[0].value);
+    unlockTx.subtractFee(fee, 0);
+
+    // Remake script with the new signature
+    const unlockScript2 = new Script();
+    unlockScript2.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
+    unlockScript2.pushInt(1);
+    unlockScript2.pushData(redeemScript.toRaw());
+    unlockScript2.compile();
+
+    unlockTx.inputs[0].script = unlockScript2;
 
     return unlockTx.toTX();
 }

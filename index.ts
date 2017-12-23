@@ -37,7 +37,7 @@ async function main() {
     const lockTx = genLockTx(ring, coins, 'test', upfrontFee, delayFee, feeRate, ring.getAddress(), p2shAddr);
     console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
 
-    const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript);
+    const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate);
     console.log('Unlock TX:\n' + unlockTx.toRaw().toString('hex'));
 }
 
