@@ -1,6 +1,7 @@
 import {
     script as Script,
     coin as Coin,
+    address as Address,
     util,
 } from 'bcoin';
 
@@ -24,7 +25,7 @@ async function getFeesSatoshiPerKB() {
     return data.medium_fee_per_kb;
 }
 
-async function fundTx(addr: any, target: number) {
+async function fundTx(addr: Address, target: number) {
     const coins: any[] = [];
 
     const url = `https://testnet-api.smartbit.com.au/v1/blockchain/address/${addr}/unspent?limit=1000`;

@@ -1,16 +1,31 @@
 declare module 'bcoin' {
-    interface bcoin_t {
-        script: any,
-        address: any,
-        output: any,
-        mtx: any,
-        amount: any,
-        keyring: any,
-        coin: any,
-        util: any,
-        crypto: any,
-        hd: any,
+    const script: any;
+    const output: any;
+    const mtx: any;
+    const amount: any;
+    const keyring: any;
+    const coin: any;
+    const util: any;
+    const crypto: any;
+    const hd: any;
+
+    class address {
+        toBase58(string): string;
+        static fromScript(string): address;
     }
-    const bcoin: bcoin_t;
-    export = bcoin;
+
+    export {
+        script,
+        address,
+        output,
+        mtx,
+        amount,
+        keyring,
+        coin,
+        util,
+        crypto,
+        hd,
+    };
+
+    // export {address} from './address';
 }
