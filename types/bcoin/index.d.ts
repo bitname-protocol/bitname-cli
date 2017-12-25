@@ -1,6 +1,6 @@
 declare module 'bcoin' {
     // const script: any;
-    const output: any;
+    // const output: any;
     const mtx: any;
     const amount: any;
     const keyring: any;
@@ -81,6 +81,19 @@ declare module 'bcoin' {
         compile(): script;
 
         toRaw(): Buffer;
+    }
+
+    interface NakedOutput {
+        value: Amount;
+        script: NakedScript;
+    }
+
+    class output {
+        value: Amount;
+        script: script;
+        constructor(options: NakedOutput);
+
+        static fromScript(script: script | address, value: Amount): output;
     }
 
     export {
