@@ -27,11 +27,12 @@ declare module 'bcoin' {
     }
 
     type Hash = Buffer | string;
+    type Amount = number;
 
     interface NakedCoin {
         version?: number;
         height?: number;
-        value?: number; // Should be Amount
+        value?: Amount;
         script?: any;
         coinbase?: boolean;
         hash?: Hash;
@@ -43,7 +44,7 @@ declare module 'bcoin' {
 
         version: number;
         height: number;
-        value: number; // Should be Amount
+        value: Amount;
         script: any;
         coinbase: boolean;
         hash: Hash;
