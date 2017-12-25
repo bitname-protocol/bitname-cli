@@ -5,7 +5,7 @@ declare module 'bcoin' {
     const amount: any;
     const keyring: any;
     // const coin: any;
-    const util: any;
+    // const util: any;
     // const crypto: any;
 
     class address {
@@ -18,27 +18,35 @@ declare module 'bcoin' {
         derivePath(path: string): hd;
     }
 
+    class util {
+        static revHex<T extends Hash>(hex: T): T;
+    }
+
     class crypto {
         static sha256(data: Buffer): Buffer;
     }
 
-    interface CoinOpts {
-        version: number;
-        height: number;
-        value: number;
-        script: any;
-        hash: Buffer;
-        index: number;
+    type Hash = Buffer | string;
+
+    interface NakedCoin {
+        version?: number;
+        height?: number;
+        value?: number; // Should be Amount
+        script?: any;
+        coinbase?: boolean;
+        hash?: Hash;
+        index?: number;
     }
 
-    class coin implements CoinOpts {
-        constructor(opts: CoinOpts);
+    class coin implements NakedCoin {
+        constructor(opts: coin | NakedCoin);
 
         version: number;
         height: number;
-        value: number;
+        value: number; // Should be Amount
         script: any;
-        hash: Buffer;
+        coinbase: boolean;
+        hash: Hash;
         index: number;
     }
 
