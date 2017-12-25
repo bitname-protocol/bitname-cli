@@ -49,7 +49,7 @@ function genRedeemScript(ring: any, locktime: number) {
     return makeEncumberScript(ring.getPublicKey(), ring.getPublicKey(), locktime);
 }
 
-function genP2shAddr(redeemScript: any) {
+function genP2shAddr(redeemScript: Script): Address {
     const outputScript = Script.fromScripthash(redeemScript.hash160());
     const p2shAddr = Address.fromScript(outputScript);
 
@@ -123,7 +123,7 @@ function genLockTx(ring: any,
     return lockTx.toTX();
 }
 
-function genUnlockTx(ring: any, lockTx: any, locktime: number, redeemScript: any, feeRate: number) {
+function genUnlockTx(ring: any, lockTx: any, locktime: number, redeemScript: Script, feeRate: number) {
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({
         version: 2,
