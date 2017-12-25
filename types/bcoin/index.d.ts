@@ -1,12 +1,5 @@
 declare module 'bcoin' {
-    // const script: any;
-    // const output: any;
-    // const mtx: any;
-    const amount: any;
     const keyring: any;
-    // const coin: any;
-    // const util: any;
-    // const crypto: any;
 
     class address {
         toBase58(network: string): string;
@@ -27,12 +20,12 @@ declare module 'bcoin' {
     }
 
     type Hash = Buffer | string;
-    type Amount = number;
+    type amount = number;
 
     interface NakedCoin {
         version?: number;
         height?: number;
-        value?: Amount;
+        value?: amount;
         script?: script;
         coinbase?: boolean;
         hash?: Hash;
@@ -44,7 +37,7 @@ declare module 'bcoin' {
 
         version: number;
         height: number;
-        value: Amount;
+        value: amount;
         script: script;
         coinbase: boolean;
         hash: Hash;
@@ -83,23 +76,40 @@ declare module 'bcoin' {
         toRaw(): Buffer;
     }
 
+    // TODO: Define these
+    type Outpoint = any;
+    type Witness = any;
+
+    interface NakedInput {
+        prevout?: Outpoint;
+        script?: NakedScript;
+        sequence?: number;
+        witness?: Witness;
+    }
+
+    class input {
+        constructor(options?: NakedInput);
+
+        script: script;
+    }
+
     interface NakedOutput {
-        value: Amount;
+        value: amount;
         script: NakedScript;
     }
 
     class output {
-        value: Amount;
+        value: amount;
         script: script;
         constructor(options: NakedOutput);
 
-        static fromScript(script: script | address, value: Amount): output;
+        static fromScript(script: script | address, value: amount): output;
     }
 
     interface NakedTX {
         version?: number;
         flag?: number;
-        inputs?: any[]; // Should be NakedInput[]
+        inputs?: NakedInput[];
         outputs?: output[];
         locktime?: number;
     }
@@ -113,21 +123,21 @@ declare module 'bcoin' {
 
         toRaw(): Buffer;
 
-        inputs: any[];
+        inputs: input[];
         outputs: output[];
     }
 
     class mtx extends tx {
-        addCoin(coin: coin): any;
-        addOutput(script: address | script | output | Object, value?: Amount): output;
+        addCoin(coin: coin): input;
+        addOutput(script: address | script | output | Object, value?: amount): output;
         scriptInput(index: number, coin: coin | output, ring: any): boolean; // ring should be KeyRing
-        subtractFee(fee: Amount, index?: number): void;
+        subtractFee(fee: amount, index?: number): void;
         signInput(index: number, coin: coin | output, ring: any, type: number): boolean;
         toTX(): tx;
         static fromOptions(options: NakedTX): mtx;
 
-        addTX(tx: tx, index: number, height?: number): any; // Should return Input
-        signature(index: number, prev: script, value: Amount, privKey: Buffer, type: number, version: number): Buffer;
+        addTX(tx: tx, index: number, height?: number): input;
+        signature(index: number, prev: script, value: amount, privKey: Buffer, type: number, version: number): Buffer;
     }
 
     export {
