@@ -6,7 +6,9 @@
   "license": "GPL-3.0",
   "private": true,
   "devDependencies": {
+    "@types/jest": "^21.1.9",
     "@types/node-fetch": "^1.6.7",
+    "jest": "^22.0.4",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "typescript": "^2.6.2"
