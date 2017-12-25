@@ -1,6 +1,4 @@
 declare module 'bcoin' {
-    const keyring: any;
-
     class address {
         toBase58(network: string): string;
         static fromScript(script: script): address;
@@ -130,14 +128,28 @@ declare module 'bcoin' {
     class mtx extends tx {
         addCoin(coin: coin): input;
         addOutput(script: address | script | output | Object, value?: amount): output;
-        scriptInput(index: number, coin: coin | output, ring: any): boolean; // ring should be KeyRing
+        scriptInput(index: number, coin: coin | output, ring: keyring): boolean; // ring should be KeyRing
         subtractFee(fee: amount, index?: number): void;
-        signInput(index: number, coin: coin | output, ring: any, type: number): boolean;
+        signInput(index: number, coin: coin | output, ring: keyring, type: number): boolean;
         toTX(): tx;
         static fromOptions(options: NakedTX): mtx;
 
         addTX(tx: tx, index: number, height?: number): input;
         signature(index: number, prev: script, value: amount, privKey: Buffer, type: number, version: number): Buffer;
+    }
+
+    interface KeyRingOpts {
+    }
+
+    type Base58String = string;
+
+    class keyring {
+        static fromOptions(options: KeyRingOpts | hd, network: string): keyring;
+
+        getAddress(): address;
+        toSecret(): Base58String;
+        getPrivateKey(enc?: string): Buffer;
+        getPublicKey(enc?: string): Buffer;
     }
 
     export {

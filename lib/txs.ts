@@ -8,6 +8,7 @@ import {
     amount as Amount,
     coin as Coin,
     tx as TX,
+    keyring as KeyRing,
 } from 'bcoin';
 
 function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number) {
@@ -46,7 +47,7 @@ function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime
     return script;
 }
 
-function genRedeemScript(ring: any, locktime: number) {
+function genRedeemScript(ring: KeyRing, locktime: number) {
     return makeEncumberScript(ring.getPublicKey(), ring.getPublicKey(), locktime);
 }
 
@@ -57,7 +58,7 @@ function genP2shAddr(redeemScript: Script): Address {
     return p2shAddr;
 }
 
-function genLockTx(ring: any,
+function genLockTx(ring: KeyRing,
                    coins: Coin[],
                    name: string,
                    upfrontFee: number,
@@ -124,7 +125,7 @@ function genLockTx(ring: any,
     return lockTx.toTX();
 }
 
-function genUnlockTx(ring: any, lockTx: TX, locktime: number, redeemScript: Script, feeRate: number) {
+function genUnlockTx(ring: KeyRing, lockTx: TX, locktime: number, redeemScript: Script, feeRate: number) {
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({
         version: 2,
