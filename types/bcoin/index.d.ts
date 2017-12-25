@@ -13,8 +13,13 @@ declare module 'bcoin' {
         static revHex<T extends Hash>(hex: T): T;
     }
 
+    class secp256k1 {
+        publicKeyVerify(key: Buffer): boolean;
+    }
+
     class crypto {
         static sha256(data: Buffer): Buffer;
+        static secp256k1: secp256k1;
     }
 
     type Hash = Buffer | string;
@@ -72,6 +77,9 @@ declare module 'bcoin' {
         compile(): script;
 
         toRaw(): Buffer;
+        isNulldata(minimal?: boolean): boolean;
+        isScripthash(minimal?: boolean): boolean;
+        isPubkeyhash(minimal?: boolean): boolean;
     }
 
     // TODO: Define these
@@ -102,6 +110,8 @@ declare module 'bcoin' {
         constructor(options: NakedOutput);
 
         static fromScript(script: script | address, value: amount): output;
+
+        getAddress(): address;
     }
 
     interface NakedTX {

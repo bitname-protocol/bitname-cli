@@ -36,7 +36,7 @@ An OP_RETURN containing the controlling pubkey for the name. This should contain
 
 ===== 1
 
-An OP_RETURN containing the name to be registered. This should contain 1-64 valid ASCII characters. This should contain a value of 0 satoshis.
+An OP_RETURN containing the name to be registered. This should contain 1-64 URL-safe characters (see https://tools.ietf.org/html/rfc3986#section-2.3[RFC 3986]). This should contain a value of 0 satoshis.
 
 ===== 2
 

@@ -1,6 +1,7 @@
 import { genLockTx, genUnlockTx, genRedeemScript, genP2shAddr } from './lib/txs';
 import { fundTx, getFeesSatoshiPerKB } from './lib/net';
 import { keyFromPass } from './lib/crypto';
+import { verifyLockTX } from './lib/verify';
 // import { KeyRing } from 'bcoin/lib/primitives';
 import {
     keyring as KeyRing,
@@ -39,9 +40,11 @@ async function main() {
     // const lockTx = genLockTx(ring, coins, 1000000, 100000, p2shAddr);
     const lockTx = genLockTx(ring, coins, 'test', upfrontFee, delayFee, feeRate, ring.getAddress(), p2shAddr);
     console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
+    console.log(verifyLockTX(lockTx, addr));
 
     const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate);
     console.log('Unlock TX:\n' + unlockTx.toRaw().toString('hex'));
+    console.log(verifyLockTX(unlockTx, addr));
 }
 
 main().catch((err) => {
