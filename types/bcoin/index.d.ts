@@ -144,6 +144,7 @@ declare module 'bcoin' {
         script,
         address,
         output,
+        tx,
         mtx,
         amount,
         keyring,

@@ -7,6 +7,7 @@ import {
     mtx as MTX,
     amount as Amount,
     coin as Coin,
+    tx as TX,
 } from 'bcoin';
 
 function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number) {
@@ -123,7 +124,7 @@ function genLockTx(ring: any,
     return lockTx.toTX();
 }
 
-function genUnlockTx(ring: any, lockTx: any, locktime: number, redeemScript: Script, feeRate: number) {
+function genUnlockTx(ring: any, lockTx: TX, locktime: number, redeemScript: Script, feeRate: number) {
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({
         version: 2,
