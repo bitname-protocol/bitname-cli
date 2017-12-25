@@ -6,6 +6,7 @@ import {
     output as Output,
     mtx as MTX,
     amount as Amount,
+    coin as Coin,
 } from 'bcoin';
 
 function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number) {
@@ -56,7 +57,7 @@ function genP2shAddr(redeemScript: any) {
 }
 
 function genLockTx(ring: any,
-                   coins: any[],
+                   coins: Coin[],
                    name: string,
                    upfrontFee: number,
                    lockedFee: number,

@@ -4,7 +4,7 @@ declare module 'bcoin' {
     const mtx: any;
     const amount: any;
     const keyring: any;
-    const coin: any;
+    // const coin: any;
     const util: any;
     // const crypto: any;
 
@@ -20,6 +20,26 @@ declare module 'bcoin' {
 
     class crypto {
         static sha256(data: Buffer): Buffer;
+    }
+
+    interface CoinOpts {
+        version: number;
+        height: number;
+        value: number;
+        script: any;
+        hash: Buffer;
+        index: number;
+    }
+
+    class coin implements CoinOpts {
+        constructor(opts: CoinOpts);
+
+        version: number;
+        height: number;
+        value: number;
+        script: any;
+        hash: Buffer;
+        index: number;
     }
 
     export {

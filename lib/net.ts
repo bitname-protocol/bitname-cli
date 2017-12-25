@@ -25,8 +25,8 @@ async function getFeesSatoshiPerKB() {
     return data.medium_fee_per_kb;
 }
 
-async function fundTx(addr: Address, target: number) {
-    const coins: any[] = [];
+async function fundTx(addr: Address, target: number): Promise<Coin[]> {
+    const coins: Coin[] = [];
 
     const url = `https://testnet-api.smartbit.com.au/v1/blockchain/address/${addr}/unspent?limit=1000`;
 
