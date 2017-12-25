@@ -1,7 +1,7 @@
 declare module 'bcoin' {
     // const script: any;
     // const output: any;
-    const mtx: any;
+    // const mtx: any;
     const amount: any;
     const keyring: any;
     // const coin: any;
@@ -94,6 +94,40 @@ declare module 'bcoin' {
         constructor(options: NakedOutput);
 
         static fromScript(script: script | address, value: Amount): output;
+    }
+
+    interface NakedTX {
+        version?: number;
+        flag?: number;
+        inputs?: any[]; // Should be NakedInput[]
+        outputs?: output[];
+        locktime?: number;
+    }
+
+    class tx {
+        constructor(options?: NakedTX);
+
+        getVirtualSize(): number;
+
+        static fromOptions(options: NakedTX): tx;
+
+        toRaw(): Buffer;
+
+        inputs: any[];
+        outputs: output[];
+    }
+
+    class mtx extends tx {
+        addCoin(coin: coin): any;
+        addOutput(script: address | script | output | Object, value?: Amount): output;
+        scriptInput(index: number, coin: coin | output, ring: any): boolean; // ring should be KeyRing
+        subtractFee(fee: Amount, index?: number): void;
+        signInput(index: number, coin: coin | output, ring: any, type: number): boolean;
+        toTX(): tx;
+        static fromOptions(options: NakedTX): mtx;
+
+        addTX(tx: tx, index: number, height?: number): any; // Should return Input
+        signature(index: number, prev: script, value: Amount, privKey: Buffer, type: number, version: number): Buffer;
     }
 
     export {

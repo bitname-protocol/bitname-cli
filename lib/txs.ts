@@ -64,7 +64,7 @@ function genLockTx(ring: any,
                    feeRate: number,
                    serviceAddr: Address,
                    p2shAddr: Address) {
-    const lockTx = new MTX(null);
+    const lockTx = new MTX();
 
     const total = coins.reduce((acc, cur) => acc + cur.value, 0);
 
@@ -83,23 +83,23 @@ function genLockTx(ring: any,
     lockTx.addOutput({
         address: ring.getAddress(),
         value: changeVal,
-    }, null);
+    });
 
     // Add OP_RETURN as output 1
     const dataScript = Script.fromNulldata(Buffer.from(name, 'utf-8'));
-    lockTx.addOutput(Output.fromScript(dataScript, opRetVal), null);
+    lockTx.addOutput(Output.fromScript(dataScript, opRetVal));
 
     // Add upfront fee as output 2
     lockTx.addOutput({
         address: serviceAddr,
         value: upfrontFee,
-    }, null);
+    });
 
     // Add locked fee as output 3
     lockTx.addOutput({
         address: p2shAddr,
         value: lockedFee,
-    }, null);
+    });
 
     for (let i = 0; i < coins.length; ++i) {
         const coin = coins[i];
