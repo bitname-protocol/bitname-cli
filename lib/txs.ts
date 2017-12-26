@@ -156,7 +156,7 @@ function genUnlockTx(ring: KeyRing,
 
     const unlockScript = new Script();
     unlockScript.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
-    unlockScript.pushInt(1);
+    unlockScript.pushInt(boolVal);
     unlockScript.pushData(redeemScript.toRaw());
     unlockScript.compile();
 
@@ -174,7 +174,7 @@ function genUnlockTx(ring: KeyRing,
     // Remake script with the new signature
     const unlockScript2 = new Script();
     unlockScript2.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
-    unlockScript2.pushInt(1);
+    unlockScript2.pushInt(boolVal);
     unlockScript2.pushData(redeemScript.toRaw());
     unlockScript2.compile();
 

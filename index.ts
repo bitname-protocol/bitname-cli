@@ -42,7 +42,7 @@ async function main() {
     console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(lockTx, addr));
 
-    const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, false);
+    const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, true);
     console.log('Unlock TX:\n' + unlockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(unlockTx, addr));
 }
