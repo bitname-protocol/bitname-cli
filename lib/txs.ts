@@ -74,20 +74,18 @@ function genLockTx(ring: KeyRing,
         lockTx.addCoin(coin);
     }
 
-    const opRetVal = 1;
+    const opRetVal = 0;
 
     // console.log(total, opRetVal, upfrontFee, lockedFee, netFee);
     // console.log(opRetVal + upfrontFee + lockedFee + netFee);
 
     const changeVal = total - opRetVal - upfrontFee - lockedFee;
 
-    // Add change output as 0
-    lockTx.addOutput({
-        address: ring.getAddress(),
-        value: changeVal,
-    });
+    // Add pubkey OP_RETURN as output 0
+    const pubkeyDataScript = Script.fromNulldata(ring.getPublicKey());
+    lockTx.addOutput(Output.fromScript(pubkeyDataScript, opRetVal));
 
-    // Add OP_RETURN as output 1
+    // Add name OP_RETURN as output 1
     const dataScript = Script.fromNulldata(Buffer.from(name, 'utf-8'));
     lockTx.addOutput(Output.fromScript(dataScript, opRetVal));
 
@@ -101,6 +99,12 @@ function genLockTx(ring: KeyRing,
     lockTx.addOutput({
         address: p2shAddr,
         value: lockedFee,
+    });
+
+    // Add change output as 4
+    lockTx.addOutput({
+        address: ring.getAddress(),
+        value: changeVal,
     });
 
     for (let i = 0; i < coins.length; ++i) {
@@ -125,13 +129,23 @@ function genLockTx(ring: KeyRing,
     return lockTx.toTX();
 }
 
-function genUnlockTx(ring: KeyRing, lockTx: TX, locktime: number, redeemScript: Script, feeRate: number) {
+function genUnlockTx(ring: KeyRing,
+                     lockTx: TX,
+                     locktime: number,
+                     redeemScript: Script,
+                     feeRate: number,
+                     service: boolean) {
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({
         version: 2,
     });
     unlockTx.addTX(lockTx, 3);
-    // unlockTx.setSequence(0, locktime);
+
+    const boolVal = service ? 0 : 1;
+
+    if (service) {
+        unlockTx.setSequence(0, locktime);
+    }
 
     // console.log(val);
 

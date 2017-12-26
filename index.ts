@@ -11,7 +11,7 @@ const NETWORK = config.network;
 
 // const asdf = genLockTx()
 async function main() {
-    const LOCKTIME = 5;
+    const LOCKTIME = 1;
     console.log(`Locking for ${LOCKTIME} blocks`);
 
     const masterKey = keyFromPass('correct horse stapler battery');
@@ -42,7 +42,7 @@ async function main() {
     console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(lockTx, addr));
 
-    const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate);
+    const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, false);
     console.log('Unlock TX:\n' + unlockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(unlockTx, addr));
 }

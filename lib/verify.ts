@@ -30,7 +30,7 @@ function isValidOP_RETURN(output: Output): boolean {
 }
 
 function verifyLockTX(tx: TX, serviceAddr: Address): boolean {
-    if (tx.outputs.length >= 4) {
+    if (tx.outputs.length < 4) {
         return false;
     }
 
@@ -69,7 +69,7 @@ function verifyLockTX(tx: TX, serviceAddr: Address): boolean {
     }
 
     // Check that output 2 is sent to the service's address
-    if (tx.outputs[2].getAddress() !== serviceAddr) {
+    if (tx.outputs[2].getAddress().toBase58('testnet') !== serviceAddr.toBase58('testnet')) {
         return false;
     }
 
@@ -77,6 +77,8 @@ function verifyLockTX(tx: TX, serviceAddr: Address): boolean {
     if (!tx.outputs[3].script.isScripthash()) {
         return false;
     }
+
+    // console.log('reached end');
 
     return true;
 }

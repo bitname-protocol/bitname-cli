@@ -146,6 +146,7 @@ declare module 'bcoin' {
 
         addTX(tx: tx, index: number, height?: number): input;
         signature(index: number, prev: script, value: amount, privKey: Buffer, type: number, version: number): Buffer;
+        setSequence(index: number, locktime: number, seconds?: boolean): void;
     }
 
     interface KeyRingOpts {
@@ -160,6 +161,8 @@ declare module 'bcoin' {
         toSecret(): Base58String;
         getPrivateKey(enc?: string): Buffer;
         getPublicKey(enc?: string): Buffer;
+
+        static fromSecret(secret: Base58String): keyring;
     }
 
     export {

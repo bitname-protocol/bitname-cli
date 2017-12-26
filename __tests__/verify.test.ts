@@ -17,7 +17,7 @@ test('generated txs pass verification', () => {
         hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
     };
 
-    const coins = [Coin(testCoin)];
+    const coins = [new Coin(testCoin)];
     const upfrontFee = 1000000;
     const delayFee = 1000000;
     const feeRate = 1;
