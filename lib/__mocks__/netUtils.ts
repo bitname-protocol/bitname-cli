@@ -11,7 +11,7 @@ import * as path from 'path';
 
 async function fetchUnspentTX(addr: Address): Promise<any> {
     return new Promise((resolve, reject) => {
-        fs.readFile(path.resolve(__dirname, '__mockData__', 'smartbit_utxos.json'), 'utf8', (err, data) => {
+        fs.readFile(path.resolve(__dirname, '__mockData__', 'blockcypher_utxos.json'), 'utf8', (err, data) => {
             if (err) {
                 reject(err);
             }

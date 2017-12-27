@@ -76,6 +76,7 @@ declare module 'bcoin' {
         static fromAddress(addr: address): script;
         static fromNulldata(data: Buffer): script;
         static fromScripthash(hash: Hash): script;
+        static fromRaw(data: Buffer | string, enc?: string): script;
         hash160(data?: string): Hash;
 
         pushSym(sym: string): script;

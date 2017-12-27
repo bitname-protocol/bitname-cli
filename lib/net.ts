@@ -48,7 +48,7 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
 
     const data = await fetchUnspentTX(addr);
 
-    const txs = data.unspent;
+    const txs = data.txrefs;
 
     if (typeof txs === 'undefined') {
         throw new Error(`No unspent txs found for ${addr}`);
@@ -66,10 +66,10 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
         const coinOpts = {
             version: 1,
             height: -1,
-            value: tx.value_int,
-            script: Script.fromAddress(addr),
-            hash: revHex(tx.txid),
-            index: tx.n,
+            value: tx.value,
+            script: Script.fromRaw(tx.script, 'hex'),
+            hash: revHex(tx.tx_hash),
+            index: tx.tx_output_n,
         };
 
         coins.push(new Coin(coinOpts));
