@@ -12,6 +12,8 @@ import fetch from 'node-fetch';
 import { config } from '../config';
 const NETWORK = config.network;
 
+import { fetchUnspentTX } from './netUtils';
+
 async function getFeesSatoshiPerKB() {
     let netSuffix = 'main';
     if (NETWORK === 'testnet') {
@@ -25,13 +27,26 @@ async function getFeesSatoshiPerKB() {
     return data.medium_fee_per_kb;
 }
 
+// async function fundTx(addr: Address, target: number): Promise<Coin[]> {
+//     const coins: Coin[] = [];
+
+//     let netSuffix = 'main';
+//     if (NETWORK === 'testnet') {
+//         netSuffix = 'test3';
+//     }
+
+//     const url = `https://api.blockcypher.com/v1/btc/${netSuffix}/addrs/${addr}?unspentOnly=true`;
+
+//     const resp = await fetch(url);
+//     const data = await resp.json();
+
+//     const txs = data.txrefs;
+// }
+
 async function fundTx(addr: Address, target: number): Promise<Coin[]> {
     const coins: Coin[] = [];
 
-    const url = `https://testnet-api.smartbit.com.au/v1/blockchain/address/${addr}/unspent?limit=1000`;
-
-    const resp = await fetch(url);
-    const data = await resp.json();
+    const data = await fetchUnspentTX(addr);
 
     const txs = data.unspent;
 
@@ -64,6 +79,10 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
         if (totalVal >= target) {
             break;
         }
+    }
+
+    if (totalVal < target) {
+        throw new Error('Insufficient funds available');
     }
 
     return coins;
