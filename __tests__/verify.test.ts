@@ -1,9 +1,28 @@
 import { verifyLockTX } from '../lib/verify';
 import { genRedeemScript, genP2shAddr, genLockTx } from '../lib/txs';
-import { keyring as KeyRing, coin as Coin } from 'bcoin';
+import {
+    keyring as KeyRing,
+    coin as Coin,
+    tx as TX,
+    address as Address,
+} from 'bcoin';
+
+import * as fs from 'fs';
+import * as path from 'path';
 
 describe('transaction verification', () => {
-    it('generated txs pass verification', () => {
+    it('verifies valid locking tx', () => {
+        const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
+        const txData = fs.readFileSync(txDataPath).toString('utf8');
+
+        const tx = TX.fromRaw(txData, 'hex');
+
+        const serviceAddr = Address.fromBase58('mjWdjbQNpk7f6ZvPcSxup6SN1NbLNKHJ9g');
+
+        expect(verifyLockTX(tx, serviceAddr)).toBe(true);
+    });
+
+    it('verifies generated locking txs', () => {
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const ring = KeyRing.fromSecret(wif);
 
