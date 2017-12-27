@@ -17,9 +17,16 @@ declare module 'bcoin' {
         publicKeyVerify(key: Buffer): boolean;
     }
 
+    class scrypt {
+        derive(key: Buffer, salt: Buffer, N: number, r: number, p: number, len: number): Buffer;
+        deriveAsync(key: Buffer, salt: Buffer, N: number, r: number, p: number, len: number): Promise<Buffer>;
+    }
+
     class crypto {
         static sha256(data: Buffer): Buffer;
+        static hash256(data: Buffer): Buffer;
         static secp256k1: secp256k1;
+        static scrypt: scrypt;
     }
 
     type Hash = Buffer | string;
