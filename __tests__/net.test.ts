@@ -5,7 +5,7 @@ import { fundTx } from '../lib/net';
 
 import { address as Address } from 'bcoin';
 
-describe('Network data functions', () => {
+describe('network data', () => {
     it('generates coins correctly', async () => {
         const addr = Address.fromBase58('mk8cJh83q2JKBNguuzamfN1LZ9aECtnVJ7');
         const coins = await fundTx(addr, 1);
