@@ -43,11 +43,12 @@ async function main() {
     console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(lockTx, addr));
 
-    const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, false);
+    // const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, false);
+    const unlockTx = genUnlockTx(lockTx, feeRate, false, ring, ring.getPublicKey(), LOCKTIME);
     console.log('Unlock TX:\n' + unlockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(unlockTx, addr));
 }
 
 main().catch((err) => {
-    throw err;
+    console.error(err);
 });

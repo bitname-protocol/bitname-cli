@@ -146,12 +146,17 @@ function genLockTx(coins: Coin[],
     return lockTx.toTX();
 }
 
-function genUnlockTx(ring: KeyRing,
-                     lockTx: TX,
-                     locktime: number,
-                     redeemScript: Script,
+function genUnlockTx(lockTx: TX,
                      feeRate: number,
-                     service: boolean) {
+                     service: boolean,
+                     ring: KeyRing,
+                     otherPubKey: Buffer,
+                     locktime: number) {
+    const servicePubKey =  service ? ring.getPublicKey() : otherPubKey;
+    const userPubKey    = !service ? ring.getPublicKey() : otherPubKey;
+
+    const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
+
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({
         version: 2,
@@ -165,6 +170,9 @@ function genUnlockTx(ring: KeyRing,
     }
 
     // console.log(val);
+
+    // const pkh = crypto.hash160(service ? servicePubKey : userPubKey);
+    // const addr = Address.fromPubkeyhash(pkh, NETWORK);
 
     unlockTx.addOutput({
         address: ring.getAddress(),
