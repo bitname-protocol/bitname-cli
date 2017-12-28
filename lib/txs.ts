@@ -14,6 +14,9 @@ import {
 
 import { BadUserPublicKeyError, BadServicePublicKeyError } from './errors';
 
+import { config } from '../config';
+const NETWORK = config.network;
+
 function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number): Script {
     if (!crypto.secp256k1.publicKeyVerify(userPubkey)) {
         throw new BadUserPublicKeyError();
@@ -66,14 +69,20 @@ function genP2shAddr(redeemScript: Script): Address {
     return p2shAddr;
 }
 
-function genLockTx(ring: KeyRing,
-                   coins: Coin[],
+function genLockTx(coins: Coin[],
                    name: string,
                    upfrontFee: number,
                    lockedFee: number,
                    feeRate: number,
-                   serviceAddr: Address,
-                   p2shAddr: Address) {
+                   userRing: KeyRing,
+                   servicePubKey: Buffer,
+                   locktime: number) {
+    const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
+    const p2shAddr = genP2shAddr(redeemScript);
+
+    const servicePKH = crypto.hash160(servicePubKey);
+    const serviceAddr = Address.fromPubkeyhash(servicePKH, NETWORK);
+
     const lockTx = new MTX();
 
     const total = coins.reduce((acc, cur) => acc + cur.value, 0);
@@ -90,7 +99,7 @@ function genLockTx(ring: KeyRing,
     const changeVal = total - opRetVal - upfrontFee - lockedFee;
 
     // Add pubkey OP_RETURN as output 0
-    const pubkeyDataScript = Script.fromNulldata(ring.getPublicKey());
+    const pubkeyDataScript = Script.fromNulldata(userRing.getPublicKey());
     lockTx.addOutput(Output.fromScript(pubkeyDataScript, opRetVal));
 
     // Add name OP_RETURN as output 1
@@ -111,13 +120,13 @@ function genLockTx(ring: KeyRing,
 
     // Add change output as 4
     lockTx.addOutput({
-        address: ring.getAddress(),
+        address: userRing.getAddress(),
         value: changeVal,
     });
 
     for (let i = 0; i < coins.length; ++i) {
         const coin = coins[i];
-        lockTx.scriptInput(i, coin, ring);
+        lockTx.scriptInput(i, coin, userRing);
         // lockTx.signInput(i, coin, ring, Script.hashType.ALL);
     }
 
@@ -128,7 +137,7 @@ function genLockTx(ring: KeyRing,
     for (let i = 0; i < coins.length; ++i) {
         const coin = coins[i];
         // lockTx.scriptInput(i, coin, ring);
-        lockTx.signInput(i, coin, ring, Script.hashType.ALL);
+        lockTx.signInput(i, coin, userRing, Script.hashType.ALL);
     }
 
     // const virtSize = lockTx.getVirtualSize();

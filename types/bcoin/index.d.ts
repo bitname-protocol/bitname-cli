@@ -2,6 +2,7 @@ declare module 'bcoin' {
     class address {
         toBase58(network: string): string;
         static fromScript(script: script): address;
+        static fromPubkeyhash(hash: Buffer, network?: string): address;
     }
 
     class hd {

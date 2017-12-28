@@ -26,10 +26,6 @@ describe('transaction verification', () => {
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const ring = KeyRing.fromSecret(wif);
 
-        const redeemScript = genRedeemScript(ring.getPublicKey(), ring.getPublicKey(), 5);
-
-        const p2shAddr = genP2shAddr(redeemScript);
-
         const testCoin = {
             version: 1,
             height: -1,
@@ -42,7 +38,7 @@ describe('transaction verification', () => {
         const delayFee = 1000000;
         const feeRate = 1;
 
-        const tx = genLockTx(ring, coins, 'test', upfrontFee, delayFee, feeRate, ring.getAddress(), p2shAddr);
+        const tx = genLockTx(coins, 'testName', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), 5);
 
         expect(verifyLockTX(tx, ring.getAddress())).toBe(true);
     });
