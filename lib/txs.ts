@@ -9,9 +9,20 @@ import {
     coin as Coin,
     tx as TX,
     keyring as KeyRing,
+    crypto,
 } from 'bcoin';
 
+import { BadUserPublicKeyError, BadServicePublicKeyError } from './errors';
+
 function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number): Script {
+    if (!crypto.secp256k1.publicKeyVerify(userPubkey)) {
+        throw new BadUserPublicKeyError();
+    }
+
+    if (!crypto.secp256k1.publicKeyVerify(servicePubkey)) {
+        throw new BadServicePublicKeyError();
+    }
+
     const script = new Script(null);
 
     script.pushSym('OP_IF');
