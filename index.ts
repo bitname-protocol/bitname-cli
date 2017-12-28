@@ -21,7 +21,7 @@ async function main() {
     console.log('Addr:\n' + ring.getAddress());
     console.log('WIF:\n' + ring.toSecret());
 
-    const redeemScript = genRedeemScript(ring, LOCKTIME);
+    const redeemScript = genRedeemScript(ring.getPublicKey(), ring.getPublicKey(), LOCKTIME);
 
     const p2shAddr = genP2shAddr(redeemScript);
     console.log('To lock, send coins to: ' + p2shAddr.toBase58(NETWORK));

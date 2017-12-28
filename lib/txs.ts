@@ -11,7 +11,7 @@ import {
     keyring as KeyRing,
 } from 'bcoin';
 
-function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number) {
+function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number): Script {
     const script = new Script(null);
 
     script.pushSym('OP_IF');
@@ -34,6 +34,7 @@ function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime
         }
     }
     script.pushData(numBuff.slice(0, min));
+
     script.pushSym('OP_CHECKSEQUENCEVERIFY');
     script.pushSym('OP_DROP');
 
@@ -45,10 +46,6 @@ function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime
     script.compile();
 
     return script;
-}
-
-function genRedeemScript(ring: KeyRing, locktime: number) {
-    return makeEncumberScript(ring.getPublicKey(), ring.getPublicKey(), locktime);
 }
 
 function genP2shAddr(redeemScript: Script): Address {

@@ -26,7 +26,7 @@ describe('transaction verification', () => {
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const ring = KeyRing.fromSecret(wif);
 
-        const redeemScript = genRedeemScript(ring, 5);
+        const redeemScript = genRedeemScript(ring.getPublicKey(), ring.getPublicKey(), 5);
 
         const p2shAddr = genP2shAddr(redeemScript);
 
