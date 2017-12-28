@@ -25,6 +25,7 @@ declare module 'bcoin' {
     class crypto {
         static sha256(data: Buffer): Buffer;
         static hash256(data: Buffer): Buffer;
+        static hash160(data: Buffer): Buffer;
         static secp256k1: secp256k1;
         static scrypt: scrypt;
     }

@@ -37,12 +37,14 @@ async function main() {
     // Fund up to a 2 KB transaction
     const coins = await fundTx(addr, upfrontFee + delayFee + 2 * feeRate);
 
+    console.log(coins);
+
     // const lockTx = genLockTx(ring, coins, 1000000, 100000, p2shAddr);
     const lockTx = genLockTx(ring, coins, 'test', upfrontFee, delayFee, feeRate, ring.getAddress(), p2shAddr);
     console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(lockTx, addr));
 
-    const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, true);
+    const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, false);
     console.log('Unlock TX:\n' + unlockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(unlockTx, addr));
 }
