@@ -76,7 +76,7 @@ describe('tx generation', () => {
         expect(tx.hash('hex')).toBe('2ed11b3d989a0a8369e0473f67542c62028435647bdc7a613b299f0d105ca538');
     });
 
-    it('generates unlocking transactions', () => {
+    it('generates user unlocking transaction', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath).toString('utf8');
 
@@ -88,6 +88,20 @@ describe('tx generation', () => {
         const tx = genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey(), 1);
 
         expect(tx.hash('hex')).toBe('642ffc28852e1007bcb12cd4d5a65e3999d929078a944951e6f5ee21a1bcdb74');
+    });
+
+    it('generates service unlocking transaction', () => {
+        const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
+        const txData = fs.readFileSync(txDataPath).toString('utf8');
+
+        const lockTX = TX.fromRaw(txData, 'hex');
+
+        const wif = 'cUTaW9nuwpwfuZLkgY98qnfdbzokta2BKxnQ43HyGf7jLEwe1Big';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const tx = genUnlockTx(lockTX, 1, true, userRing, userRing.getPublicKey(), 1);
+
+        expect(tx.hash('hex')).toBe('a8c6f65bf625a71e80831e37f69fef9be738d292dce8c577535a67c808556870');
     });
 
     it('errors on unlocking with incorrect lock time', () => {
