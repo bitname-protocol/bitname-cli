@@ -12,7 +12,11 @@ import {
     crypto,
 } from 'bcoin';
 
-import { BadUserPublicKeyError, BadServicePublicKeyError } from './errors';
+import {
+    BadUserPublicKeyError,
+    BadServicePublicKeyError,
+    BadUnlockScriptParametersError,
+} from './errors';
 
 import { config } from '../config';
 const NETWORK = config.network;
@@ -132,7 +136,8 @@ function genLockTx(coins: Coin[],
 
     // Each signature is 72 bytes long
     const virtSize = lockTx.getVirtualSize() + coins.length * 72;
-    lockTx.subtractFee(Math.ceil(virtSize / 1000 * feeRate), 0);
+    // console.log(Math.ceil(virtSize / 1000 * feeRate));
+    lockTx.subtractIndex(4, Math.ceil(virtSize / 1000 * feeRate));
 
     for (let i = 0; i < coins.length; ++i) {
         const coin = coins[i];
@@ -157,6 +162,13 @@ function genUnlockTx(lockTx: TX,
 
     const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
 
+    const redeemScriptHash = crypto.hash160(redeemScript.toRaw());
+    const redeemScriptAddr = Address.fromScripthash(redeemScriptHash);
+
+    if (lockTx.outputs[3].getAddress().toBase58(NETWORK) !== redeemScriptAddr.toBase58(NETWORK)) {
+        throw new BadUnlockScriptParametersError();
+    }
+
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({
         version: 2,
@@ -168,11 +180,6 @@ function genUnlockTx(lockTx: TX,
     if (service) {
         unlockTx.setSequence(0, locktime);
     }
-
-    // console.log(val);
-
-    // const pkh = crypto.hash160(service ? servicePubKey : userPubKey);
-    // const addr = Address.fromPubkeyhash(pkh, NETWORK);
 
     unlockTx.addOutput({
         address: ring.getAddress(),
@@ -193,8 +200,7 @@ function genUnlockTx(lockTx: TX,
 
     const virtSize = unlockTx.getVirtualSize();
     const fee = Math.ceil(virtSize / 1000 * feeRate);
-    console.log(fee, unlockTx.outputs[0].value);
-    unlockTx.subtractFee(fee, 0);
+    unlockTx.subtractFee(fee);
 
     // Remake script with the new signature
     const unlockScript2 = new Script();
