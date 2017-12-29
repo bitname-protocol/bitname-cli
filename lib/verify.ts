@@ -4,6 +4,7 @@ import {
     address as Address,
     crypto,
 } from 'bcoin';
+import { genRedeemScript } from './txs';
 
 function isURISafe(str: string) {
     const re = /^[a-zA-Z0-9_\-\.\~]*$/;
@@ -80,7 +81,13 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
         return false;
     }
 
-    // console.log('reached end');
+    // Check that output 3 script is correct
+    const redeemScript = genRedeemScript(pubKey, servicePubKey, 1);
+    const scriptHash = crypto.hash160(redeemScript.toRaw());
+    const p2shAddr = Address.fromScripthash(scriptHash);
+    if (tx.outputs[3].getAddress().toBase58('testnet') !== p2shAddr.toBase58('testnet')) {
+        return false;
+    }
 
     return true;
 }
