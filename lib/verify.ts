@@ -29,7 +29,7 @@ function isValidOP_RETURN(output: Output): boolean {
     return true;
 }
 
-function verifyLockTX(tx: TX, serviceAddr: Address): boolean {
+function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
     if (tx.outputs.length < 4) {
         return false;
     }
@@ -69,6 +69,8 @@ function verifyLockTX(tx: TX, serviceAddr: Address): boolean {
     }
 
     // Check that output 2 is sent to the service's address
+    const servicePKH = crypto.hash160(servicePubKey);
+    const serviceAddr = Address.fromPubkeyhash(servicePKH);
     if (tx.outputs[2].getAddress().toBase58('testnet') !== serviceAddr.toBase58('testnet')) {
         return false;
     }
