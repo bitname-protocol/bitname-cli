@@ -17,9 +17,9 @@ describe('transaction verification', () => {
 
         const tx = TX.fromRaw(txData, 'hex');
 
-        const serviceAddr = Address.fromBase58('mjWdjbQNpk7f6ZvPcSxup6SN1NbLNKHJ9g');
+        const servicePubKey = Buffer.from('02450e93fa1d4ec9370f885e48d9ada1559519fcfe0ca7def8a443865fd2c86a30', 'hex');
 
-        expect(verifyLockTX(tx, serviceAddr)).toBe(true);
+        expect(verifyLockTX(tx, servicePubKey)).toBe(true);
     });
 
     it('verifies generated locking txs', () => {
@@ -40,6 +40,6 @@ describe('transaction verification', () => {
 
         const tx = genLockTx(coins, 'testName', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), 5);
 
-        expect(verifyLockTX(tx, ring.getAddress())).toBe(true);
+        expect(verifyLockTX(tx, ring.getPublicKey())).toBe(true);
     });
 });
