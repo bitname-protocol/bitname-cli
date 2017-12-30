@@ -174,10 +174,11 @@ function genUnlockTx(lockTx: TX,
                      feeRate: number,
                      service: boolean,
                      ring: KeyRing,
-                     otherPubKey: Buffer,
-                     locktime: number) {
+                     otherPubKey: Buffer) {
     const servicePubKey =  service ? ring.getPublicKey() : otherPubKey;
     const userPubKey    = !service ? ring.getPublicKey() : otherPubKey;
+
+    const locktime = extractEncodedMetadata(lockTx.outputs[1].script)[0];
 
     const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
 

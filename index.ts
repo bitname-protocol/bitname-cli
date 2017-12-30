@@ -45,7 +45,7 @@ async function main() {
     console.log(verifyLockTX(lockTx, pubKey));
 
     // const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, false);
-    const unlockTx = genUnlockTx(lockTx, feeRate, false, ring, ring.getPublicKey(), LOCKTIME);
+    const unlockTx = genUnlockTx(lockTx, feeRate, false, ring, ring.getPublicKey());
     console.log('Unlock TX:\n' + unlockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(unlockTx, pubKey));
 }

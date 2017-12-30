@@ -12,8 +12,6 @@ async function fetchUnspentTX(addr: Address): Promise<any> {
 
     const url = `https://api.blockcypher.com/v1/btc/${netSuffix}/addrs/${addr}?unspentOnly=true&includeScript=true`;
 
-    console.log(url);
-
     const resp = await fetch(url);
     return resp.json();
 }

@@ -85,7 +85,7 @@ describe('tx generation', () => {
         const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
         const userRing = KeyRing.fromSecret(wif);
 
-        const tx = genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey(), 1);
+        const tx = genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey());
 
         expect(tx.hash('hex')).toBe('8ece940b4ef2692b6609e11f9933f624714f2256d7f003391c75df668e215f62');
     });
@@ -99,7 +99,7 @@ describe('tx generation', () => {
         const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
         const userRing = KeyRing.fromSecret(wif);
 
-        const tx = genUnlockTx(lockTX, 1, true, userRing, userRing.getPublicKey(), 1);
+        const tx = genUnlockTx(lockTX, 1, true, userRing, userRing.getPublicKey());
 
         expect(tx.hash('hex')).toBe('9c9cc53211f58c83ca4d85bc7a15a44fd133cb6f1b7e3f55f3d052798bd9598d');
     });
@@ -114,7 +114,7 @@ describe('tx generation', () => {
         const userRing = KeyRing.fromSecret(wif);
 
         expect(() => {
-            genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey(), 1024);
+            genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey());
         }).toThrow(BadUnlockScriptParametersError);
     });
 
@@ -130,7 +130,7 @@ describe('tx generation', () => {
         const serviceKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
 
         expect(() => {
-            genUnlockTx(lockTX, 1, false, userRing, serviceKey, 1);
+            genUnlockTx(lockTX, 1, false, userRing, serviceKey);
         }).toThrow(BadUnlockScriptParametersError);
     });
 
@@ -146,7 +146,7 @@ describe('tx generation', () => {
         const userKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
 
         expect(() => {
-            genUnlockTx(lockTX, 1, true, serviceRing, userKey, 1);
+            genUnlockTx(lockTX, 1, true, serviceRing, userKey);
         }).toThrow(BadUnlockScriptParametersError);
     });
 
@@ -160,7 +160,7 @@ describe('tx generation', () => {
         const userRing = KeyRing.fromSecret(wif);
 
         expect(() => {
-            genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey(), 1);
+            genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey());
         }).toThrow(BadUnlockScriptParametersError);
     });
 });
