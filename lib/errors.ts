@@ -24,12 +24,12 @@ export class BadServicePublicKeyError extends Error {
     }
 }
 
-export class BadUnlockScriptParametersError extends Error {
+export class BadLockTransactionError extends Error {
     // tslint:disable:variable-name
     public __proto__: Error;
     constructor() {
         const trueProto = new.target.prototype;
-        super('Bad public keys or locktime supplied to unlock this transaction');
+        super('This locking transaction is not valid for this service');
 
         // Alternatively use Object.setPrototypeOf if you have an ES6 environment.
         this.__proto__ = trueProto;

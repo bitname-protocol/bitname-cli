@@ -49,7 +49,6 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
 
     // Check that output 1 is an OP_RETURN of the correct form
     if (!isValidOP_RETURN(tx.outputs[1])) {
-        console.log('failed on validopret');
         return false;
     }
 
@@ -60,7 +59,6 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
     const name = metadata[1];
     const nameStr = name.toString('ascii');
     if (name.length > 64) {
-        console.log('failed on len');
         return false;
     }
 
@@ -93,7 +91,6 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
     const scriptHash = crypto.hash160(redeemScript.toRaw());
     const p2shAddr = Address.fromScripthash(scriptHash);
     if (tx.outputs[3].getAddress().toBase58('testnet') !== p2shAddr.toBase58('testnet')) {
-        console.log('failed on addr');
         return false;
     }
 

@@ -15,10 +15,11 @@ import {
 import {
     BadUserPublicKeyError,
     BadServicePublicKeyError,
-    BadUnlockScriptParametersError,
+    BadLockTransactionError,
 } from './errors';
 
 import { config } from '../config';
+import { verifyLockTX } from './verify';
 const NETWORK = config.network;
 
 function extractEncodedMetadata(opRetScript: Script): [number, Buffer] {
@@ -178,16 +179,16 @@ function genUnlockTx(lockTx: TX,
     const servicePubKey =  service ? ring.getPublicKey() : otherPubKey;
     const userPubKey    = !service ? ring.getPublicKey() : otherPubKey;
 
+    if (!verifyLockTX(lockTx, servicePubKey)) {
+        throw new BadLockTransactionError();
+    }
+
     const locktime = extractEncodedMetadata(lockTx.outputs[1].script)[0];
 
     const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
 
     const redeemScriptHash = crypto.hash160(redeemScript.toRaw());
     const redeemScriptAddr = Address.fromScripthash(redeemScriptHash);
-
-    if (lockTx.outputs[3].getAddress().toBase58(NETWORK) !== redeemScriptAddr.toBase58(NETWORK)) {
-        throw new BadUnlockScriptParametersError();
-    }
 
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({

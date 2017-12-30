@@ -13,6 +13,7 @@ import {
     BadUserPublicKeyError,
     BadServicePublicKeyError,
     BadUnlockScriptParametersError,
+    BadLockTransactionError,
 } from '../lib/errors';
 
 import * as fs from 'fs';
@@ -104,20 +105,6 @@ describe('tx generation', () => {
         expect(tx.hash('hex')).toBe('9c9cc53211f58c83ca4d85bc7a15a44fd133cb6f1b7e3f55f3d052798bd9598d');
     });
 
-    it('errors on unlocking with incorrect lock time', () => {
-        const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
-
-        const lockTX = TX.fromRaw(txData, 'hex');
-
-        const wif = 'cUTaW9nuwpwfuZLkgY98qnfdbzokta2BKxnQ43HyGf7jLEwe1Big';
-        const userRing = KeyRing.fromSecret(wif);
-
-        expect(() => {
-            genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey());
-        }).toThrow(BadUnlockScriptParametersError);
-    });
-
     it('errors on unlocking with incorrect user pubkey', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath).toString('utf8');
@@ -131,7 +118,7 @@ describe('tx generation', () => {
 
         expect(() => {
             genUnlockTx(lockTX, 1, false, userRing, serviceKey);
-        }).toThrow(BadUnlockScriptParametersError);
+        }).toThrow(BadLockTransactionError);
     });
 
     it('errors on unlocking with incorrect service pubkey', () => {
@@ -147,7 +134,7 @@ describe('tx generation', () => {
 
         expect(() => {
             genUnlockTx(lockTX, 1, true, serviceRing, userKey);
-        }).toThrow(BadUnlockScriptParametersError);
+        }).toThrow(BadLockTransactionError);
     });
 
     it('errors on unlocking with incorrect privkey', () => {
@@ -161,6 +148,6 @@ describe('tx generation', () => {
 
         expect(() => {
             genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey());
-        }).toThrow(BadUnlockScriptParametersError);
+        }).toThrow(BadLockTransactionError);
     });
 });
