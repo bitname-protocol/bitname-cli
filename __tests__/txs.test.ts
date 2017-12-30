@@ -73,7 +73,7 @@ describe('tx generation', () => {
 
         const tx = genLockTx(coins, 'google', 1, 1, 10, userRing, serviceKey, 1);
 
-        expect(tx.hash('hex')).toBe('2ed11b3d989a0a8369e0473f67542c62028435647bdc7a613b299f0d105ca538');
+        expect(tx.hash('hex')).toBe('631525eccd821de5518730aa4d543f53ed4b0d919c6f8d48b17f0cc3d4b9a70b');
     });
 
     it('generates user unlocking transaction', () => {
@@ -82,12 +82,12 @@ describe('tx generation', () => {
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
-        const wif = 'cUTaW9nuwpwfuZLkgY98qnfdbzokta2BKxnQ43HyGf7jLEwe1Big';
+        const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
         const userRing = KeyRing.fromSecret(wif);
 
         const tx = genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey(), 1);
 
-        expect(tx.hash('hex')).toBe('642ffc28852e1007bcb12cd4d5a65e3999d929078a944951e6f5ee21a1bcdb74');
+        expect(tx.hash('hex')).toBe('8ece940b4ef2692b6609e11f9933f624714f2256d7f003391c75df668e215f62');
     });
 
     it('generates service unlocking transaction', () => {
@@ -96,12 +96,12 @@ describe('tx generation', () => {
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
-        const wif = 'cUTaW9nuwpwfuZLkgY98qnfdbzokta2BKxnQ43HyGf7jLEwe1Big';
+        const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
         const userRing = KeyRing.fromSecret(wif);
 
         const tx = genUnlockTx(lockTX, 1, true, userRing, userRing.getPublicKey(), 1);
 
-        expect(tx.hash('hex')).toBe('a8c6f65bf625a71e80831e37f69fef9be738d292dce8c577535a67c808556870');
+        expect(tx.hash('hex')).toBe('9c9cc53211f58c83ca4d85bc7a15a44fd133cb6f1b7e3f55f3d052798bd9598d');
     });
 
     it('errors on unlocking with incorrect lock time', () => {

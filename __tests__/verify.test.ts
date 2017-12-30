@@ -17,7 +17,7 @@ describe('transaction verification', () => {
 
         const tx = TX.fromRaw(txData, 'hex');
 
-        const servicePubKey = Buffer.from('02450e93fa1d4ec9370f885e48d9ada1559519fcfe0ca7def8a443865fd2c86a30', 'hex');
+        const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
 
         expect(verifyLockTX(tx, servicePubKey)).toBe(true);
     });

@@ -81,6 +81,10 @@ function genLockTx(coins: Coin[],
                    userRing: KeyRing,
                    servicePubKey: Buffer,
                    locktime: number) {
+    if (locktime > 65535) {
+        throw new Error('Locktime must be 16-bits');
+    }
+
     const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
     const p2shAddr = genP2shAddr(redeemScript);
 
@@ -107,7 +111,10 @@ function genLockTx(coins: Coin[],
     lockTx.addOutput(Output.fromScript(pubkeyDataScript, opRetVal));
 
     // Add name OP_RETURN as output 1
-    const dataScript = Script.fromNulldata(Buffer.from(name, 'utf-8'));
+    const numStr = I64(locktime).toString(16, 4);
+    const numBuff = Buffer.from(numStr, 'hex');
+    const nameBuff = Buffer.from(name, 'ascii');
+    const dataScript = Script.fromNulldata(Buffer.concat([numBuff, nameBuff]));
     lockTx.addOutput(Output.fromScript(dataScript, opRetVal));
 
     // Add upfront fee as output 2

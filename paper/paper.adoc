@@ -32,7 +32,7 @@ The outputs are as follows:
 
 ===== 0
 
-An OP_RETURN containing the controlling pubkey for the name. This should contain a value of 0 satoshis.
+An OP_RETURN containing the locktime in blocks, encoded as 2 bytes, and the controlling pubkey for the name. This should contain a value of 0 satoshis.
 
 ===== 1
 
