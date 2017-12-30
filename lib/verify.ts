@@ -4,7 +4,7 @@ import {
     address as Address,
     crypto,
 } from 'bcoin';
-import { genRedeemScript } from './txs';
+import { genRedeemScript, extractEncodedMetadata } from './txs';
 import { I64 } from 'n64';
 
 function isURISafe(str: string) {
@@ -53,9 +53,11 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
         return false;
     }
 
+    const metadata = extractEncodedMetadata(tx.outputs[1].script);
+
     // Check that output 1 name data is only 64 bytes in length
     const rawNameData = tx.outputs[1].script.code[1].data;
-    const name = rawNameData.slice(2);
+    const name = metadata[1];
     const nameStr = name.toString('ascii');
     if (name.length > 64) {
         console.log('failed on len');
@@ -86,9 +88,8 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
     }
 
     // Check that output 3 script is correct
-    const locktimeData = rawNameData.slice(0, 2);
-    const locktimeI64 = I64.fromString(locktimeData.toString('hex'), 16);
-    const redeemScript = genRedeemScript(pubKey, servicePubKey, locktimeI64.toNumber());
+    const locktime = metadata[0];
+    const redeemScript = genRedeemScript(pubKey, servicePubKey, locktime);
     const scriptHash = crypto.hash160(redeemScript.toRaw());
     const p2shAddr = Address.fromScripthash(scriptHash);
     if (tx.outputs[3].getAddress().toBase58('testnet') !== p2shAddr.toBase58('testnet')) {
