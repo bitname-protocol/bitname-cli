@@ -5,6 +5,8 @@ import {
     util,
 } from 'bcoin';
 
+import CustomSet from './CustomSet';
+
 const revHex = util.revHex;
 
 import fetch from 'node-fetch';
@@ -48,6 +50,8 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
 
     const data = await fetchUnspentTX(addr);
 
+    // console.log(data);
+
     const txs = data.txrefs;
 
     if (typeof txs === 'undefined') {
@@ -62,7 +66,15 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
 
     let totalVal = 0;
 
+    const set = new CustomSet();
+
     for (const tx of txs) {
+        if (set.has(tx.tx_hash)) {
+            console.log('Duplicate tx hash found', tx.tx_hash);
+            continue;
+        }
+        set.add(tx.tx_hash);
+
         const coinOpts = {
             version: 1,
             height: -1,

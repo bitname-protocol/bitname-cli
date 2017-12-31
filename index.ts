@@ -21,12 +21,13 @@ async function main() {
     console.log('Addr:\n' + ring.getAddress());
     console.log('WIF:\n' + ring.toSecret());
 
-    const redeemScript = genRedeemScript(ring, LOCKTIME);
+    const redeemScript = genRedeemScript(ring.getPublicKey(), ring.getPublicKey(), LOCKTIME);
 
     const p2shAddr = genP2shAddr(redeemScript);
     console.log('To lock, send coins to: ' + p2shAddr.toBase58(NETWORK));
 
     const addr = ring.getAddress();
+    const pubKey = ring.getPublicKey();
 
     const feeRate = await getFeesSatoshiPerKB();
     const upfrontFee = 1000000;
@@ -37,16 +38,18 @@ async function main() {
     // Fund up to a 2 KB transaction
     const coins = await fundTx(addr, upfrontFee + delayFee + 2 * feeRate);
 
-    // const lockTx = genLockTx(ring, coins, 1000000, 100000, p2shAddr);
-    const lockTx = genLockTx(ring, coins, 'test', upfrontFee, delayFee, feeRate, ring.getAddress(), p2shAddr);
-    console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
-    console.log(verifyLockTX(lockTx, addr));
+    console.log(coins);
 
-    const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, true);
+    const lockTx = genLockTx(coins, 'test', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), LOCKTIME);
+    console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
+    console.log(verifyLockTX(lockTx, pubKey));
+
+    // const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, false);
+    const unlockTx = genUnlockTx(lockTx, feeRate, false, ring, ring.getPublicKey());
     console.log('Unlock TX:\n' + unlockTx.toRaw().toString('hex'));
-    console.log(verifyLockTX(unlockTx, addr));
+    console.log(verifyLockTX(unlockTx, pubKey));
 }
 
 main().catch((err) => {
-    throw err;
+    console.error(err);
 });

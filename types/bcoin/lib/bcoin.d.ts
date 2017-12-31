@@ -2,6 +2,8 @@ declare module 'bcoin' {
     class address {
         toBase58(network: string): string;
         static fromScript(script: script): address;
+        static fromPubkeyhash(hash: Buffer, network?: string): address;
+        static fromScripthash(hash: Buffer, network?: string): address;
     }
 
     class hd {
@@ -25,6 +27,7 @@ declare module 'bcoin' {
     class crypto {
         static sha256(data: Buffer): Buffer;
         static hash256(data: Buffer): Buffer;
+        static hash160(data: Buffer): Buffer;
         static secp256k1: secp256k1;
         static scrypt: scrypt;
     }
@@ -139,6 +142,8 @@ declare module 'bcoin' {
 
         toRaw(): Buffer;
 
+        hash(enc?: string): Hash;
+
         inputs: input[];
         outputs: output[];
     }
@@ -147,7 +152,8 @@ declare module 'bcoin' {
         addCoin(coin: coin): input;
         addOutput(script: address | script | output | Object, value?: amount): output;
         scriptInput(index: number, coin: coin | output, ring: keyring): boolean; // ring should be KeyRing
-        subtractFee(fee: amount, index?: number): void;
+        subtractFee(fee: amount): void;
+        subtractIndex(index: number, fee: amount): void;
         signInput(index: number, coin: coin | output, ring: keyring, type: number): boolean;
         toTX(): tx;
         static fromOptions(options: NakedTX): mtx;

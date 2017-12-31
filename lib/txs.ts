@@ -9,9 +9,40 @@ import {
     coin as Coin,
     tx as TX,
     keyring as KeyRing,
+    crypto,
 } from 'bcoin';
 
-function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number) {
+import {
+    BadUserPublicKeyError,
+    BadServicePublicKeyError,
+    BadLockTransactionError,
+} from './errors';
+
+import { config } from '../config';
+import { verifyLockTX } from './verify';
+const NETWORK = config.network;
+
+function extractEncodedMetadata(opRetScript: Script): [number, Buffer] {
+    const rawNameData = opRetScript.code[1].data;
+    const name = rawNameData.slice(2);
+
+    const locktimeData = rawNameData.slice(0, 2);
+    const locktimeI64 = I64.fromString(locktimeData.toString('hex'), 16);
+
+    const lockTimeNum = locktimeI64.toNumber();
+
+    return [lockTimeNum, name];
+}
+
+function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number): Script {
+    if (!crypto.secp256k1.publicKeyVerify(userPubkey)) {
+        throw new BadUserPublicKeyError();
+    }
+
+    if (!crypto.secp256k1.publicKeyVerify(servicePubkey)) {
+        throw new BadServicePublicKeyError();
+    }
+
     const script = new Script(null);
 
     script.pushSym('OP_IF');
@@ -34,6 +65,7 @@ function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime
         }
     }
     script.pushData(numBuff.slice(0, min));
+
     script.pushSym('OP_CHECKSEQUENCEVERIFY');
     script.pushSym('OP_DROP');
 
@@ -47,10 +79,6 @@ function makeEncumberScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime
     return script;
 }
 
-function genRedeemScript(ring: KeyRing, locktime: number) {
-    return makeEncumberScript(ring.getPublicKey(), ring.getPublicKey(), locktime);
-}
-
 function genP2shAddr(redeemScript: Script): Address {
     const outputScript = Script.fromScripthash(redeemScript.hash160());
     const p2shAddr = Address.fromScript(outputScript);
@@ -58,14 +86,24 @@ function genP2shAddr(redeemScript: Script): Address {
     return p2shAddr;
 }
 
-function genLockTx(ring: KeyRing,
-                   coins: Coin[],
+function genLockTx(coins: Coin[],
                    name: string,
                    upfrontFee: number,
                    lockedFee: number,
                    feeRate: number,
-                   serviceAddr: Address,
-                   p2shAddr: Address) {
+                   userRing: KeyRing,
+                   servicePubKey: Buffer,
+                   locktime: number) {
+    if (locktime > 65535) {
+        throw new Error('Locktime must be 16-bits');
+    }
+
+    const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
+    const p2shAddr = genP2shAddr(redeemScript);
+
+    const servicePKH = crypto.hash160(servicePubKey);
+    const serviceAddr = Address.fromPubkeyhash(servicePKH, NETWORK);
+
     const lockTx = new MTX();
 
     const total = coins.reduce((acc, cur) => acc + cur.value, 0);
@@ -82,11 +120,14 @@ function genLockTx(ring: KeyRing,
     const changeVal = total - opRetVal - upfrontFee - lockedFee;
 
     // Add pubkey OP_RETURN as output 0
-    const pubkeyDataScript = Script.fromNulldata(ring.getPublicKey());
+    const pubkeyDataScript = Script.fromNulldata(userRing.getPublicKey());
     lockTx.addOutput(Output.fromScript(pubkeyDataScript, opRetVal));
 
     // Add name OP_RETURN as output 1
-    const dataScript = Script.fromNulldata(Buffer.from(name, 'utf-8'));
+    const numStr = I64(locktime).toString(16, 4);
+    const numBuff = Buffer.from(numStr, 'hex');
+    const nameBuff = Buffer.from(name, 'ascii');
+    const dataScript = Script.fromNulldata(Buffer.concat([numBuff, nameBuff]));
     lockTx.addOutput(Output.fromScript(dataScript, opRetVal));
 
     // Add upfront fee as output 2
@@ -103,24 +144,25 @@ function genLockTx(ring: KeyRing,
 
     // Add change output as 4
     lockTx.addOutput({
-        address: ring.getAddress(),
+        address: userRing.getAddress(),
         value: changeVal,
     });
 
     for (let i = 0; i < coins.length; ++i) {
         const coin = coins[i];
-        lockTx.scriptInput(i, coin, ring);
+        lockTx.scriptInput(i, coin, userRing);
         // lockTx.signInput(i, coin, ring, Script.hashType.ALL);
     }
 
     // Each signature is 72 bytes long
     const virtSize = lockTx.getVirtualSize() + coins.length * 72;
-    lockTx.subtractFee(Math.ceil(virtSize / 1000 * feeRate), 0);
+    // console.log(Math.ceil(virtSize / 1000 * feeRate));
+    lockTx.subtractIndex(4, Math.ceil(virtSize / 1000 * feeRate));
 
     for (let i = 0; i < coins.length; ++i) {
         const coin = coins[i];
         // lockTx.scriptInput(i, coin, ring);
-        lockTx.signInput(i, coin, ring, Script.hashType.ALL);
+        lockTx.signInput(i, coin, userRing, Script.hashType.ALL);
     }
 
     // const virtSize = lockTx.getVirtualSize();
@@ -129,12 +171,25 @@ function genLockTx(ring: KeyRing,
     return lockTx.toTX();
 }
 
-function genUnlockTx(ring: KeyRing,
-                     lockTx: TX,
-                     locktime: number,
-                     redeemScript: Script,
+function genUnlockTx(lockTx: TX,
                      feeRate: number,
-                     service: boolean) {
+                     service: boolean,
+                     ring: KeyRing,
+                     otherPubKey: Buffer) {
+    const servicePubKey =  service ? ring.getPublicKey() : otherPubKey;
+    const userPubKey    = !service ? ring.getPublicKey() : otherPubKey;
+
+    if (!verifyLockTX(lockTx, servicePubKey)) {
+        throw new BadLockTransactionError();
+    }
+
+    const locktime = extractEncodedMetadata(lockTx.outputs[1].script)[0];
+
+    const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
+
+    const redeemScriptHash = crypto.hash160(redeemScript.toRaw());
+    const redeemScriptAddr = Address.fromScripthash(redeemScriptHash);
+
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({
         version: 2,
@@ -146,8 +201,6 @@ function genUnlockTx(ring: KeyRing,
     if (service) {
         unlockTx.setSequence(0, locktime);
     }
-
-    // console.log(val);
 
     unlockTx.addOutput({
         address: ring.getAddress(),
@@ -168,8 +221,7 @@ function genUnlockTx(ring: KeyRing,
 
     const virtSize = unlockTx.getVirtualSize();
     const fee = Math.ceil(virtSize / 1000 * feeRate);
-    console.log(fee, unlockTx.outputs[0].value);
-    unlockTx.subtractFee(fee, 0);
+    unlockTx.subtractFee(fee);
 
     // Remake script with the new signature
     const unlockScript2 = new Script();
@@ -183,4 +235,10 @@ function genUnlockTx(ring: KeyRing,
     return unlockTx.toTX();
 }
 
-export { genLockTx, genUnlockTx, genRedeemScript, genP2shAddr };
+export {
+    genLockTx,
+    genUnlockTx,
+    genRedeemScript,
+    genP2shAddr,
+    extractEncodedMetadata,
+};
