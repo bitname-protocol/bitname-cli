@@ -12,7 +12,6 @@ import {
 import {
     BadUserPublicKeyError,
     BadServicePublicKeyError,
-    BadUnlockScriptParametersError,
     BadLockTransactionError,
 } from '../lib/errors';
 
