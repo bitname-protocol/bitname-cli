@@ -139,6 +139,7 @@ declare module 'bcoin' {
         getVirtualSize(): number;
 
         static fromOptions(options: NakedTX): tx;
+        static fromRaw(data: Buffer, enc?: string): tx;
 
         toRaw(): Buffer;
 

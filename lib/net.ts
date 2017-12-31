@@ -3,6 +3,7 @@ import {
     coin as Coin,
     address as Address,
     util,
+    tx as TX,
 } from 'bcoin';
 
 import CustomSet from './CustomSet';
@@ -14,7 +15,7 @@ import fetch from 'node-fetch';
 import { config } from '../config';
 const NETWORK = config.network;
 
-import { fetchUnspentTX } from './netUtils';
+import { fetchUnspentTX, fetchAllTX } from './netUtils';
 
 async function getFeesSatoshiPerKB() {
     let netSuffix = 'main';
@@ -28,22 +29,6 @@ async function getFeesSatoshiPerKB() {
 
     return data.medium_fee_per_kb;
 }
-
-// async function fundTx(addr: Address, target: number): Promise<Coin[]> {
-//     const coins: Coin[] = [];
-
-//     let netSuffix = 'main';
-//     if (NETWORK === 'testnet') {
-//         netSuffix = 'test3';
-//     }
-
-//     const url = `https://api.blockcypher.com/v1/btc/${netSuffix}/addrs/${addr}?unspentOnly=true`;
-
-//     const resp = await fetch(url);
-//     const data = await resp.json();
-
-//     const txs = data.txrefs;
-// }
 
 async function fundTx(addr: Address, target: number): Promise<Coin[]> {
     const coins: Coin[] = [];
@@ -100,4 +85,20 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
     return coins;
 }
 
-export { getFeesSatoshiPerKB, fundTx };
+async function getAllTX(addr: Address): Promise<[TX[], boolean[][]]> {
+    const txData = await fetchAllTX(addr);
+
+    const txs: TX[] = txData.map((tx) => TX.fromRaw(Buffer.from(tx.hex, 'hex')));
+
+    const outputsSpent: boolean[][] = txData.map((tx) => {
+        return tx.outputs.map((out: object) => out.hasOwnProperty('spent_by'));
+    });
+
+    return [txs, outputsSpent];
+}
+
+export {
+    getFeesSatoshiPerKB,
+    fundTx,
+    getAllTX,
+};
