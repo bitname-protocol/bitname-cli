@@ -46,7 +46,7 @@ export default class TXList {
 
     public getTX(txid: string): TX {
         if (!this.txs.hasOwnProperty(txid)) {
-            throw new Error(`Unknown txid ${txid}`);
+            throw new Error(`Unknown txid '${txid}'`);
         }
 
         return this.txs[txid];
@@ -54,13 +54,13 @@ export default class TXList {
 
     public getOutputSpent(txid: string, output: number): boolean {
         if (!this.spent.hasOwnProperty(txid)) {
-            throw new Error(`Unknown txid ${txid}`);
+            throw new Error(`Unknown txid '${txid}'`);
         }
 
         const txSpent = this.spent[txid];
 
         if (output < 0 || output >= txSpent.length) {
-            throw new Error(`Unknown output ${output} for txid ${txid}`);
+            throw new Error(`Unknown output '${output}' for txid '${txid}'`);
         }
 
         return txSpent[output];
@@ -68,9 +68,5 @@ export default class TXList {
 
     public getTxids(): ReadonlyArray<string> {
         return this.txids;
-    }
-
-    public toString(): string {
-        return `AddrTXs with ${this.txids.length} entries`;
     }
 }
