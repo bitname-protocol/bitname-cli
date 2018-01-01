@@ -1,5 +1,6 @@
 import {
     tx as TX,
+    util,
 } from 'bcoin';
 
 export default class TXList {
@@ -26,7 +27,11 @@ export default class TXList {
             const tx = txs[i];
             const txSpent = spent[i];
 
-            const hash = tx.hash('hex') as string;
+            const hash = util.revHex(tx.hash('hex')) as string;
+
+            if (tx.outputs.length !== txSpent.length) {
+                throw new Error(`Bad outputs for tx ${hash}; got ${txSpent.length}, expected ${tx.outputs.length}`);
+            }
 
             txMap[hash] = tx;
             spentMap[hash] = txSpent;
@@ -61,7 +66,7 @@ export default class TXList {
         return txSpent[output];
     }
 
-    public get getTxids(): ReadonlyArray<string> {
+    public getTxids(): ReadonlyArray<string> {
         return this.txids;
     }
 
