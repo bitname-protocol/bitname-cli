@@ -7,6 +7,7 @@ import {
 } from 'bcoin';
 
 import CustomSet from './CustomSet';
+import TXList from './TXList';
 
 const revHex = util.revHex;
 
@@ -85,7 +86,7 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
     return coins;
 }
 
-async function getAllTX(addr: Address): Promise<[TX[], boolean[][]]> {
+async function getAllTX(addr: Address): Promise<TXList> {
     const txData = await fetchAllTX(addr);
 
     const txs: TX[] = txData.map((tx) => TX.fromRaw(Buffer.from(tx.hex, 'hex')));
@@ -94,7 +95,7 @@ async function getAllTX(addr: Address): Promise<[TX[], boolean[][]]> {
         return tx.outputs.map((out: object) => out.hasOwnProperty('spent_by'));
     });
 
-    return [txs, outputsSpent];
+    return new TXList(txs, outputsSpent);
 }
 
 export {
