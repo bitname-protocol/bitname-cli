@@ -1,0 +1,94 @@
+= Bitname Protocol 0.0.1 Specification
+Colin Atkinson <me@colatkinson.site>
+v0.0.1, December 2017
+:pdf-page-size: 8.5in x 11in
+:toc:
+
+== Overview
+
+Bitname is a protocol via which arbitrary text (a "name") may be associated with a Bitcoin address, and thus its underlying public key. Unlike existing solutions for this, name registration is temporary--each service may choose how long each name contract should last. This is accomplished using https://github.com/bitcoin/bips/blob/master/bip-0068.mediawiki[BIP 68] relative locktimes.
+
+Ownership of a name can be verified independently of the registering service. all necessary information is publically available on the blockchain.
+
+In order to register a name, a specially-formatted transaction is sent, with one of its outputs being to a P2SH address for a script with two branches. In one, the registrant may spend funds immediately. In the other, the registrar may spend funds only after a set period of time. This provides a degree of certainty that services which the registrar promises will be continued--if they are not, the user may just take their money and leave.
+
+Ownership of names may also be transferred. In order to do this, the current owner essentially makes a revocation transaction, but specifies the outputs to be the start of a new contract with the service. Additional inputs may be provided, allowing the current owner to require payment of some kind from the new party.
+
+== Transaction Format
+
+There are two classes of transactions in the protocol: locking and unlocking. The former creates a name attestation, while the latter spends funds from it once it has expired.
+
+=== Locking Transactions
+
+==== Inputs
+
+The locking transaction may use inputs from any source, including P2PKH and P2SH addresses. This allows the possibility of using multisignature wallets as sources of funding.
+
+==== Outputs
+
+The outputs must be provided in a specific order. While this violates https://github.com/bitcoin/bips/blob/master/bip-0069.mediawiki[BIP 69] lexicographical ordering, it ensures that the transaction can be parsed correctly.
+
+The outputs are as follows:
+
+===== 0
+
+An OP_RETURN containing the locktime in blocks, encoded as 2 bytes, and the controlling pubkey for the name. This should contain a value of 0 satoshis.
+
+===== 1
+
+An OP_RETURN containing the name to be registered. This should contain 1-64 URL-safe characters (see https://tools.ietf.org/html/rfc3986#section-2.3[RFC 3986]). This should contain a value of 0 satoshis.
+
+===== 2
+
+A P2PKH/P2SH output to the service's set address. This represents the upfront fee for the service. The value should be determined by the service.
+
+===== 3
+
+A P2SH output to the time-lock script's address. This is the fee that incentivizes the registrar to provide the service as promised. More information about these script contracts will be provided later. The value should be determined by the service.
+
+===== [4..∞)
+
+Change outputs. These may be of any form.
+
+=== Unlocking Transactions
+
+The unlocking transaction refers to the transaction spending from the time-lock P2SH address.
+
+The redeem script is of the form:
+
+[source]
+----
+IF
+    [user pubkey] CHECKSIG
+ELSE
+    [time] CHECKSEQUENCEVERIFY
+    DROP
+    [service pubkey] CHECKSIG
+ENDIF
+----
+
+[user pubkey]:: The user's spending pubkey
+[time]:: The encoded time lock length
+[service pubkey]:: The service's spending pubkey
+
+Note that as of this version, the spending transaction is limited to a single pubkey. This may be changed in later versions.
+
+==== Spending as the User (Revoking/Transferring Name)
+
+The scriptSig will be:
+
+[source]
+----
+[user sig] 1
+----
+
+==== Spending as the Service
+
+The scriptSig will be:
+
+[source]
+----
+[service sig] 0
+----
+
+The transaction sequence number must also be set to `[time]`.

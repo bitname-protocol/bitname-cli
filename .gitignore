@@ -1,3 +1,8 @@
+.vscode/
+
+paper.html
+paper.pdf
+
 dist/
 
 # Logs

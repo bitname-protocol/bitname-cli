@@ -6,7 +6,10 @@
   "license": "GPL-3.0",
   "private": true,
   "devDependencies": {
+    "@types/jest": "^21.1.9",
     "@types/node-fetch": "^1.6.7",
+    "jest": "^22.0.4",
+    "ts-jest": "^22.0.0",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "typescript": "^2.6.2"
@@ -19,6 +22,22 @@
   "scripts": {
     "start:dev": "ts-node index.ts",
     "build": "tsc",
-    "start": "npm run build && node dist/index.js"
+    "start": "npm run build && node dist/index.js",
+    "test": "jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "mapCoverage": true
   }
 }
