@@ -18,7 +18,7 @@ const NETWORK = config.network;
 
 import { fetchUnspentTX, fetchAllTX, fetchMetadata } from './netUtils';
 
-async function getFeesSatoshiPerKB() {
+async function getFeesSatoshiPerKB(): Promise<number> {
     const data = await fetchMetadata();
 
     return data.medium_fee_per_kb;

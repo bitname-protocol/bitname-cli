@@ -18,9 +18,9 @@ import {
     BadLockTransactionError,
 } from './errors';
 
-import { config } from '../config';
+// import { config } from '../config';
 import { verifyLockTX } from './verify';
-const NETWORK = config.network;
+// const NETWORK = config.network;
 
 function extractEncodedMetadata(opRetScript: Script): [number, Buffer] {
     const rawNameData = opRetScript.code[1].data;
@@ -102,7 +102,7 @@ function genLockTx(coins: Coin[],
     const p2shAddr = genP2shAddr(redeemScript);
 
     const servicePKH = crypto.hash160(servicePubKey);
-    const serviceAddr = Address.fromPubkeyhash(servicePKH, NETWORK);
+    const serviceAddr = Address.fromPubkeyhash(servicePKH);
 
     const lockTx = new MTX();
 

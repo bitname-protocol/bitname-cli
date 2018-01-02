@@ -1,6 +1,7 @@
 declare module 'bcoin' {
     class address {
         toBase58(network: string): string;
+        static fromBase58(address: string): address;
         static fromScript(script: script): address;
         static fromPubkeyhash(hash: Buffer, network?: string): address;
         static fromScripthash(hash: Buffer, network?: string): address;
@@ -13,6 +14,21 @@ declare module 'bcoin' {
 
     class util {
         static revHex<T extends Hash>(hex: T): T;
+    }
+
+    interface AddrResult {
+        hrp: string,
+        version: number,
+        hash: Buffer;
+    }
+
+    class bech32 {
+        decode(str: string): AddrResult;
+        encode(hrp: string, version: number, data: Buffer): string;
+    }
+
+    class utils {
+        static bech32: bech32;
     }
 
     class secp256k1 {
@@ -192,6 +208,7 @@ declare module 'bcoin' {
         util,
         crypto,
         hd,
+        utils,
     };
 
     // export {address} from './address';
