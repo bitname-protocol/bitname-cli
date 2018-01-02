@@ -97,4 +97,4 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
     return true;
 }
 
-export {verifyLockTX};
+export {verifyLockTX, isURISafe};

@@ -74,6 +74,7 @@ import { keyFromPass } from './lib/crypto';
 import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX } from './lib/net';
 
 import * as fs from 'fs';
+import { verifyLockTX } from './lib/verify';
 
 async function register(argv: yargs.Arguments) {
     const decoded = utils.bech32.decode(argv.servicePubKey);
@@ -131,15 +132,21 @@ async function register(argv: yargs.Arguments) {
         return;
     }
 
-    const lockTx = genLockTx(coins,
-                             argv.name,
-                             upfrontFee,
-                             delayFee,
-                             feeRate,
-                             ring,
-                             ring.getPublicKey(),
-                             argv.locktime);
-    console.log(lockTx.toRaw().toString('hex'));
+    try {
+        const lockTx = genLockTx(coins,
+                                argv.name,
+                                upfrontFee,
+                                delayFee,
+                                feeRate,
+                                ring,
+                                ring.getPublicKey(),
+                                argv.locktime);
+        console.log(lockTx.toRaw().toString('hex'));
+    } catch (err) {
+        console.error('There was a problem generating the transaction:');
+        console.error('    ' + err.message);
+        process.exit(1);
+    }
 }
 
 async function revoke(argv: yargs.Arguments) {
@@ -181,6 +188,11 @@ async function revoke(argv: yargs.Arguments) {
         console.error('    ' + err.message);
         process.exit(1);
         return;
+    }
+
+    if (!verifyLockTX(lockTX, servicePubKey)) {
+        console.error('This tx is not a valid bitname registration');
+        process.exit(1);
     }
 
     let feeRate: number;

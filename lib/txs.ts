@@ -19,7 +19,7 @@ import {
 } from './errors';
 
 // import { config } from '../config';
-import { verifyLockTX } from './verify';
+import { verifyLockTX, isURISafe } from './verify';
 // const NETWORK = config.network;
 
 function extractEncodedMetadata(opRetScript: Script): [number, Buffer] {
@@ -96,6 +96,14 @@ function genLockTx(coins: Coin[],
                    locktime: number) {
     if (locktime > 65535) {
         throw new Error('Locktime must be 16-bits');
+    }
+
+    if (name.length > 64) {
+        throw new Error('Name is too long');
+    }
+
+    if (!isURISafe(name)) {
+        throw new Error('Invalid character(s) in name');
     }
 
     const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
