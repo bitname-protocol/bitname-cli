@@ -13,27 +13,24 @@ const revHex = util.revHex;
 
 import fetch from 'node-fetch';
 
-import { config } from '../config';
-const NETWORK = config.network;
-
 import { fetchUnspentTX, fetchAllTX, fetchMetadata, fetchTX } from './netUtils';
 
-async function getFeesSatoshiPerKB(): Promise<number> {
-    const data = await fetchMetadata();
+async function getFeesSatoshiPerKB(network: string): Promise<number> {
+    const data = await fetchMetadata(network);
 
     return data.medium_fee_per_kb;
 }
 
-async function getBlockHeight() {
-    const data = await fetchMetadata();
+async function getBlockHeight(network: string) {
+    const data = await fetchMetadata(network);
 
     return data.height;
 }
 
-async function fundTx(addr: Address, target: number): Promise<Coin[]> {
+async function fundTx(addr: Address, target: number, network: string): Promise<Coin[]> {
     const coins: Coin[] = [];
 
-    const data = await fetchUnspentTX(addr);
+    const data = await fetchUnspentTX(addr, network);
 
     // console.log(data);
 
@@ -43,7 +40,7 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
         throw new Error(`No unspent txs found for ${addr}`);
     }
 
-    const addrString = addr.toBase58(NETWORK);
+    const addrString = addr.toBase58(network);
 
     txs.sort((a: number, b: number) => {
         return a - b;
@@ -85,8 +82,8 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
     return coins;
 }
 
-async function getAllTX(addr: Address): Promise<TXList> {
-    const txData = await fetchAllTX(addr);
+async function getAllTX(addr: Address, network: string): Promise<TXList> {
+    const txData = await fetchAllTX(addr, network);
 
     const confirmedOnly = txData.filter((data) => data.block_height > 0);
 
@@ -101,8 +98,8 @@ async function getAllTX(addr: Address): Promise<TXList> {
     return new TXList(txs, outputsSpent, heights);
 }
 
-async function getTX(txid: string): Promise<TX> {
-    const txData = await fetchTX(txid);
+async function getTX(txid: string, network: string): Promise<TX> {
+    const txData = await fetchTX(txid, network);
 
     const hex = txData.hex;
 

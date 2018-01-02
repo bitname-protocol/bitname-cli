@@ -5,7 +5,7 @@ describe('cryptographic primitives', () => {
         // Hex form of expected derived private key
         const correctPrivKey = 'c8abc6569b01a5e9ec966b53d504174c575652705a71fd55116ae62b7bf555a0';
 
-        const key = keyFromPass('correct horse stapler battery');
+        const key = keyFromPass('correct horse stapler battery', 'testnet');
         expect(key.privateKey.toString('hex')).toBe(correctPrivKey);
     });
 });

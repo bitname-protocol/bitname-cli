@@ -60,6 +60,8 @@
 //     console.error(err);
 // });
 
+/* tslint:disable:no-console */
+
 import * as yargs from 'yargs';
 import {
     utils,
@@ -90,7 +92,7 @@ async function register(argv: yargs.Arguments) {
     let ring: KeyRing;
 
     if (typeof argv.password !== 'undefined') {
-        const masterKey = keyFromPass(argv.password);
+        const masterKey = keyFromPass(argv.password, net);
         const derivedKey = masterKey.derivePath("m/44'/1'/0'/0/0");
         ring = KeyRing.fromOptions(derivedKey, net);
     } else if (typeof argv.wif !== 'undefined') {
@@ -107,7 +109,7 @@ async function register(argv: yargs.Arguments) {
 
     let feeRate: number;
     try {
-        feeRate = await getFeesSatoshiPerKB();
+        feeRate = await getFeesSatoshiPerKB(net);
     } catch (err) {
         console.error('There was a problem fetching fee information:');
         console.error('    ' + err.message);
@@ -121,7 +123,7 @@ async function register(argv: yargs.Arguments) {
     // Fund up to a 2 KB transaction
     let coins: Coin[];
     try {
-        coins = await fundTx(addr, upfrontFee + delayFee + 2 * feeRate);
+        coins = await fundTx(addr, upfrontFee + delayFee + 2 * feeRate, net);
     } catch (err) {
         console.error('There was a problem funding the transaction:');
         console.error('    ' + err.message);
@@ -157,7 +159,7 @@ async function revoke(argv: yargs.Arguments) {
     let ring: KeyRing;
 
     if (typeof argv.password !== 'undefined') {
-        const masterKey = keyFromPass(argv.password);
+        const masterKey = keyFromPass(argv.password, net);
         const derivedKey = masterKey.derivePath("m/44'/1'/0'/0/0");
         ring = KeyRing.fromOptions(derivedKey, net);
     } else if (typeof argv.wif !== 'undefined') {
@@ -169,9 +171,11 @@ async function revoke(argv: yargs.Arguments) {
         return;
     }
 
+    // console.log(argv);
+
     let lockTX: TX;
     try {
-        lockTX = await getTX(argv.txid);
+        lockTX = await getTX(argv.txid, net);
     } catch (err) {
         console.error('There was a problem finding this transaction:');
         console.error('    ' + err.message);
@@ -181,7 +185,7 @@ async function revoke(argv: yargs.Arguments) {
 
     let feeRate: number;
     try {
-        feeRate = await getFeesSatoshiPerKB();
+        feeRate = await getFeesSatoshiPerKB(net);
     } catch (err) {
         console.error('There was a problem fetching fee information:');
         console.error('    ' + err.message);
@@ -230,10 +234,6 @@ function main() {
                 .positional('servicePubKey', {
                     type: 'string',
                     describe: 'the public key of the service',
-                })
-                .option('testnet', {
-                    type: 'boolean',
-                    describe: 'whether this should be on the testnet',
                 })
                 .option('password', {
                     alias: 'p',
