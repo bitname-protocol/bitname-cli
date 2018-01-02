@@ -2,7 +2,7 @@ import { genLockTx, genUnlockTx, genRedeemScript, genP2shAddr } from './lib/txs'
 import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight } from './lib/net';
 import { keyFromPass } from './lib/crypto';
 import { verifyLockTX } from './lib/verify';
-import Chain from './lib/Chain';
+import { extractInfo } from './lib/chain';
 // import { KeyRing } from 'bcoin/lib/primitives';
 import {
     keyring as KeyRing,
@@ -53,7 +53,7 @@ async function main() {
     const txList = await getAllTX(addr);
     // console.log
     const curHeight = await getBlockHeight();
-    console.log(new Chain(txList, ring.getPublicKey(), curHeight));
+    console.log(extractInfo(txList, ring.getPublicKey(), curHeight));
 }
 
 main().catch((err) => {

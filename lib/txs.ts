@@ -183,6 +183,10 @@ function getLockTxTime(lockTx: TX): number {
     return metadata[0];
 }
 
+function getLockTxPubKey(lockTx: TX): Buffer {
+    return lockTx.outputs[0].script.code[1].data;
+}
+
 function genUnlockTx(lockTx: TX,
                      feeRate: number,
                      service: boolean,
@@ -255,4 +259,5 @@ export {
     extractEncodedMetadata,
     getLockTxName,
     getLockTxTime,
+    getLockTxPubKey,
 };
