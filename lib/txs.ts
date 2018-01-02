@@ -106,6 +106,10 @@ function genLockTx(coins: Coin[],
         throw new Error('Invalid character(s) in name');
     }
 
+    if (!crypto.secp256k1.publicKeyVerify(servicePubKey)) {
+        throw new Error('Invalid service public key');
+    }
+
     const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
     const p2shAddr = genP2shAddr(redeemScript);
 
@@ -205,6 +209,10 @@ function genUnlockTx(lockTx: TX,
 
     if (!verifyLockTX(lockTx, servicePubKey)) {
         throw new BadLockTransactionError();
+    }
+
+    if (!crypto.secp256k1.publicKeyVerify(otherPubKey)) {
+        throw new Error('Invalid service public key');
     }
 
     const locktime = extractEncodedMetadata(lockTx.outputs[1].script)[0];

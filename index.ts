@@ -134,13 +134,13 @@ async function register(argv: yargs.Arguments) {
 
     try {
         const lockTx = genLockTx(coins,
-                                argv.name,
-                                upfrontFee,
-                                delayFee,
-                                feeRate,
-                                ring,
-                                ring.getPublicKey(),
-                                argv.locktime);
+                                 argv.name,
+                                 upfrontFee,
+                                 delayFee,
+                                 feeRate,
+                                 ring,
+                                 servicePubKey,
+                                 argv.locktime);
         console.log(lockTx.toRaw().toString('hex'));
     } catch (err) {
         console.error('There was a problem generating the transaction:');
