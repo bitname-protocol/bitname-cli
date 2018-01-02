@@ -3,9 +3,11 @@ import {
     coin as Coin,
     address as Address,
     util,
+    tx as TX,
 } from 'bcoin';
 
 import CustomSet from './CustomSet';
+import TXList from './TXList';
 
 const revHex = util.revHex;
 
@@ -14,36 +16,19 @@ import fetch from 'node-fetch';
 import { config } from '../config';
 const NETWORK = config.network;
 
-import { fetchUnspentTX } from './netUtils';
+import { fetchUnspentTX, fetchAllTX, fetchMetadata } from './netUtils';
 
 async function getFeesSatoshiPerKB() {
-    let netSuffix = 'main';
-    if (NETWORK === 'testnet') {
-        netSuffix = 'test3';
-    }
-    const url = `https://api.blockcypher.com/v1/btc/${netSuffix}`;
-
-    const resp = await fetch(url);
-    const data = await resp.json();
+    const data = await fetchMetadata();
 
     return data.medium_fee_per_kb;
 }
 
-// async function fundTx(addr: Address, target: number): Promise<Coin[]> {
-//     const coins: Coin[] = [];
+async function getBlockHeight() {
+    const data = await fetchMetadata();
 
-//     let netSuffix = 'main';
-//     if (NETWORK === 'testnet') {
-//         netSuffix = 'test3';
-//     }
-
-//     const url = `https://api.blockcypher.com/v1/btc/${netSuffix}/addrs/${addr}?unspentOnly=true`;
-
-//     const resp = await fetch(url);
-//     const data = await resp.json();
-
-//     const txs = data.txrefs;
-// }
+    return data.height;
+}
 
 async function fundTx(addr: Address, target: number): Promise<Coin[]> {
     const coins: Coin[] = [];
@@ -100,4 +85,25 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
     return coins;
 }
 
-export { getFeesSatoshiPerKB, fundTx };
+async function getAllTX(addr: Address): Promise<TXList> {
+    const txData = await fetchAllTX(addr);
+
+    const confirmedOnly = txData.filter((data) => data.block_height > 0);
+
+    const txs: TX[] = confirmedOnly.map((tx) => TX.fromRaw(Buffer.from(tx.hex, 'hex')));
+
+    const outputsSpent: boolean[][] = confirmedOnly.map((tx) => {
+        return tx.outputs.map((out: object) => out.hasOwnProperty('spent_by'));
+    });
+
+    const heights: number[] = confirmedOnly.map((tx) => tx.block_height);
+
+    return new TXList(txs, outputsSpent, heights);
+}
+
+export {
+    getFeesSatoshiPerKB,
+    getBlockHeight,
+    fundTx,
+    getAllTX,
+};
