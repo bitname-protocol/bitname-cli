@@ -16,7 +16,7 @@ import fetch from 'node-fetch';
 import { config } from '../config';
 const NETWORK = config.network;
 
-import { fetchUnspentTX, fetchAllTX, fetchMetadata } from './netUtils';
+import { fetchUnspentTX, fetchAllTX, fetchMetadata, fetchTX } from './netUtils';
 
 async function getFeesSatoshiPerKB(): Promise<number> {
     const data = await fetchMetadata();
@@ -101,9 +101,18 @@ async function getAllTX(addr: Address): Promise<TXList> {
     return new TXList(txs, outputsSpent, heights);
 }
 
+async function getTX(txid: string): Promise<TX> {
+    const txData = await fetchTX(txid);
+
+    const hex = txData.hex;
+
+    return TX.fromRaw(Buffer.from(hex, 'hex'));
+}
+
 export {
     getFeesSatoshiPerKB,
     getBlockHeight,
     fundTx,
     getAllTX,
+    getTX,
 };

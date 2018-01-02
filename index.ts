@@ -65,17 +65,16 @@ import {
     utils,
     keyring as KeyRing,
     coin as Coin,
+    tx as TX,
 } from 'bcoin';
-import { genLockTx } from './lib/txs';
+import { genLockTx, genUnlockTx } from './lib/txs';
 import { keyFromPass } from './lib/crypto';
-import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight } from './lib/net';
+import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX } from './lib/net';
 
 import * as fs from 'fs';
 
 async function register(argv: yargs.Arguments) {
-    // console.log(argv);
     const decoded = utils.bech32.decode(argv.servicePubKey);
-    // console.log(decoded);
     if (decoded.hrp !== 'pk' && decoded.hrp !== 'tp') {
         console.error('Invalid pubkey HRP');
         process.exit(1);
@@ -118,9 +117,7 @@ async function register(argv: yargs.Arguments) {
 
     const upfrontFee = 1000000;
     const delayFee   = 1000000;
-    // const delayFee =    100000;
 
-    // const coin = await getBiggestUTXO(addr);
     // Fund up to a 2 KB transaction
     let coins: Coin[];
     try {
@@ -141,8 +138,59 @@ async function register(argv: yargs.Arguments) {
                              ring.getPublicKey(),
                              argv.locktime);
     console.log(lockTx.toRaw().toString('hex'));
+}
 
-    // const tx = genLockTx();
+async function revoke(argv: yargs.Arguments) {
+    const decoded = utils.bech32.decode(argv.servicePubKey);
+    if (decoded.hrp !== 'pk' && decoded.hrp !== 'tp') {
+        console.error('Invalid pubkey HRP');
+        process.exit(1);
+    }
+
+    let net = 'main';
+    if (decoded.hrp === 'tp') {
+        net = 'testnet';
+    }
+
+    const servicePubKey = decoded.hash;
+
+    let ring: KeyRing;
+
+    if (typeof argv.password !== 'undefined') {
+        const masterKey = keyFromPass(argv.password);
+        const derivedKey = masterKey.derivePath("m/44'/1'/0'/0/0");
+        ring = KeyRing.fromOptions(derivedKey, net);
+    } else if (typeof argv.wif !== 'undefined') {
+        const wifData = fs.readFileSync(argv.wif, 'utf8');
+        ring = KeyRing.fromSecret(wifData.trim());
+    } else {
+        console.error('Specify a password or WIF key!');
+        process.exit(1);
+        return;
+    }
+
+    let lockTX: TX;
+    try {
+        lockTX = await getTX(argv.txid);
+    } catch (err) {
+        console.error('There was a problem finding this transaction:');
+        console.error('    ' + err.message);
+        process.exit(1);
+        return;
+    }
+
+    let feeRate: number;
+    try {
+        feeRate = await getFeesSatoshiPerKB();
+    } catch (err) {
+        console.error('There was a problem fetching fee information:');
+        console.error('    ' + err.message);
+        process.exit(1);
+        return;
+    }
+
+    const unlockTx = genUnlockTx(lockTX, feeRate, false, ring, servicePubKey);
+    console.log(unlockTx.toRaw().toString('hex'));
 }
 
 function main() {
@@ -173,6 +221,31 @@ function main() {
                     describe: 'path to WIF file',
                 });
         }, register)
+        .command('revoke <txid> <servicePubKey>', 'revoke a name', (yargsObj) => {
+            return yargsObj
+                .positional('txid', {
+                    type: 'string',
+                    describe: 'the txid of the registering transaction',
+                })
+                .positional('servicePubKey', {
+                    type: 'string',
+                    describe: 'the public key of the service',
+                })
+                .option('testnet', {
+                    type: 'boolean',
+                    describe: 'whether this should be on the testnet',
+                })
+                .option('password', {
+                    alias: 'p',
+                    type: 'string',
+                    describe: 'brainwallet password',
+                })
+                .option('wif', {
+                    alias: 'w',
+                    type: 'string',
+                    describe: 'path to WIF file',
+                });
+        }, revoke)
         .help()
         .argv;
 }

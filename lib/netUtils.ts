@@ -58,8 +58,23 @@ async function fetchMetadata() {
     return data;
 }
 
+async function fetchTX(txid: string) {
+    let netSuffix = 'main';
+    if (NETWORK === 'testnet') {
+        netSuffix = 'test3';
+    }
+
+    const url = `https://api.blockcypher.com/v1/btc/${netSuffix}/txs/${txid}?includeHex=true`;
+
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    return data;
+}
+
 export {
     fetchUnspentTX,
     fetchAllTX,
     fetchMetadata,
+    fetchTX,
 };
