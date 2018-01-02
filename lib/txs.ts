@@ -171,6 +171,18 @@ function genLockTx(coins: Coin[],
     return lockTx.toTX();
 }
 
+function getLockTxName(lockTx: TX): string {
+    const metadata = extractEncodedMetadata(lockTx.outputs[1].script);
+
+    return metadata[1].toString('ascii');
+}
+
+function getLockTxTime(lockTx: TX): number {
+    const metadata = extractEncodedMetadata(lockTx.outputs[1].script);
+
+    return metadata[0];
+}
+
 function genUnlockTx(lockTx: TX,
                      feeRate: number,
                      service: boolean,
@@ -241,4 +253,6 @@ export {
     genRedeemScript,
     genP2shAddr,
     extractEncodedMetadata,
+    getLockTxName,
+    getLockTxTime,
 };

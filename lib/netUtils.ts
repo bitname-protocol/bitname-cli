@@ -45,7 +45,21 @@ async function fetchAllTX(addr: Address): Promise<any[]> {
     return data;
 }
 
+async function fetchMetadata() {
+    let netSuffix = 'main';
+    if (NETWORK === 'testnet') {
+        netSuffix = 'test3';
+    }
+    const url = `https://api.blockcypher.com/v1/btc/${netSuffix}`;
+
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    return data;
+}
+
 export {
     fetchUnspentTX,
     fetchAllTX,
+    fetchMetadata,
 };

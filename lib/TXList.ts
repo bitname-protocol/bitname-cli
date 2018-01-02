@@ -12,20 +12,26 @@ export default class TXList {
         readonly [key: string]: boolean[];
     };
 
+    private readonly heights: {
+        readonly [key: string]: number;
+    };
+
     private readonly txids: ReadonlyArray<string>;
 
-    constructor(txs: TX[], spent: boolean[][]) {
-        if (txs.length !== spent.length) {
-            throw new Error('List of TXs and spent outputs must be of same length');
+    constructor(txs: TX[], spent: boolean[][], heights: number[]) {
+        if (txs.length !== spent.length || txs.length !== heights.length) {
+            throw new Error('Lists of TXs, spent outputs, and heights must be of same length');
         }
 
         const txMap: {[key: string]: TX} = {};
         const spentMap: {[key: string]: boolean[]} = {};
+        const heightMap: {[key: string]: number} = {};
         const tmpTxids: string[] = [];
 
         for (let i = 0; i < txs.length; ++i) {
             const tx = txs[i];
             const txSpent = spent[i];
+            const txHeight = heights[i];
 
             const hash = util.revHex(tx.hash('hex')) as string;
 
@@ -35,12 +41,14 @@ export default class TXList {
 
             txMap[hash] = tx;
             spentMap[hash] = txSpent;
+            heightMap[hash] = txHeight;
 
             tmpTxids.push(hash);
         }
 
         this.txs = txMap;
         this.spent = spentMap;
+        this.heights = heightMap;
         this.txids = tmpTxids;
     }
 
@@ -64,6 +72,14 @@ export default class TXList {
         }
 
         return txSpent[output];
+    }
+
+    public getHeight(txid: string): number {
+        if (!this.heights.hasOwnProperty(txid)) {
+            throw new Error(`Unknown txid '${txid}'`);
+        }
+
+        return this.heights[txid];
     }
 
     public getTxids(): ReadonlyArray<string> {

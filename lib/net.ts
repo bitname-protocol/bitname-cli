@@ -16,19 +16,18 @@ import fetch from 'node-fetch';
 import { config } from '../config';
 const NETWORK = config.network;
 
-import { fetchUnspentTX, fetchAllTX } from './netUtils';
+import { fetchUnspentTX, fetchAllTX, fetchMetadata } from './netUtils';
 
 async function getFeesSatoshiPerKB() {
-    let netSuffix = 'main';
-    if (NETWORK === 'testnet') {
-        netSuffix = 'test3';
-    }
-    const url = `https://api.blockcypher.com/v1/btc/${netSuffix}`;
-
-    const resp = await fetch(url);
-    const data = await resp.json();
+    const data = await fetchMetadata();
 
     return data.medium_fee_per_kb;
+}
+
+async function getBlockHeight() {
+    const data = await fetchMetadata();
+
+    return data.height;
 }
 
 async function fundTx(addr: Address, target: number): Promise<Coin[]> {
@@ -89,17 +88,22 @@ async function fundTx(addr: Address, target: number): Promise<Coin[]> {
 async function getAllTX(addr: Address): Promise<TXList> {
     const txData = await fetchAllTX(addr);
 
-    const txs: TX[] = txData.map((tx) => TX.fromRaw(Buffer.from(tx.hex, 'hex')));
+    const confirmedOnly = txData.filter((data) => data.block_height > 0);
 
-    const outputsSpent: boolean[][] = txData.map((tx) => {
+    const txs: TX[] = confirmedOnly.map((tx) => TX.fromRaw(Buffer.from(tx.hex, 'hex')));
+
+    const outputsSpent: boolean[][] = confirmedOnly.map((tx) => {
         return tx.outputs.map((out: object) => out.hasOwnProperty('spent_by'));
     });
 
-    return new TXList(txs, outputsSpent);
+    const heights: number[] = confirmedOnly.map((tx) => tx.block_height);
+
+    return new TXList(txs, outputsSpent, heights);
 }
 
 export {
     getFeesSatoshiPerKB,
+    getBlockHeight,
     fundTx,
     getAllTX,
 };

@@ -1,7 +1,8 @@
 import { genLockTx, genUnlockTx, genRedeemScript, genP2shAddr } from './lib/txs';
-import { fundTx, getFeesSatoshiPerKB, getAllTX } from './lib/net';
+import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight } from './lib/net';
 import { keyFromPass } from './lib/crypto';
 import { verifyLockTX } from './lib/verify';
+import Chain from './lib/Chain';
 // import { KeyRing } from 'bcoin/lib/primitives';
 import {
     keyring as KeyRing,
@@ -11,7 +12,7 @@ const NETWORK = config.network;
 
 // const asdf = genLockTx()
 async function main() {
-    const LOCKTIME = 1;
+    const LOCKTIME = 30;
     console.log(`Locking for ${LOCKTIME} blocks`);
 
     const masterKey = keyFromPass('correct horse stapler battery');
@@ -49,7 +50,10 @@ async function main() {
     console.log('Unlock TX:\n' + unlockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(unlockTx, pubKey));
 
-    console.log(await getAllTX(addr));
+    const txList = await getAllTX(addr);
+    // console.log
+    const curHeight = await getBlockHeight();
+    console.log(new Chain(txList, ring.getPublicKey(), curHeight));
 }
 
 main().catch((err) => {
