@@ -83,6 +83,33 @@ describe('TXList class', () => {
         expect(retLockTxSpent).toEqual(lockTxSpent);
     });
 
+    it('correctly stores height info', () => {
+        const txDataPath = path.resolve(__dirname, 'data');
+
+        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
+        const randTxData = fs.readFileSync(randTxPath).toString('utf8');
+        const randTx = TX.fromRaw(randTxData, 'hex');
+        const randTxSpent = [true];
+
+        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
+        const lockTxData = fs.readFileSync(lockTxPath).toString('utf8');
+        const lockTx = TX.fromRaw(lockTxData, 'hex');
+        const lockTxSpent = [false, false, false, true, false];
+
+        const heights = [1, 2];
+
+        const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], heights);
+
+        const txids = [
+            '04accc0dce3a7ff28af27de7d63f55834a563bcfa5e62b746785a6e5e3c2576f',
+            '9464e553907a85188e28e0ace9bfa10e61a9c5b8aa4be826770e6ce47e92fe62',
+        ];
+
+        const actualHeights = txids.map((txid) => list.getHeight(txid));
+
+        expect(actualHeights).toEqual(heights);
+    });
+
     it('throws on bad spent length', () => {
         const txDataPath = path.resolve(__dirname, 'data');
 
@@ -199,5 +226,25 @@ describe('TXList class', () => {
         expect(() => {
             list.getOutputSpent(hash, 64);
         }).toThrow(`Unknown output '64' for txid '${hash}'`);
+    });
+
+    it('throws on bad txid in height lookup', () => {
+        const txDataPath = path.resolve(__dirname, 'data');
+
+        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
+        const randTxData = fs.readFileSync(randTxPath).toString('utf8');
+        const randTx = TX.fromRaw(randTxData, 'hex');
+        const randTxSpent = [true];
+
+        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
+        const lockTxData = fs.readFileSync(lockTxPath).toString('utf8');
+        const lockTx = TX.fromRaw(lockTxData, 'hex');
+        const lockTxSpent = [false, false, false, true, false];
+
+        const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
+
+        expect(() => {
+            list.getHeight('asdf');
+        }).toThrow('Unknown txid \'asdf\'');
     });
 });
