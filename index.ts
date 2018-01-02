@@ -41,7 +41,7 @@ async function main() {
 
     console.log(coins);
 
-    const lockTx = genLockTx(coins, 'test', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), LOCKTIME);
+    const lockTx = genLockTx(coins, 'boop', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), LOCKTIME);
     console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
     console.log(verifyLockTX(lockTx, pubKey));
 

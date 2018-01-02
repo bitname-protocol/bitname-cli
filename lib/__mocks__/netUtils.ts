@@ -23,7 +23,7 @@ async function fetchUnspentTX(addr: Address): Promise<any> {
 
 async function fetchAllTX(addr: Address): Promise<any[]> {
     return new Promise<any[]>((resolve, reject) => {
-        fs.readFile(path.resolve(__dirname, '__mockData__', 'blockcypher_full_txs.json'), 'utf8', (err, data) => {
+        fs.readFile(path.resolve(__dirname, '__mockData__', 'blockcypher_full_revoked.json'), 'utf8', (err, data) => {
             if (err) {
                 reject(err);
             }
