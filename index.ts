@@ -68,10 +68,13 @@ import {
     keyring as KeyRing,
     coin as Coin,
     tx as TX,
+    address as Address,
+    crypto,
 } from 'bcoin';
 import { genLockTx, genUnlockTx } from './lib/txs';
 import { keyFromPass } from './lib/crypto';
 import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX } from './lib/net';
+import { extractInfo } from './lib/chain';
 
 import * as fs from 'fs';
 import { verifyLockTX } from './lib/verify';
@@ -260,6 +263,25 @@ async function serviceSpend(argv: yargs.Arguments) {
     console.log(unlockTx.toRaw().toString('hex'));
 }
 
+async function allNames(argv: yargs.Arguments) {
+    const decoded = utils.bech32.decode(argv.servicePubKey);
+    if (decoded.hrp !== 'pk' && decoded.hrp !== 'tp') {
+        console.error('Invalid pubkey HRP');
+        process.exit(1);
+    }
+
+    let net = 'main';
+    if (decoded.hrp === 'tp') {
+        net = 'testnet';
+    }
+
+    const addr = Address.fromPubkeyhash(crypto.hash160(decoded.hash));
+
+    const txList = await getAllTX(addr, net);
+    const curHeight = await getBlockHeight(net);
+    console.log(extractInfo(txList, decoded.hash, curHeight));
+}
+
 function main() {
     /* tslint:disable:no-unused-expression */
     yargs
@@ -332,6 +354,13 @@ function main() {
                     describe: 'path to WIF file',
                 });
         }, serviceSpend)
+        .command('all-names <servicePubKey>', 'get all current names registered with a service', (yargsObj) => {
+            return yargsObj
+                .positional('servicePubKey', {
+                    type: 'string',
+                    describe: 'the public key of the service',
+                });
+        }, allNames)
         .version('0.0.1')
         .help()
         .argv;
