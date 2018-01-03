@@ -209,9 +209,62 @@ async function revoke(argv: yargs.Arguments) {
     console.log(unlockTx.toRaw().toString('hex'));
 }
 
+async function serviceSpend(argv: yargs.Arguments) {
+    const net = argv.testnet ? 'testnet' : 'main';
+
+    let ring: KeyRing;
+
+    if (typeof argv.password !== 'undefined') {
+        const masterKey = keyFromPass(argv.password, net);
+        const derivedKey = masterKey.derivePath("m/44'/1'/0'/0/0");
+        ring = KeyRing.fromOptions(derivedKey, net);
+    } else if (typeof argv.wif !== 'undefined') {
+        const wifData = fs.readFileSync(argv.wif, 'utf8');
+        ring = KeyRing.fromSecret(wifData.trim());
+    } else {
+        console.error('Specify a password or WIF key!');
+        process.exit(1);
+        return;
+    }
+
+    const servicePubKey = ring.getPublicKey();
+
+    // console.log(argv);
+
+    let lockTX: TX;
+    try {
+        lockTX = await getTX(argv.txid, net);
+    } catch (err) {
+        console.error('There was a problem finding this transaction:');
+        console.error('    ' + err.message);
+        process.exit(1);
+        return;
+    }
+
+    if (!verifyLockTX(lockTX, servicePubKey)) {
+        console.error('This tx is not a valid bitname registration');
+        process.exit(1);
+    }
+
+    let feeRate: number;
+    try {
+        feeRate = await getFeesSatoshiPerKB(net);
+    } catch (err) {
+        console.error('There was a problem fetching fee information:');
+        console.error('    ' + err.message);
+        process.exit(1);
+        return;
+    }
+
+    const unlockTx = genUnlockTx(lockTX, feeRate, true, ring, servicePubKey);
+    console.log(unlockTx.toRaw().toString('hex'));
+}
+
 function main() {
     /* tslint:disable:no-unused-expression */
     yargs
+        .strict()
+        .demandCommand(1, 'Please specify a command')
         .command('register <servicePubKey> <name> <locktime>', 'register a name with the service', (yargsObj) => {
             return yargsObj
                 .positional('servicePubKey', {
@@ -258,6 +311,28 @@ function main() {
                     describe: 'path to WIF file',
                 });
         }, revoke)
+        .command('service-spend <txid>', 'spend locked fee sent to a service you control', (yargsObj) => {
+            return yargsObj
+                .positional('txid', {
+                    type: 'string',
+                    describe: 'the txid of the registering transaction',
+                })
+                .option('testnet', {
+                    type: 'boolean',
+                    describe: 'is this a testnet service?',
+                })
+                .option('password', {
+                    alias: 'p',
+                    type: 'string',
+                    describe: 'brainwallet password',
+                })
+                .option('wif', {
+                    alias: 'w',
+                    type: 'string',
+                    describe: 'path to WIF file',
+                });
+        }, serviceSpend)
+        .version('0.0.1')
         .help()
         .argv;
 }
