@@ -67,9 +67,8 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
         return false;
     }
 
-    // Check that output 2 is a P2PKH or P2SH
-    if (!tx.outputs[2].script.isPubkeyhash() &&
-        !tx.outputs[2].script.isScripthash()) {
+    // Check that output 2 is a P2PKH
+    if (!tx.outputs[2].script.isPubkeyhash()) {
         return false;
     }
 
@@ -97,4 +96,4 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
     return true;
 }
 
-export {verifyLockTX};
+export {verifyLockTX, isURISafe};

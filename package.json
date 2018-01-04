@@ -1,6 +1,6 @@
 {
-  "name": "bitname_cli",
-  "version": "1.0.0",
+  "name": "bitname-cli",
+  "version": "0.0.1",
   "main": "index.js",
   "author": "Colin Atkinson",
   "license": "GPL-3.0",
@@ -8,6 +8,7 @@
   "devDependencies": {
     "@types/jest": "^21.1.9",
     "@types/node-fetch": "^1.6.7",
+    "@types/yargs": "^10.0.0",
     "jest": "^22.0.4",
     "ts-jest": "^22.0.0",
     "ts-node": "^3.3.0",
@@ -16,8 +17,10 @@
   },
   "dependencies": {
     "bcoin": "^1.0.0-beta.15",
+    "chalk": "^2.3.0",
     "n64": "^0.0.18",
-    "node-fetch": "^1.7.3"
+    "node-fetch": "^1.7.3",
+    "yargs": "^10.0.3"
   },
   "scripts": {
     "start:dev": "ts-node index.ts",
@@ -39,5 +42,8 @@
       "node"
     ],
     "mapCoverage": true
+  },
+  "bin": {
+    "bitname": "dist/index.js"
   }
 }

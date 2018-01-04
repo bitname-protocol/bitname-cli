@@ -18,9 +18,9 @@ import {
     BadLockTransactionError,
 } from './errors';
 
-import { config } from '../config';
-import { verifyLockTX } from './verify';
-const NETWORK = config.network;
+// import { config } from '../config';
+import { verifyLockTX, isURISafe } from './verify';
+// const NETWORK = config.network;
 
 function extractEncodedMetadata(opRetScript: Script): [number, Buffer] {
     const rawNameData = opRetScript.code[1].data;
@@ -98,11 +98,23 @@ function genLockTx(coins: Coin[],
         throw new Error('Locktime must be 16-bits');
     }
 
+    if (name.length > 64) {
+        throw new Error('Name is too long');
+    }
+
+    if (!isURISafe(name)) {
+        throw new Error('Invalid character(s) in name');
+    }
+
+    if (!crypto.secp256k1.publicKeyVerify(servicePubKey)) {
+        throw new Error('Invalid service public key');
+    }
+
     const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
     const p2shAddr = genP2shAddr(redeemScript);
 
     const servicePKH = crypto.hash160(servicePubKey);
-    const serviceAddr = Address.fromPubkeyhash(servicePKH, NETWORK);
+    const serviceAddr = Address.fromPubkeyhash(servicePKH);
 
     const lockTx = new MTX();
 
@@ -197,6 +209,10 @@ function genUnlockTx(lockTx: TX,
 
     if (!verifyLockTX(lockTx, servicePubKey)) {
         throw new BadLockTransactionError();
+    }
+
+    if (!crypto.secp256k1.publicKeyVerify(otherPubKey)) {
+        throw new Error('Invalid service public key');
     }
 
     const locktime = extractEncodedMetadata(lockTx.outputs[1].script)[0];

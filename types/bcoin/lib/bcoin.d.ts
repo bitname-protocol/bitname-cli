@@ -1,6 +1,7 @@
 declare module 'bcoin' {
     class address {
         toBase58(network: string): string;
+        static fromBase58(address: string): address;
         static fromScript(script: script): address;
         static fromPubkeyhash(hash: Buffer, network?: string): address;
         static fromScripthash(hash: Buffer, network?: string): address;
@@ -13,6 +14,21 @@ declare module 'bcoin' {
 
     class util {
         static revHex<T extends Hash>(hex: T): T;
+    }
+
+    interface AddrResult {
+        hrp: string,
+        version: number,
+        hash: Buffer;
+    }
+
+    class bech32 {
+        decode(str: string): AddrResult;
+        encode(hrp: string, version: number, data: Buffer): string;
+    }
+
+    class utils {
+        static bech32: bech32;
     }
 
     class secp256k1 {
@@ -152,7 +168,7 @@ declare module 'bcoin' {
     class mtx extends tx {
         addCoin(coin: coin): input;
         addOutput(script: address | script | output | Object, value?: amount): output;
-        scriptInput(index: number, coin: coin | output, ring: keyring): boolean; // ring should be KeyRing
+        scriptInput(index: number, coin: coin | output, ring: keyring): boolean;
         subtractFee(fee: amount): void;
         subtractIndex(index: number, fee: amount): void;
         signInput(index: number, coin: coin | output, ring: keyring, type: number): boolean;
@@ -170,14 +186,16 @@ declare module 'bcoin' {
     type Base58String = string;
 
     class keyring {
+        public network: string;
         static fromOptions(options: KeyRingOpts | hd, network: string): keyring;
 
         getAddress(): address;
-        toSecret(): Base58String;
+        toSecret(network?: string): Base58String;
         getPrivateKey(enc?: string): Buffer;
         getPublicKey(enc?: string): Buffer;
 
         static fromSecret(secret: Base58String): keyring;
+        static generate(network?: string): keyring;
     }
 
     export {
@@ -192,6 +210,7 @@ declare module 'bcoin' {
         util,
         crypto,
         hd,
+        utils,
     };
 
     // export {address} from './address';
