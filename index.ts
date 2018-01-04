@@ -70,10 +70,11 @@ import {
     tx as TX,
     address as Address,
     crypto,
+    util,
 } from 'bcoin';
 import { genLockTx, genUnlockTx } from './lib/txs';
 import { keyFromPass } from './lib/crypto';
-import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX } from './lib/net';
+import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from './lib/net';
 import { extractInfo } from './lib/chain';
 
 import * as fs from 'fs';
@@ -146,7 +147,22 @@ async function register(argv: yargs.Arguments) {
                                  ring,
                                  servicePubKey,
                                  argv.locktime);
-        console.log(lockTx.toRaw().toString('hex'));
+        const txidStr = chalk`{green ${util.revHex(lockTx.hash('hex')) as string}}`;
+
+        if (argv.push) {
+            try {
+                await postTX(lockTx, net);
+                console.log(txidStr);
+            } catch (err) {
+                console.error('There was a problem publishing the transaction:');
+                console.error('    ' + err.message);
+                process.exit(1);
+                return;
+            }
+        } else {
+            console.log(txidStr);
+            console.log(lockTx.toRaw().toString('hex'));
+        }
     } catch (err) {
         console.error('There was a problem generating the transaction:');
         console.error('    ' + err.message);
@@ -211,7 +227,22 @@ async function revoke(argv: yargs.Arguments) {
     }
 
     const unlockTx = genUnlockTx(lockTX, feeRate, false, ring, servicePubKey);
-    console.log(unlockTx.toRaw().toString('hex'));
+    const txidStr = chalk`{green ${util.revHex(unlockTx.hash('hex')) as string}}`;
+
+    if (argv.push) {
+        try {
+            await postTX(unlockTx, net);
+            console.log(txidStr);
+        } catch (err) {
+            console.error('There was a problem publishing the transaction:');
+            console.error('    ' + err.message);
+            process.exit(1);
+            return;
+        }
+    } else {
+        console.log(txidStr);
+        console.log(unlockTx.toRaw().toString('hex'));
+    }
 }
 
 async function serviceSpend(argv: yargs.Arguments) {
@@ -262,7 +293,22 @@ async function serviceSpend(argv: yargs.Arguments) {
     }
 
     const unlockTx = genUnlockTx(lockTX, feeRate, true, ring, servicePubKey);
-    console.log(unlockTx.toRaw().toString('hex'));
+    const txidStr = chalk`{green ${util.revHex(unlockTx.hash('hex')) as string}}`;
+
+    if (argv.push) {
+        try {
+            await postTX(unlockTx, net);
+            console.log(txidStr);
+        } catch (err) {
+            console.error('There was a problem publishing the transaction:');
+            console.error('    ' + err.message);
+            process.exit(1);
+            return;
+        }
+    } else {
+        console.log(txidStr);
+        console.log(unlockTx.toRaw().toString('hex'));
+    }
 }
 
 async function allNames(argv: yargs.Arguments) {
@@ -319,6 +365,10 @@ function main() {
                     alias: 'w',
                     type: 'string',
                     describe: 'path to WIF file',
+                })
+                .option('push', {
+                    type: 'boolean',
+                    describe: 'whether to push this transaction to the network',
                 });
         }, register)
         .command('revoke <txid> <servicePubKey>', 'revoke a name', (yargsObj) => {
@@ -340,6 +390,10 @@ function main() {
                     alias: 'w',
                     type: 'string',
                     describe: 'path to WIF file',
+                })
+                .option('push', {
+                    type: 'boolean',
+                    describe: 'whether to push this transaction to the network',
                 });
         }, revoke)
         .command('service-spend <txid>', 'spend locked fee sent to a service you control', (yargsObj) => {
@@ -361,6 +415,10 @@ function main() {
                     alias: 'w',
                     type: 'string',
                     describe: 'path to WIF file',
+                })
+                .option('push', {
+                    type: 'boolean',
+                    describe: 'whether to push this transaction to the network',
                 });
         }, serviceSpend)
         .command('all-names <servicePubKey>', 'get all current names registered with a service', (yargsObj) => {

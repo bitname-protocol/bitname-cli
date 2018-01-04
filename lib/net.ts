@@ -13,7 +13,7 @@ const revHex = util.revHex;
 
 import fetch from 'node-fetch';
 
-import { fetchUnspentTX, fetchAllTX, fetchMetadata, fetchTX } from './netUtils';
+import { fetchUnspentTX, fetchAllTX, fetchMetadata, fetchTX, fetchPostTX } from './netUtils';
 
 async function getFeesSatoshiPerKB(network: string): Promise<number> {
     const data = await fetchMetadata(network);
@@ -106,10 +106,15 @@ async function getTX(txid: string, network: string): Promise<TX> {
     return TX.fromRaw(Buffer.from(hex, 'hex'));
 }
 
+async function postTX(tx: TX, network: string): Promise<void> {
+    await fetchPostTX(tx.toRaw().toString('hex'), network);
+}
+
 export {
     getFeesSatoshiPerKB,
     getBlockHeight,
     fundTx,
     getAllTX,
     getTX,
+    postTX,
 };

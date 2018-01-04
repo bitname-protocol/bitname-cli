@@ -73,9 +73,38 @@ async function fetchTX(txid: string, network: string) {
     return data;
 }
 
+async function fetchPostTX(tx: string, network: string): Promise<{error?: string}> {
+    let netSuffix = 'main';
+    if (network === 'testnet') {
+        netSuffix = 'test3';
+    }
+
+    const url = `https://api.blockcypher.com/v1/btc/${netSuffix}/txs/push`;
+
+    const txObj = {
+        tx,
+    };
+
+    const resp = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(txObj),
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    });
+    const data = await resp.json();
+
+    if (data.hasOwnProperty('error')) {
+        throw new Error(data.error);
+    }
+
+    return data;
+}
+
 export {
     fetchUnspentTX,
     fetchAllTX,
     fetchMetadata,
     fetchTX,
+    fetchPostTX,
 };
