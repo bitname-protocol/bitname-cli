@@ -40,7 +40,7 @@ An OP_RETURN containing the name to be registered. This should contain 1-64 URL-
 
 ===== 2
 
-A P2PKH/P2SH output to the service's set address. This represents the upfront fee for the service. The value should be determined by the service.
+A P2PKH output to the service's set address. This represents the upfront fee for the service. The value should be determined by the service.
 
 ===== 3
 
