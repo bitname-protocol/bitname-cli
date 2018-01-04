@@ -64,7 +64,6 @@
 
 import * as yargs from 'yargs';
 import {
-    utils,
     keyring as KeyRing,
     coin as Coin,
     tx as TX,
@@ -79,22 +78,20 @@ import { extractInfo } from './lib/chain';
 
 import * as fs from 'fs';
 import { verifyLockTX } from './lib/verify';
+import { bech32Encode, bech32Decode } from './lib/utils';
 
 import chalk from 'chalk';
 
 async function register(argv: yargs.Arguments) {
-    const decoded = utils.bech32.decode(argv.servicePubKey);
-    if (decoded.hrp !== 'pk' && decoded.hrp !== 'tp') {
+    const decoded = bech32Decode(argv.servicePubKey);
+    if (decoded === null) {
         console.error('Invalid pubkey HRP');
         process.exit(1);
+        return;
     }
 
-    let net = 'main';
-    if (decoded.hrp === 'tp') {
-        net = 'testnet';
-    }
-
-    const servicePubKey = decoded.hash;
+    const net = decoded.network;
+    const servicePubKey = decoded.pubKey;
 
     let ring: KeyRing;
 
@@ -171,18 +168,15 @@ async function register(argv: yargs.Arguments) {
 }
 
 async function revoke(argv: yargs.Arguments) {
-    const decoded = utils.bech32.decode(argv.servicePubKey);
-    if (decoded.hrp !== 'pk' && decoded.hrp !== 'tp') {
+    const decoded = bech32Decode(argv.servicePubKey);
+    if (decoded === null) {
         console.error('Invalid pubkey HRP');
         process.exit(1);
+        return;
     }
 
-    let net = 'main';
-    if (decoded.hrp === 'tp') {
-        net = 'testnet';
-    }
-
-    const servicePubKey = decoded.hash;
+    const net = decoded.network;
+    const servicePubKey = decoded.pubKey;
 
     let ring: KeyRing;
 
@@ -312,27 +306,27 @@ async function serviceSpend(argv: yargs.Arguments) {
 }
 
 async function allNames(argv: yargs.Arguments) {
-    const decoded = utils.bech32.decode(argv.servicePubKey);
-    if (decoded.hrp !== 'pk' && decoded.hrp !== 'tp') {
+    const decoded = bech32Decode(argv.servicePubKey);
+    if (decoded === null) {
         console.error('Invalid pubkey HRP');
         process.exit(1);
+        return;
     }
 
-    let net = 'main';
-    if (decoded.hrp === 'tp') {
-        net = 'testnet';
-    }
+    const net = decoded.network;
+    const servicePubKey = decoded.pubKey;
 
-    const addr = Address.fromPubkeyhash(crypto.hash160(decoded.hash));
+    const addr = Address.fromPubkeyhash(crypto.hash160(servicePubKey));
 
     const txList = await getAllTX(addr, net);
     const curHeight = await getBlockHeight(net);
-    const info = extractInfo(txList, decoded.hash, curHeight);
+    const info = extractInfo(txList, servicePubKey, curHeight);
     for (const key in info) {
         if (!info.hasOwnProperty(key)) {
             continue;
         }
-        const encKey = utils.bech32.encode(decoded.hrp, 0, info[key].pubKey);
+        const encKey = bech32Encode(info[key].pubKey, net);
+
         console.log(chalk`{green ${key}}\n{blue txid} ${info[key].txid}\n{blue pubk} ${encKey}\n`);
     }
 }
@@ -344,8 +338,7 @@ function keyGen(argv: yargs.Arguments) {
     const wif = ring.toSecret(net);
     const pubKeyRaw = ring.getPublicKey();
 
-    const hrp = argv.testnet ? 'tp' : 'pk';
-    const encPK = utils.bech32.encode(hrp, 0, pubKeyRaw);
+    const encPK = bech32Encode(pubKeyRaw, net);
 
     const addr = ring.getAddress().toBase58(net);
 
@@ -376,11 +369,15 @@ function keyInfo(argv: yargs.Arguments) {
 
     const ring = KeyRing.fromSecret(data.trim());
     const net = ring.network.toString();
+    if (net !== 'testnet' && net !== 'main') {
+        console.error(`Unknown network ${net}`);
+        process.exit(1);
+        return;
+    }
 
     const pubKeyRaw = ring.getPublicKey();
 
-    const hrp = net === 'testnet' ? 'tp' : 'pk';
-    const encPK = utils.bech32.encode(hrp, 0, pubKeyRaw);
+    const encPK = bech32Encode(pubKeyRaw, net);
 
     const addr = ring.getAddress().toBase58(net);
 
