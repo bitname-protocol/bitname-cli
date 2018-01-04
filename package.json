@@ -1,5 +1,5 @@
 {
-  "name": "bitname_cli",
+  "name": "bitname-cli",
   "version": "0.0.1",
   "main": "index.js",
   "author": "Colin Atkinson",
@@ -42,5 +42,8 @@
       "node"
     ],
     "mapCoverage": true
+  },
+  "bin": {
+    "bitname": "dist/index.js"
   }
 }

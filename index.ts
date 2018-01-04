@@ -1,3 +1,4 @@
+#!/bin/env node
 /* tslint:disable:no-console */
 
 import * as yargs from 'yargs';
