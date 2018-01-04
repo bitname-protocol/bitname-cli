@@ -1,5 +1,4 @@
 #!/bin/env node
-/* tslint:disable:no-console */
 
 import * as yargs from 'yargs';
 import {
@@ -11,16 +10,17 @@ import {
     util,
 } from 'bcoin';
 import { genLockTx, genUnlockTx } from './lib/txs';
-import { keyFromPass } from './lib/crypto';
 import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from './lib/net';
 import { extractInfo } from './lib/chain';
 
 import * as fs from 'fs';
+import * as path from 'path';
 import { verifyLockTX } from './lib/verify';
 import { bech32Encode, bech32Decode } from './lib/utils';
 
 import chalk from 'chalk';
 
+/* tslint:disable:no-console */
 function error(msg: string): never {
     console.error(chalk`{red Error: ${msg}}`);
     return process.exit(1);
@@ -32,10 +32,6 @@ function errorUnfoundTx(): never {
 
 function errorBadHRP() {
     return error('Invalid pubkey HRP');
-}
-
-function errorNoSecret() {
-    return error('You must pecify a password or WIF key');
 }
 
 function errorNoFees() {
@@ -59,18 +55,8 @@ async function register(argv: yargs.Arguments) {
     const net = decoded.network;
     const servicePubKey = decoded.pubKey;
 
-    let ring: KeyRing;
-
-    if (typeof argv.password !== 'undefined') {
-        const masterKey = keyFromPass(argv.password, net);
-        const derivedKey = masterKey.derivePath("m/44'/1'/0'/0/0");
-        ring = KeyRing.fromOptions(derivedKey, net);
-    } else if (typeof argv.wif !== 'undefined') {
-        const wifData = fs.readFileSync(argv.wif, 'utf8');
-        ring = KeyRing.fromSecret(wifData.trim());
-    } else {
-        return errorNoSecret();
-    }
+    const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
+    const ring = KeyRing.fromSecret(wifData.trim());
 
     const addr = ring.getAddress();
     const pubKey = ring.getPublicKey();
@@ -129,18 +115,8 @@ async function revoke(argv: yargs.Arguments) {
     const net = decoded.network;
     const servicePubKey = decoded.pubKey;
 
-    let ring: KeyRing;
-
-    if (typeof argv.password !== 'undefined') {
-        const masterKey = keyFromPass(argv.password, net);
-        const derivedKey = masterKey.derivePath("m/44'/1'/0'/0/0");
-        ring = KeyRing.fromOptions(derivedKey, net);
-    } else if (typeof argv.wif !== 'undefined') {
-        const wifData = fs.readFileSync(argv.wif, 'utf8');
-        ring = KeyRing.fromSecret(wifData.trim());
-    } else {
-        return errorNoSecret();
-    }
+    const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
+    const ring = KeyRing.fromSecret(wifData.trim());
 
     // console.log(argv);
 
@@ -181,22 +157,10 @@ async function revoke(argv: yargs.Arguments) {
 async function serviceSpend(argv: yargs.Arguments) {
     const net = argv.testnet ? 'testnet' : 'main';
 
-    let ring: KeyRing;
-
-    if (typeof argv.password !== 'undefined') {
-        const masterKey = keyFromPass(argv.password, net);
-        const derivedKey = masterKey.derivePath("m/44'/1'/0'/0/0");
-        ring = KeyRing.fromOptions(derivedKey, net);
-    } else if (typeof argv.wif !== 'undefined') {
-        const wifData = fs.readFileSync(argv.wif, 'utf8');
-        ring = KeyRing.fromSecret(wifData.trim());
-    } else {
-        return errorNoSecret();
-    }
+    const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
+    const ring = KeyRing.fromSecret(wifData.trim());
 
     const servicePubKey = ring.getPublicKey();
-
-    // console.log(argv);
 
     let lockTX: TX;
     try {
@@ -271,7 +235,7 @@ function keyGen(argv: yargs.Arguments) {
 
     if (typeof argv.out !== 'undefined') {
         try {
-            fs.writeFileSync(argv.out, wif, 'utf8');
+            fs.writeFileSync(path.resolve(argv.out), wif, 'utf8');
         } catch (err) {
             return error(`Could not write to ${argv.out}`);
         }
@@ -281,7 +245,7 @@ function keyGen(argv: yargs.Arguments) {
 function keyInfo(argv: yargs.Arguments) {
     let data: string;
     try {
-        data = fs.readFileSync(argv.file, 'utf8');
+        data = fs.readFileSync(path.resolve(argv.file), 'utf8');
     } catch (err) {
         return error(`Could not read ${argv.file}`);
     }
@@ -320,15 +284,11 @@ function main() {
                     type: 'number',
                     describe: 'how many blocks (up to 65535) to hold the name for',
                 })
-                .option('password', {
-                    alias: 'p',
-                    type: 'string',
-                    describe: 'brainwallet password',
-                })
                 .option('wif', {
                     alias: 'w',
                     type: 'string',
                     describe: 'path to WIF file',
+                    demandOption: true,
                 })
                 .option('push', {
                     type: 'boolean',
@@ -345,15 +305,11 @@ function main() {
                     type: 'string',
                     describe: 'the public key of the service',
                 })
-                .option('password', {
-                    alias: 'p',
-                    type: 'string',
-                    describe: 'brainwallet password',
-                })
                 .option('wif', {
                     alias: 'w',
                     type: 'string',
                     describe: 'path to WIF file',
+                    demandOption: true,
                 })
                 .option('push', {
                     type: 'boolean',
@@ -370,15 +326,11 @@ function main() {
                     type: 'boolean',
                     describe: 'is this a testnet service?',
                 })
-                .option('password', {
-                    alias: 'p',
-                    type: 'string',
-                    describe: 'brainwallet password',
-                })
                 .option('wif', {
                     alias: 'w',
                     type: 'string',
                     describe: 'path to WIF file',
+                    demandOption: true,
                 })
                 .option('push', {
                     type: 'boolean',
