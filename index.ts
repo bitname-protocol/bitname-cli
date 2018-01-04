@@ -79,6 +79,8 @@ import { extractInfo } from './lib/chain';
 import * as fs from 'fs';
 import { verifyLockTX } from './lib/verify';
 
+import chalk from 'chalk';
+
 async function register(argv: yargs.Arguments) {
     const decoded = utils.bech32.decode(argv.servicePubKey);
     if (decoded.hrp !== 'pk' && decoded.hrp !== 'tp') {
@@ -279,7 +281,14 @@ async function allNames(argv: yargs.Arguments) {
 
     const txList = await getAllTX(addr, net);
     const curHeight = await getBlockHeight(net);
-    console.log(extractInfo(txList, decoded.hash, curHeight));
+    const info = extractInfo(txList, decoded.hash, curHeight);
+    for (const key in info) {
+        if (!info.hasOwnProperty(key)) {
+            continue;
+        }
+        const encKey = utils.bech32.encode(decoded.hrp, 0, info[key].pubKey);
+        console.log(chalk`{green ${key}}\n{blue txid} ${info[key].txid}\n{blue pubk} ${encKey}\n`);
+    }
 }
 
 function main() {

@@ -234,7 +234,7 @@ describe('transaction verification', () => {
         // This new output will also be a P2SH, so we're sure it's not just checking for that
         // const newOutput = Output.fromScript(newScript.getAddress(), oldVal);
         const addr = Address.fromBase58('muwhLTVYGD7xHpAP2Dx4aCjKThorymmV4w');
-        const newOutput = Output.fromScript(addr, oldVal)
+        const newOutput = Output.fromScript(addr, oldVal);
 
         mtx.outputs[3] = newOutput;
 
