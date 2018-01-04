@@ -168,7 +168,7 @@ declare module 'bcoin' {
     class mtx extends tx {
         addCoin(coin: coin): input;
         addOutput(script: address | script | output | Object, value?: amount): output;
-        scriptInput(index: number, coin: coin | output, ring: keyring): boolean; // ring should be KeyRing
+        scriptInput(index: number, coin: coin | output, ring: keyring): boolean;
         subtractFee(fee: amount): void;
         subtractIndex(index: number, fee: amount): void;
         signInput(index: number, coin: coin | output, ring: keyring, type: number): boolean;
@@ -186,14 +186,16 @@ declare module 'bcoin' {
     type Base58String = string;
 
     class keyring {
+        public network: string;
         static fromOptions(options: KeyRingOpts | hd, network: string): keyring;
 
         getAddress(): address;
-        toSecret(): Base58String;
+        toSecret(network?: string): Base58String;
         getPrivateKey(enc?: string): Buffer;
         getPublicKey(enc?: string): Buffer;
 
         static fromSecret(secret: Base58String): keyring;
+        static generate(network?: string): keyring;
     }
 
     export {

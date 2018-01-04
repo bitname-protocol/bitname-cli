@@ -337,6 +337,56 @@ async function allNames(argv: yargs.Arguments) {
     }
 }
 
+function keyGen(argv: yargs.Arguments) {
+    const net = argv.testnet ? 'testnet' : 'main';
+    const ring = KeyRing.generate(net);
+
+    const wif = ring.toSecret(net);
+    const pubKeyRaw = ring.getPublicKey();
+
+    const hrp = argv.testnet ? 'tp' : 'pk';
+    const encPK = utils.bech32.encode(hrp, 0, pubKeyRaw);
+
+    const addr = ring.getAddress().toBase58(net);
+
+    console.log(chalk`{magenta secret} ${wif}\n{blue pubk}   ${encPK}\n{blue addr}   ${addr}`);
+
+    if (typeof argv.out !== 'undefined') {
+        try {
+            fs.writeFileSync(argv.out, wif, 'utf8');
+        } catch (err) {
+            console.error(`Could not write to ${argv.out}:`);
+            console.error('    ' + err.message);
+            process.exit(1);
+            return;
+        }
+    }
+}
+
+function keyInfo(argv: yargs.Arguments) {
+    let data: string;
+    try {
+        data = fs.readFileSync(argv.file, 'utf8');
+    } catch (err) {
+        console.error(`Could not read ${argv.file}`);
+        console.error('    ' + err.message);
+        process.exit(1);
+        return;
+    }
+
+    const ring = KeyRing.fromSecret(data.trim());
+    const net = ring.network.toString();
+
+    const pubKeyRaw = ring.getPublicKey();
+
+    const hrp = net === 'testnet' ? 'tp' : 'pk';
+    const encPK = utils.bech32.encode(hrp, 0, pubKeyRaw);
+
+    const addr = ring.getAddress().toBase58(net);
+
+    console.log(chalk`{blue pubk} ${encPK}\n{blue addr} ${addr}`);
+}
+
 function main() {
     /* tslint:disable:no-unused-expression */
     yargs
@@ -371,7 +421,7 @@ function main() {
                     describe: 'whether to push this transaction to the network',
                 });
         }, register)
-        .command('revoke <txid> <servicePubKey>', 'revoke a name', (yargsObj) => {
+        .command('revoke <servicePubKey> <txid>', 'revoke a name', (yargsObj) => {
             return yargsObj
                 .positional('txid', {
                     type: 'string',
@@ -428,6 +478,25 @@ function main() {
                     describe: 'the public key of the service',
                 });
         }, allNames)
+        .command('key-gen', 'generate a new priv/pub keypair', (yargsObj) => {
+            return yargsObj
+                .option('testnet', {
+                    type: 'boolean',
+                    describe: 'whether to generate a testnet key',
+                })
+                .option('out', {
+                    alias: 'o',
+                    type: 'string',
+                    describe: 'write WIF to a file',
+                });
+        }, keyGen)
+        .command('key-info <file>', 'get information about a private key', (yargsObj) => {
+            return yargsObj
+                .positional('file', {
+                    type: 'string',
+                    describe: 'the WIF file containing the private key',
+                });
+        }, keyInfo)
         .version('0.0.1')
         .help()
         .argv;
