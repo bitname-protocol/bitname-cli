@@ -1,65 +1,3 @@
-// import { genLockTx, genUnlockTx, genRedeemScript, genP2shAddr } from './lib/txs';
-// import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight } from './lib/net';
-// import { keyFromPass } from './lib/crypto';
-// import { verifyLockTX } from './lib/verify';
-// import { extractInfo } from './lib/chain';
-// // import { KeyRing } from 'bcoin/lib/primitives';
-// import {
-//     keyring as KeyRing,
-// } from 'bcoin';
-// import { config } from './config';
-// const NETWORK = config.network;
-
-// // const asdf = genLockTx()
-// async function main() {
-//     const LOCKTIME = 30;
-//     console.log(`Locking for ${LOCKTIME} blocks`);
-
-//     const masterKey = keyFromPass('correct horse stapler battery');
-//     const derivedKey = masterKey.derivePath("m/44'/1'/0'/0/0");
-//     console.log(derivedKey);
-//     const ring = KeyRing.fromOptions(derivedKey, NETWORK);
-//     console.log('Addr:\n' + ring.getAddress());
-//     console.log('WIF:\n' + ring.toSecret());
-
-//     const redeemScript = genRedeemScript(ring.getPublicKey(), ring.getPublicKey(), LOCKTIME);
-
-//     const p2shAddr = genP2shAddr(redeemScript);
-//     console.log('To lock, send coins to: ' + p2shAddr.toBase58(NETWORK));
-
-//     const addr = ring.getAddress();
-//     const pubKey = ring.getPublicKey();
-
-//     const feeRate = await getFeesSatoshiPerKB();
-//     const upfrontFee = 1000000;
-//     const delayFee   = 1000000;
-//     // const delayFee =    100000;
-
-//     // const coin = await getBiggestUTXO(addr);
-//     // Fund up to a 2 KB transaction
-//     const coins = await fundTx(addr, upfrontFee + delayFee + 2 * feeRate);
-
-//     console.log(coins);
-
-//     const lockTx = genLockTx(coins, 'boop', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), LOCKTIME);
-//     console.log('Lock TX:\n' + lockTx.toRaw().toString('hex'));
-//     console.log(verifyLockTX(lockTx, pubKey));
-
-//     // const unlockTx = genUnlockTx(ring, lockTx, LOCKTIME, redeemScript, feeRate, false);
-//     const unlockTx = genUnlockTx(lockTx, feeRate, false, ring, ring.getPublicKey());
-//     console.log('Unlock TX:\n' + unlockTx.toRaw().toString('hex'));
-//     console.log(verifyLockTX(unlockTx, pubKey));
-
-//     const txList = await getAllTX(addr);
-//     // console.log
-//     const curHeight = await getBlockHeight();
-//     console.log(extractInfo(txList, ring.getPublicKey(), curHeight));
-// }
-
-// main().catch((err) => {
-//     console.error(err);
-// });
-
 /* tslint:disable:no-console */
 
 import * as yargs from 'yargs';
@@ -82,12 +20,39 @@ import { bech32Encode, bech32Decode } from './lib/utils';
 
 import chalk from 'chalk';
 
+function error(msg: string): never {
+    console.error(chalk`{red Error: ${msg}}`);
+    return process.exit(1);
+}
+
+function errorUnfoundTx(): never {
+    return error('Could not find the transaction. Check the txid or try again later.');
+}
+
+function errorBadHRP() {
+    return error('Invalid pubkey HRP');
+}
+
+function errorNoSecret() {
+    return error('You must pecify a password or WIF key');
+}
+
+function errorNoFees() {
+    return error('Could not fetch fee information. Try again later.');
+}
+
+function errorInvalidLock() {
+    return error('This is not a valid bitname registration tx');
+}
+
+function errorCantPush() {
+    return error('There was a problem publishing the tx. Try again later.');
+}
+
 async function register(argv: yargs.Arguments) {
     const decoded = bech32Decode(argv.servicePubKey);
     if (decoded === null) {
-        console.error('Invalid pubkey HRP');
-        process.exit(1);
-        return;
+        return errorBadHRP();
     }
 
     const net = decoded.network;
@@ -103,9 +68,7 @@ async function register(argv: yargs.Arguments) {
         const wifData = fs.readFileSync(argv.wif, 'utf8');
         ring = KeyRing.fromSecret(wifData.trim());
     } else {
-        console.error('Specify a password or WIF key!');
-        process.exit(1);
-        return;
+        return errorNoSecret();
     }
 
     const addr = ring.getAddress();
@@ -115,10 +78,7 @@ async function register(argv: yargs.Arguments) {
     try {
         feeRate = await getFeesSatoshiPerKB(net);
     } catch (err) {
-        console.error('There was a problem fetching fee information:');
-        console.error('    ' + err.message);
-        process.exit(1);
-        return;
+        return errorNoFees();
     }
 
     const upfrontFee = 1000000;
@@ -129,10 +89,7 @@ async function register(argv: yargs.Arguments) {
     try {
         coins = await fundTx(addr, upfrontFee + delayFee + 2 * feeRate, net);
     } catch (err) {
-        console.error('There was a problem funding the transaction:');
-        console.error('    ' + err.message);
-        process.exit(1);
-        return;
+        return error('Could not fund the transaction');
     }
 
     try {
@@ -151,28 +108,21 @@ async function register(argv: yargs.Arguments) {
                 await postTX(lockTx, net);
                 console.log(txidStr);
             } catch (err) {
-                console.error('There was a problem publishing the transaction:');
-                console.error('    ' + err.message);
-                process.exit(1);
-                return;
+                return errorCantPush();
             }
         } else {
             console.log(txidStr);
             console.log(lockTx.toRaw().toString('hex'));
         }
     } catch (err) {
-        console.error('There was a problem generating the transaction:');
-        console.error('    ' + err.message);
-        process.exit(1);
+        return error('Could not generate transaction: ' + err.message);
     }
 }
 
 async function revoke(argv: yargs.Arguments) {
     const decoded = bech32Decode(argv.servicePubKey);
     if (decoded === null) {
-        console.error('Invalid pubkey HRP');
-        process.exit(1);
-        return;
+        return errorBadHRP();
     }
 
     const net = decoded.network;
@@ -188,9 +138,7 @@ async function revoke(argv: yargs.Arguments) {
         const wifData = fs.readFileSync(argv.wif, 'utf8');
         ring = KeyRing.fromSecret(wifData.trim());
     } else {
-        console.error('Specify a password or WIF key!');
-        process.exit(1);
-        return;
+        return errorNoSecret();
     }
 
     // console.log(argv);
@@ -199,25 +147,18 @@ async function revoke(argv: yargs.Arguments) {
     try {
         lockTX = await getTX(argv.txid, net);
     } catch (err) {
-        console.error('There was a problem finding this transaction:');
-        console.error('    ' + err.message);
-        process.exit(1);
-        return;
+        return errorUnfoundTx();
     }
 
     if (!verifyLockTX(lockTX, servicePubKey)) {
-        console.error('This tx is not a valid bitname registration');
-        process.exit(1);
+        return errorInvalidLock();
     }
 
     let feeRate: number;
     try {
         feeRate = await getFeesSatoshiPerKB(net);
     } catch (err) {
-        console.error('There was a problem fetching fee information:');
-        console.error('    ' + err.message);
-        process.exit(1);
-        return;
+        return errorNoFees();
     }
 
     const unlockTx = genUnlockTx(lockTX, feeRate, false, ring, servicePubKey);
@@ -228,10 +169,7 @@ async function revoke(argv: yargs.Arguments) {
             await postTX(unlockTx, net);
             console.log(txidStr);
         } catch (err) {
-            console.error('There was a problem publishing the transaction:');
-            console.error('    ' + err.message);
-            process.exit(1);
-            return;
+            return errorCantPush();
         }
     } else {
         console.log(txidStr);
@@ -252,9 +190,7 @@ async function serviceSpend(argv: yargs.Arguments) {
         const wifData = fs.readFileSync(argv.wif, 'utf8');
         ring = KeyRing.fromSecret(wifData.trim());
     } else {
-        console.error('Specify a password or WIF key!');
-        process.exit(1);
-        return;
+        return errorNoSecret();
     }
 
     const servicePubKey = ring.getPublicKey();
@@ -265,25 +201,18 @@ async function serviceSpend(argv: yargs.Arguments) {
     try {
         lockTX = await getTX(argv.txid, net);
     } catch (err) {
-        console.error('There was a problem finding this transaction:');
-        console.error('    ' + err.message);
-        process.exit(1);
-        return;
+        return errorUnfoundTx();
     }
 
     if (!verifyLockTX(lockTX, servicePubKey)) {
-        console.error('This tx is not a valid bitname registration');
-        process.exit(1);
+        return errorInvalidLock();
     }
 
     let feeRate: number;
     try {
         feeRate = await getFeesSatoshiPerKB(net);
     } catch (err) {
-        console.error('There was a problem fetching fee information:');
-        console.error('    ' + err.message);
-        process.exit(1);
-        return;
+        return errorNoFees();
     }
 
     const unlockTx = genUnlockTx(lockTX, feeRate, true, ring, servicePubKey);
@@ -294,10 +223,7 @@ async function serviceSpend(argv: yargs.Arguments) {
             await postTX(unlockTx, net);
             console.log(txidStr);
         } catch (err) {
-            console.error('There was a problem publishing the transaction:');
-            console.error('    ' + err.message);
-            process.exit(1);
-            return;
+            return errorCantPush();
         }
     } else {
         console.log(txidStr);
@@ -308,9 +234,7 @@ async function serviceSpend(argv: yargs.Arguments) {
 async function allNames(argv: yargs.Arguments) {
     const decoded = bech32Decode(argv.servicePubKey);
     if (decoded === null) {
-        console.error('Invalid pubkey HRP');
-        process.exit(1);
-        return;
+        return errorBadHRP();
     }
 
     const net = decoded.network;
@@ -348,10 +272,7 @@ function keyGen(argv: yargs.Arguments) {
         try {
             fs.writeFileSync(argv.out, wif, 'utf8');
         } catch (err) {
-            console.error(`Could not write to ${argv.out}:`);
-            console.error('    ' + err.message);
-            process.exit(1);
-            return;
+            return error(`Could not write to ${argv.out}`);
         }
     }
 }
@@ -361,18 +282,13 @@ function keyInfo(argv: yargs.Arguments) {
     try {
         data = fs.readFileSync(argv.file, 'utf8');
     } catch (err) {
-        console.error(`Could not read ${argv.file}`);
-        console.error('    ' + err.message);
-        process.exit(1);
-        return;
+        return error(`Could not read ${argv.file}`);
     }
 
     const ring = KeyRing.fromSecret(data.trim());
     const net = ring.network.toString();
     if (net !== 'testnet' && net !== 'main') {
-        console.error(`Unknown network ${net}`);
-        process.exit(1);
-        return;
+        return error(`Unknown network ${net}`);
     }
 
     const pubKeyRaw = ring.getPublicKey();
@@ -499,7 +415,4 @@ function main() {
         .argv;
 }
 
-// main().catch((err) => {
-//     console.error(err);
-// });
 main();
