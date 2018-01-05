@@ -23,7 +23,8 @@ async function fetchUnspentTX(addr: Address, network: string): Promise<any> {
 
 async function fetchAllTX(addr: Address, network: string): Promise<any[]> {
     return new Promise<any[]>((resolve, reject) => {
-        fs.readFile(path.resolve(__dirname, '__mockData__', 'blockcypher_full_revoked.json'), 'utf8', (err, data) => {
+        const b58 = addr.toBase58(network);
+        fs.readFile(path.resolve(__dirname, '__mockData__', 'fetchAllTX', b58 + '.json'), 'utf8', (err, data) => {
             if (err) {
                 reject(err);
             }
