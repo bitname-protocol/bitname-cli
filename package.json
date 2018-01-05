@@ -4,7 +4,11 @@
   "main": "index.js",
   "author": "Colin Atkinson",
   "description": "Associate public keys with names on the Bitcoin blockchain",
-  "keywords": ["typescript", "bitcoin", "cryptography"],
+  "keywords": [
+    "typescript",
+    "bitcoin",
+    "cryptography"
+  ],
   "homepage": "https://github.com/colatkinson/bitname-cli",
   "bugs": "https://github.com/colatkinson/bitname-cli/issues",
   "repository": {

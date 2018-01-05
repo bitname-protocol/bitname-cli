@@ -23,7 +23,8 @@ import chalk from 'chalk';
 /* tslint:disable:no-console */
 function error(msg: string): never {
     console.error(chalk`{red Error: ${msg}}`);
-    return process.exit(1);
+    process.exit(1);
+    throw new Error('Somehow, exiting the process failed?');
 }
 
 function errorUnfoundTx(): never {
