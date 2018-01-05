@@ -78,7 +78,7 @@ describe('tx generation', () => {
 
     it('generates user unlocking transaction', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
@@ -92,7 +92,7 @@ describe('tx generation', () => {
 
     it('generates service unlocking transaction', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
@@ -106,7 +106,7 @@ describe('tx generation', () => {
 
     it('errors on unlocking with incorrect user pubkey', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
@@ -122,7 +122,7 @@ describe('tx generation', () => {
 
     it('errors on unlocking with incorrect service pubkey', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
@@ -138,7 +138,7 @@ describe('tx generation', () => {
 
     it('errors on unlocking with incorrect privkey', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
