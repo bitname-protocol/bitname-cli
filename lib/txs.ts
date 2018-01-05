@@ -5,7 +5,6 @@ import {
     address as Address,
     output as Output,
     mtx as MTX,
-    amount as Amount,
     coin as Coin,
     tx as TX,
     keyring as KeyRing,
@@ -218,9 +217,6 @@ function genUnlockTx(lockTx: TX,
     const locktime = extractEncodedMetadata(lockTx.outputs[1].script)[0];
 
     const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
-
-    const redeemScriptHash = crypto.hash160(redeemScript.toRaw());
-    const redeemScriptAddr = Address.fromScripthash(redeemScriptHash);
 
     const val = lockTx.outputs[3].value;
     const unlockTx = MTX.fromOptions({
