@@ -10,8 +10,8 @@
     <a href="https://travis-ci.org/colatkinson/bitname-cli">
         <img src="https://img.shields.io/travis/colatkinson/bitname-cli.svg?style=flat-square" alt="Travis" />
     </a>
-    <!--<a href="https://codecov.io/gh/colatkinson/bitname-cli">
-        <img src="https://img.shields.io/codecov/c/github/colatkinson/bitname-cli.svg?style=flat-square" alt="Codecov" />-->
+    <a href="https://codecov.io/gh/colatkinson/bitname-cli">
+        <img src="https://img.shields.io/codecov/c/github/colatkinson/bitname-cli.svg?style=flat-square" alt="Codecov" />
     </a>
     <a href="https://waffle.io/colatkinson/bitname-cli">
         <img src="https://img.shields.io/github/issues/colatkinson/bitname-cli.svg?style=flat-square" alt="Issues" />
