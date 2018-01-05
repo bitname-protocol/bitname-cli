@@ -1,23 +1,26 @@
 <h1 align="center">
     <br />
-    <img src="graphics/logo.png" alt="bitname" />
+    <img src="graphics/logo.png" alt="bitname" width="256" />
     <br />
 </h1>
 
 <p align="center"><b>Associate public keys with names on the Bitcoin blockchain</b></p>
 
 <p align="center">
+    <a href="">
+        <img src="https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=for-the-badge" alt="Chat on Gitter" />
+    </a>
     <a href="https://travis-ci.org/colatkinson/bitname-cli">
-        <img src="https://img.shields.io/travis/colatkinson/bitname-cli.svg?style=flat-square" alt="Travis" />
+        <img src="https://img.shields.io/travis/colatkinson/bitname-cli.svg?style=for-the-badge" alt="Travis" />
     </a>
     <a href="https://codecov.io/gh/colatkinson/bitname-cli">
-        <img src="https://img.shields.io/codecov/c/github/colatkinson/bitname-cli.svg?style=flat-square" alt="Codecov" />
+        <img src="https://img.shields.io/codecov/c/github/colatkinson/bitname-cli.svg?style=for-the-badge" alt="Codecov" />
     </a>
     <a href="https://waffle.io/colatkinson/bitname-cli">
-        <img src="https://img.shields.io/github/issues/colatkinson/bitname-cli.svg?style=flat-square" alt="Issues" />
+        <img src="https://img.shields.io/github/issues/colatkinson/bitname-cli.svg?style=for-the-badge" alt="Issues" />
     </a>
     <a href="https://www.gnu.org/licenses/lgpl.html">
-        <img src="https://img.shields.io/github/license/colatkinson/bitname-cli.svg?style=flat-square" alt="License" />
+        <img src="https://img.shields.io/github/license/colatkinson/bitname-cli.svg?style=for-the-badge" alt="License" />
     </a>
 </p>
 

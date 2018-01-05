@@ -10,7 +10,7 @@
     "cryptography"
   ],
   "homepage": "https://github.com/colatkinson/bitname-cli",
-  "bugs": "https://github.com/colatkinson/bitname-cli/issues",
+  "bugs": "https://waffle.io/colatkinson/bitname-cli",
   "repository": {
     "type": "git",
     "url": "https://github.com/colatkinson/bitname-cli.git"
