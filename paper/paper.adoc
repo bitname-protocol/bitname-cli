@@ -1,6 +1,6 @@
 = Bitname Protocol 0.0.1 Specification
 Colin Atkinson <me@colatkinson.site>
-v0.0.1, December 2017
+v0.0.1, January 2018
 :pdf-page-size: 8.5in x 11in
 :toc:
 
@@ -92,3 +92,13 @@ The scriptSig will be:
 ----
 
 The transaction sequence number must also be set to `[time]`.
+
+= Protocol Gotchas
+
+== Duplicate Names
+
+Alice registers the name 'test' at block `N`, and the registration is valid for 100 blocks. At block `N + 50`, Bob registers the same name, also for 100 blocks. Which registration is valid in this case?
+
+In this case, we say that Alice's registration is valid, and Bob's is invalid. In fact, it is invalid even after block `N + 100`, when Alice's registration has expired. This discourages an attack wherein Bob intentionally registers 'test' for 65535 blocks (the maximum allowed) at block `N + 99` and extorts Alice in exchange for revoking his registration.
+
+But what happens if Bob is watching the mempool and decides to DoS Alice? He can publish a transaction registering the same name, and it may be accepted in the same block (especially if Bob happens to be a miner). To discourage this, right now both registrations will simply be ignored. In the future, however, a cleaner solution will be developed, possibly taking ideas from Namecoin.
