@@ -106,6 +106,10 @@ Glad you asked! For a more technical summary, check out the [protocol specificat
 * A switch to the open Electrum protocol instead of relying on a proprietary, rate-limited API
 * Fixing a potential DoS attack vector (see the spec for a better description)
 
+## Contributing
+
+Please see the [code of conduct](CODE_OF_CONDUCT.md) and [contributor guidelines](CONTRIBUTING.md).
+
 ## Disclosure Policy
 
 Please do not contact any contributors privately to disclose a bug. Make an issue so that this is immediately brought to light.
