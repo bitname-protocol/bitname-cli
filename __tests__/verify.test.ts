@@ -16,7 +16,7 @@ import * as path from 'path';
 describe('transaction verification', () => {
     it('verifies valid locking tx', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
         const tx = TX.fromRaw(txData, 'hex');
 
@@ -27,7 +27,7 @@ describe('transaction verification', () => {
 
     it('fails on fewer than 4 outputs', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -41,7 +41,7 @@ describe('transaction verification', () => {
 
     it('fails on output 0 not being an OP_RETURN', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -64,7 +64,7 @@ describe('transaction verification', () => {
 
     it('fails on output 0 having value > 0', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -78,7 +78,7 @@ describe('transaction verification', () => {
 
     it('fails on output 0 having more than 2 ops', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -95,7 +95,7 @@ describe('transaction verification', () => {
 
     it('fails on output 0 not containing a public key', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -111,7 +111,7 @@ describe('transaction verification', () => {
 
     it('fails on output 1 not being an OP_RETURN', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -134,7 +134,7 @@ describe('transaction verification', () => {
 
     it('fails on output 1 having value > 0', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -148,7 +148,7 @@ describe('transaction verification', () => {
 
     it('fails on output 1 having more than 2 ops', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -165,7 +165,7 @@ describe('transaction verification', () => {
 
     it('fails on output 1 name being too long', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -183,7 +183,7 @@ describe('transaction verification', () => {
 
     it('fails on output 1 name not being URI-safe', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -201,7 +201,7 @@ describe('transaction verification', () => {
 
     it('fails on output 2 not being a P2PKH', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -224,7 +224,7 @@ describe('transaction verification', () => {
 
     it('fails on output 3 not being a P2SH', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
@@ -245,7 +245,7 @@ describe('transaction verification', () => {
 
     it('fails on bad lock script format', () => {
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath).toString('utf8');
+        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
