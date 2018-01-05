@@ -3,7 +3,15 @@
   "version": "0.0.1",
   "main": "index.js",
   "author": "Colin Atkinson",
-  "license": "GPL-3.0",
+  "description": "Associate public keys with names on the Bitcoin blockchain",
+  "keywords": ["typescript", "bitcoin", "cryptography"],
+  "homepage": "https://github.com/colatkinson/bitname-cli",
+  "bugs": "https://github.com/colatkinson/bitname-cli/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/colatkinson/bitname-cli.git"
+  },
+  "license": "LGPL-3.0-or-later",
   "private": true,
   "devDependencies": {
     "@types/jest": "^21.1.9",
