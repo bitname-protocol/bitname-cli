@@ -11,8 +11,6 @@ import TXList from './TXList';
 
 const revHex = util.revHex;
 
-import fetch from 'node-fetch';
-
 import { fetchUnspentTX, fetchAllTX, fetchMetadata, fetchTX, fetchPostTX } from './netUtils';
 
 async function getFeesSatoshiPerKB(network: string): Promise<number> {
@@ -40,8 +38,6 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
         throw new Error(`No unspent txs found for ${addr}`);
     }
 
-    const addrString = addr.toBase58(network);
-
     txs.sort((a: number, b: number) => {
         return a - b;
     });
@@ -52,7 +48,6 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
 
     for (const tx of txs) {
         if (set.has(tx.tx_hash)) {
-            console.log('Duplicate tx hash found', tx.tx_hash);
             continue;
         }
         set.add(tx.tx_hash);

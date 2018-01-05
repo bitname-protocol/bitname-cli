@@ -59,7 +59,6 @@ async function register(argv: yargs.Arguments) {
     const ring = KeyRing.fromSecret(wifData.trim());
 
     const addr = ring.getAddress();
-    const pubKey = ring.getPublicKey();
 
     let feeRate: number;
     try {

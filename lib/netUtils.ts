@@ -30,17 +30,13 @@ async function fetchAllTX(addr: Address, network: string): Promise<any[]> {
 
     let data = curData.txs;
 
-    let reqs = 1;
-
     while (curData.hasOwnProperty('hasMore')) {
         const lastHeight = curData.txs[curData.txs.length - 1].block_height;
         const url = `${baseURL}&before=${lastHeight}`;
-        curResp = await fetch(baseURL);
+        curResp = await fetch(url);
         curData = await curResp.json();
 
-        // data.push(curData);
         data = data.concat(curData.txs);
-        reqs += 1;
     }
 
     return data;

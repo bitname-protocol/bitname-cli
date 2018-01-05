@@ -5,7 +5,6 @@ import {
     crypto,
 } from 'bcoin';
 import { genRedeemScript, extractEncodedMetadata } from './txs';
-import { I64 } from 'n64';
 
 function isURISafe(str: string) {
     const re = /^[a-zA-Z0-9_\-\.\~]*$/;
@@ -55,7 +54,6 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
     const metadata = extractEncodedMetadata(tx.outputs[1].script);
 
     // Check that output 1 name data is only 64 bytes in length
-    const rawNameData = tx.outputs[1].script.code[1].data;
     const name = metadata[1];
     const nameStr = name.toString('ascii');
     if (name.length > 64) {
