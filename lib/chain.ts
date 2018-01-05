@@ -15,6 +15,7 @@ interface INameInfo {
         txid: string;
         pubKey: Buffer;
         expires: number;
+        invalid?: boolean;
     };
 }
 
@@ -47,9 +48,15 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
             txid,
             pubKey,
             expires,
+            invalid: false,
         };
 
         const name = getLockTxName(lockTx);
+
+        if (map.hasOwnProperty(name) && txs.getHeight(map[name].txid) === height) {
+            map[name].invalid = true;
+            continue;
+        }
 
         // If this name is already registered, don't replace it
         // Unless the name expired before this tx even existed, in which case include it
@@ -61,8 +68,9 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
     // Now return only the non-expired names
     const mapNonExp: INameInfo = {};
     for (const key in map) {
-        if (map[key].expires >= curHeight) {
-            mapNonExp[key] = map[key];
+        if (map[key].expires >= curHeight && !map[key].invalid) {
+            const {invalid, ...dataCpy} = map[key];
+            mapNonExp[key] = dataCpy;
         }
     }
 

@@ -28,7 +28,7 @@ describe('chain state', () => {
         expect(info).toEqual(expectedInfo);
     });
 
-    it('does not include a double name', async () => {
+    it('does not include a double name, even if both are in the same block', async () => {
         const addr = Address.fromBase58('n4QGUi9Ds29DBcN8MdPcHwb3rt3uh8NLHw');
         const txList = await getAllTX(addr, 'testnet');
 
