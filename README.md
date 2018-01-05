@@ -7,7 +7,7 @@
 <p align="center"><b>Associate public keys with names on the Bitcoin blockchain</b></p>
 
 <p align="center">
-    <a href="">
+    <a href="https://gitter.im/bitname-cli/Lobby">
         <img src="https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=for-the-badge" alt="Chat on Gitter" />
     </a>
     <a href="https://travis-ci.org/colatkinson/bitname-cli">
