@@ -1,6 +1,6 @@
-= Bitname Protocol 0.0.1 Specification
+= Bitname Protocol Specification
 Colin Atkinson <me@colatkinson.site>
-v0.0.1, January 2018
+v0.0.2, January 2018
 :pdf-page-size: 8.5in x 11in
 :toc:
 
@@ -16,13 +16,50 @@ Ownership of names may also be transferred. In order to do this, the current own
 
 == Transaction Format
 
-There are two classes of transactions in the protocol: locking and unlocking. The former creates a name attestation, while the latter spends funds from it once it has expired.
+There are three classes of transactions in the protocol: commitment, locking, and unlocking. The former creates a name attestation, while the latter spends funds from it once it has expired.
+
+=== Commitment Transactions
+
+==== Inputs
+
+The locking transaction may use inputs from any source, including P2PKH and P2SH addresses. This allows the possibility of using multisignature wallets as sources of funding.
+
+==== Outputs
+
+===== 0
+
+An OP_RETURN containing the nonce value.
+
+===== 1
+
+A P2SH for a script of the following form:
+
+[source]
+----
+[256-bit nonce]
+DROP
+6 CHECKSEQUENCEVERIFY
+DROP
+HASH256
+[hash of 256-bit nonce + 2-byte locktime + 1-byte length of name + name] EQUALVERIFY
+[user pubkey] CHECKSIG
+----
+
+The CSV is to ensure that at least 6 blocks have passed, meaning that history cannot be rewritten.
+
+Ths scriptSig for this output will be:
+
+[source]
+----
+[user sig]
+[256-bit nonce + 2-byte locktime + 1-byte length of name + name]
+----
 
 === Locking Transactions
 
 ==== Inputs
 
-The locking transaction may use inputs from any source, including P2PKH and P2SH addresses. This allows the possibility of using multisignature wallets as sources of funding.
+The locking transaction must use output 1 of the commitment transaction as input.
 
 ==== Outputs
 
