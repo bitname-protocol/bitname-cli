@@ -436,4 +436,5 @@ export {
     getLockTxPubKey,
     genCommitUnlockTx,
     genCommitTx,
+    genCommitRedeemScript,
 };

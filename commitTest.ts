@@ -5,6 +5,7 @@ import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } 
 import {keyring as KeyRing, coin as Coin, util} from 'bcoin';
 
 import chalk from 'chalk';
+import { verifyCommitTX } from './lib/verify';
 
 /* tslint:disable:no-console */
 function error(msg: string): never {
@@ -68,6 +69,7 @@ async function register() {
 
         console.log(txidStr);
         console.log(commitTx.toRaw().toString('hex'));
+        console.log(verifyCommitTX(commitTx, ring.getPublicKey(), servicePubKey, 'test'));
 
         const uncommitTx = genCommitUnlockTx(commitTx, feeRate, ring, 'test');
         console.log('\n\n' + uncommitTx.toRaw().toString('hex'));
