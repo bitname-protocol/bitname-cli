@@ -11,6 +11,8 @@ import {
     crypto,
 } from 'bcoin';
 
+import randomBytes = require('randombytes');
+
 import {
     BadUserPublicKeyError,
     BadServicePublicKeyError,
@@ -78,11 +80,171 @@ function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: n
     return script;
 }
 
+function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string): Script {
+    if (!crypto.secp256k1.publicKeyVerify(userPubkey)) {
+        throw new BadUserPublicKeyError();
+    }
+
+    const script = new Script();
+    script.pushInt(1);
+    script.pushSym('OP_CHECKSEQUENCEVERIFY');
+    script.pushSym('OP_DROP');
+
+    script.pushSym('OP_HASH256');
+
+    const hexNameLen = name.length < 16 ? '0' + name.length.toString(16) : name.length.toString(16);
+    const nameLenBuff = Buffer.from(hexNameLen, 'hex');
+    const hashData = Buffer.concat([nonce, nameLenBuff, Buffer.from(name, 'ascii')]);
+    const hash = crypto.hash256(hashData);
+    script.pushData(hash);
+    script.pushSym('OP_EQUALVERIFY');
+
+    script.pushData(userPubkey);
+    script.pushSym('OP_CHECKSIG');
+
+    script.compile();
+    return script;
+}
+
 function genP2shAddr(redeemScript: Script): Address {
     const outputScript = Script.fromScripthash(redeemScript.hash160());
     const p2shAddr = Address.fromScript(outputScript);
 
     return p2shAddr;
+}
+
+function genCommitTx(coins: Coin[],
+                     name: string,
+                     upfrontFee: number,
+                     lockedFee: number,
+                     feeRate: number,
+                     userRing: KeyRing,
+                     servicePubKey: Buffer): TX {
+    if (name.length > 64) {
+        throw new Error('Name is too long');
+    }
+
+    if (!isURISafe(name)) {
+        throw new Error('Invalid character(s) in name');
+    }
+
+    if (!crypto.secp256k1.publicKeyVerify(servicePubKey)) {
+        throw new Error('Invalid service public key');
+    }
+
+    const nonce = randomBytes(32);
+    // console.log(nonce);
+    const redeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name);
+    const p2shAddr = genP2shAddr(redeemScript);
+
+    const servicePKH = crypto.hash160(servicePubKey);
+    const serviceAddr = Address.fromPubkeyhash(servicePKH);
+
+    const lockTx = new MTX();
+
+    const total = coins.reduce((acc, cur) => acc + cur.value, 0);
+
+    for (const coin of coins) {
+        lockTx.addCoin(coin);
+    }
+
+    const changeVal = total - upfrontFee - lockedFee;
+
+    // Add nonce OP_RETURN as output 0
+    const pubkeyDataScript = Script.fromNulldata(nonce);
+    lockTx.addOutput(Output.fromScript(pubkeyDataScript, 0));
+
+    // Add service upfront fee as output 1
+    lockTx.addOutput({
+        address: serviceAddr,
+        value: upfrontFee,
+    });
+
+    // Add locked fee as output 2
+    lockTx.addOutput({
+        address: p2shAddr,
+        value: lockedFee,
+    });
+
+    // Add change output as 3
+    lockTx.addOutput({
+        address: userRing.getAddress(),
+        value: changeVal,
+    });
+
+    for (let i = 0; i < coins.length; ++i) {
+        const coin = coins[i];
+        lockTx.scriptInput(i, coin, userRing);
+    }
+
+    // Each signature is 72 bytes long
+    const virtSize = lockTx.getVirtualSize() + coins.length * 72;
+    lockTx.subtractIndex(3, Math.ceil(virtSize / 1000 * feeRate));
+
+    for (let i = 0; i < coins.length; ++i) {
+        const coin = coins[i];
+        lockTx.signInput(i, coin, userRing, Script.hashType.ALL);
+    }
+
+    return lockTx.toTX();
+}
+
+function genCommitUnlockTx(lockTx: TX,
+                           feeRate: number,
+                           ring: KeyRing,
+                           name: string) {
+    const userPubKey = ring.getPublicKey();
+
+    const nonce = lockTx.outputs[0].script.code[1].data;
+    // console.log(nonce);
+
+    // const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
+    const redeemScript = genCommitRedeemScript(userPubKey, nonce, name);
+
+    const val = lockTx.outputs[2].value;
+    const unlockTx = MTX.fromOptions({
+        version: 2,
+    });
+    unlockTx.addTX(lockTx, 2);
+
+    unlockTx.setSequence(0, 1);
+
+    unlockTx.addOutput({
+        address: ring.getAddress(),
+        value: val,
+    });
+
+    const hexNameLen = name.length < 16 ? '0' + name.length.toString(16) : name.length.toString(16);
+    const nameLenBuff = Buffer.from(hexNameLen, 'hex');
+    const hashData = Buffer.concat([nonce, nameLenBuff, Buffer.from(name, 'ascii')]);
+
+    const unlockScript = new Script();
+    unlockScript.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
+    unlockScript.pushData(hashData);
+    unlockScript.pushData(redeemScript.toRaw());
+    unlockScript.compile();
+
+    unlockTx.inputs[0].script = unlockScript;
+
+    // console.log(unlockTx.outputs);
+
+    // console.log('size: ', unlockTx.getVirtualSize());
+
+    const virtSize = unlockTx.getVirtualSize();
+    const fee = Math.ceil(virtSize / 1000 * feeRate);
+    unlockTx.subtractFee(fee);
+
+    // Remake script with the new signature
+    const unlockScript2 = new Script();
+    unlockScript2.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
+    unlockScript2.pushData(hashData);
+    // console.log('hashdata', hashData);
+    unlockScript2.pushData(redeemScript.toRaw());
+    unlockScript2.compile();
+
+    unlockTx.inputs[0].script = unlockScript2;
+
+    return unlockTx.toTX();
 }
 
 function genLockTx(coins: Coin[],
@@ -272,4 +434,6 @@ export {
     getLockTxName,
     getLockTxTime,
     getLockTxPubKey,
+    genCommitUnlockTx,
+    genCommitTx,
 };

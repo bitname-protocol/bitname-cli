@@ -32,16 +32,18 @@ An OP_RETURN containing the nonce value.
 
 ===== 1
 
+A P2PKH to the service's address.
+
+===== 2
+
 A P2SH for a script of the following form:
 
 [source]
 ----
-[256-bit nonce]
-DROP
 6 CHECKSEQUENCEVERIFY
 DROP
 HASH256
-[hash of 256-bit nonce + 2-byte locktime + 1-byte length of name + name] EQUALVERIFY
+[hash of 256-bit nonce + 1-byte length of name + name] EQUALVERIFY
 [user pubkey] CHECKSIG
 ----
 
@@ -54,6 +56,10 @@ Ths scriptSig for this output will be:
 [user sig]
 [256-bit nonce + 2-byte locktime + 1-byte length of name + name]
 ----
+
+===== [3..∞)
+
+Change outputs. These may be of any form.
 
 === Locking Transactions
 
