@@ -84,6 +84,10 @@ describe('tx generation', () => {
     });
 
     it('generates user unlocking transaction', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
@@ -92,12 +96,16 @@ describe('tx generation', () => {
         const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
         const userRing = KeyRing.fromSecret(wif);
 
-        const tx = genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey());
+        const tx = genUnlockTx(lockTX, ctx, 1, false, userRing, userRing.getPublicKey());
 
         expect(tx.hash('hex')).toBe('4427f7965d1f9697376dd35955aada422a67c1a7c83983a9403929a1c23459e3');
     });
 
     it('generates service unlocking transaction', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
@@ -106,12 +114,16 @@ describe('tx generation', () => {
         const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
         const userRing = KeyRing.fromSecret(wif);
 
-        const tx = genUnlockTx(lockTX, 1, true, userRing, userRing.getPublicKey());
+        const tx = genUnlockTx(lockTX, ctx, 1, true, userRing, userRing.getPublicKey());
 
         expect(tx.hash('hex')).toBe('ff2a93a6121400cba5059e2a3e18a99cb15e71a81e6f5018fea21a46dcacef45');
     });
 
     it('errors on unlocking with incorrect user pubkey', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
@@ -123,11 +135,15 @@ describe('tx generation', () => {
         const serviceKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
 
         expect(() => {
-            genUnlockTx(lockTX, 1, false, userRing, serviceKey);
+            genUnlockTx(lockTX, ctx, 1, false, userRing, serviceKey);
         }).toThrow(BadLockTransactionError);
     });
 
     it('errors on unlocking with incorrect service pubkey', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
@@ -139,11 +155,15 @@ describe('tx generation', () => {
         const userKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
 
         expect(() => {
-            genUnlockTx(lockTX, 1, true, serviceRing, userKey);
+            genUnlockTx(lockTX, ctx, 1, true, serviceRing, userKey);
         }).toThrow(BadLockTransactionError);
     });
 
     it('errors on unlocking with incorrect privkey', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
@@ -153,7 +173,7 @@ describe('tx generation', () => {
         const userRing = KeyRing.fromSecret(wif);
 
         expect(() => {
-            genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey());
+            genUnlockTx(lockTX, ctx, 1, false, userRing, userRing.getPublicKey());
         }).toThrow(BadLockTransactionError);
     });
 });

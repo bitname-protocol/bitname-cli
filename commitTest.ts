@@ -86,9 +86,9 @@ async function register() {
 
         const lockTx = genLockTx(commitTx, 'test', lockUpfrontFee, lockDelayFee, feeRate, ring, servicePubKey, 1);
         console.log('\n\n' + lockTx.toRaw().toString('hex'));
-        console.log(verifyLockTX(lockTx, servicePubKey));
+        console.log(verifyLockTX(lockTx, commitTx, servicePubKey));
 
-        const unlockTx = genUnlockTx(lockTx, feeRate, false, ring, servicePubKey);
+        const unlockTx = genUnlockTx(lockTx, commitTx, feeRate, false, ring, servicePubKey);
         console.log('\n\n' + unlockTx.toRaw().toString('hex'));
     } catch (err) {
         return error('Could not generate transaction: ' + err.message);

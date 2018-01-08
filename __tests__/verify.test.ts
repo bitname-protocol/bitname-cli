@@ -15,6 +15,10 @@ import * as path from 'path';
 
 describe('transaction verification', () => {
     it('verifies valid locking tx', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
@@ -22,10 +26,14 @@ describe('transaction verification', () => {
 
         const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
 
-        expect(verifyLockTX(tx, servicePubKey)).toBe(true);
+        expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(true);
     });
 
     it('fails on fewer than 2 outputs', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
@@ -36,31 +44,31 @@ describe('transaction verification', () => {
 
         const tx = mtx.toTX();
 
-        expect(verifyLockTX(tx, servicePubKey)).toBe(false);
+        expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
     });
 
-    it('fails on output 0 not being an OP_RETURN', () => {
-        const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        const txData = fs.readFileSync(txDataPath, 'utf8').trim();
-        const mtx = MTX.fromRaw(txData, 'hex');
+    // it('fails on output 0 not being an OP_RETURN', () => {
+    //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
+    //     const txData = fs.readFileSync(txDataPath, 'utf8').trim();
+    //     const mtx = MTX.fromRaw(txData, 'hex');
 
-        const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
-        const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+    //     const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+    //     const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
 
-        // Generate a script of any other kind
-        const newScript = Script.fromMultisig(1, 2, [servicePubKey, otherKey]);
+    //     // Generate a script of any other kind
+    //     const newScript = Script.fromMultisig(1, 2, [servicePubKey, otherKey]);
 
-        const oldVal = mtx.outputs[0].value;
+    //     const oldVal = mtx.outputs[0].value;
 
-        // This new output will also be a P2SH, so we're sure it's not just checking for that
-        const newOutput = Output.fromScript(newScript.getAddress(), oldVal);
+    //     // This new output will also be a P2SH, so we're sure it's not just checking for that
+    //     const newOutput = Output.fromScript(newScript.getAddress(), oldVal);
 
-        mtx.outputs[0] = newOutput;
+    //     mtx.outputs[0] = newOutput;
 
-        const tx = mtx.toTX();
+    //     const tx = mtx.toTX();
 
-        expect(verifyLockTX(tx, servicePubKey)).toBe(false);
-    });
+    //     expect(verifyLockTX(tx, servicePubKey)).toBe(false);
+    // });
 
     // it('fails on output 0 having value > 0', () => {
     //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
@@ -200,6 +208,10 @@ describe('transaction verification', () => {
     // });
 
     it('fails on output 0 not being a P2PKH', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
@@ -219,10 +231,14 @@ describe('transaction verification', () => {
 
         const tx = mtx.toTX();
 
-        expect(verifyLockTX(tx, servicePubKey)).toBe(false);
+        expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
     });
 
     it('fails on output 1 not being a P2SH', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
@@ -240,10 +256,14 @@ describe('transaction verification', () => {
 
         const tx = mtx.toTX();
 
-        expect(verifyLockTX(tx, servicePubKey)).toBe(false);
+        expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
     });
 
     it('fails on bad lock script format', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
         const mtx = MTX.fromRaw(txData, 'hex');
@@ -263,7 +283,7 @@ describe('transaction verification', () => {
 
         const tx = mtx.toTX();
 
-        expect(verifyLockTX(tx, servicePubKey)).toBe(false);
+        expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
     });
 
     it('verifies generated locking txs', () => {
@@ -281,6 +301,6 @@ describe('transaction verification', () => {
         // const tx = genLockTx(coins, 'testName', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), 5);
         const tx = genLockTx(commitTX, 'test', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), 1);
 
-        expect(verifyLockTX(tx, ring.getPublicKey())).toBe(true);
+        expect(verifyLockTX(tx, commitTX, ring.getPublicKey())).toBe(true);
     });
 });

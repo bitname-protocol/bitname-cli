@@ -111,11 +111,17 @@ declare module 'bcoin' {
     }
 
     // TODO: Define these
-    type Outpoint = any;
     type Witness = any;
 
+    class outpoint {
+        constructor(hash?: Hash, index?: number);
+
+        public hash: Hash;
+        public index: number;
+    }
+
     interface NakedInput {
-        prevout?: Outpoint;
+        prevout?: outpoint;
         script?: NakedScript;
         sequence?: number;
         witness?: Witness;
@@ -125,6 +131,7 @@ declare module 'bcoin' {
         constructor(options?: NakedInput);
 
         script: script;
+        prevout: outpoint;
     }
 
     interface NakedOutput {

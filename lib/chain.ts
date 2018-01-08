@@ -1,6 +1,9 @@
 import TXList from './TXList';
-import { verifyLockTX } from './verify';
+import { verifyLockTX, verifyCommitTX } from './verify';
 import { getLockTxTime, getLockTxName, getLockTxPubKey } from './txs';
+import {
+    tx as TX,
+} from 'bcoin';
 
 interface IReadonlyNameInfo {
     readonly [name: string]: {
@@ -25,8 +28,17 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
     for (const txid of ([...txs.getTxids()].reverse() as ReadonlyArray<string>)) {
         const lockTx = txs.getTX(txid);
 
+        const prevHash = lockTx.inputs[0].prevout.hash as string;
+
+        let ctx: TX;
+        try {
+            ctx = txs.getTX(prevHash);
+        } catch (e) {
+            continue;
+        }
+
         // Is this a valid lock tx or another random kind?
-        const valid = verifyLockTX(txs.getTX(txid), servicePubKey);
+        const valid = verifyLockTX(txs.getTX(txid), ctx, servicePubKey);
         if (!valid) {
             continue;
         }
@@ -34,6 +46,9 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
         // Determine at what block this tx is spendable
         const height = txs.getHeight(txid);
         const period = getLockTxTime(lockTx);
+        if (period === null) {
+            continue;
+        }
         const expires = height + period;
 
         // Has the P2SH fee been spent yet, signalling a revocation?
@@ -43,6 +58,9 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
         }
 
         const pubKey = getLockTxPubKey(lockTx);
+        if (pubKey === null) {
+            continue;
+        }
 
         const data = {
             txid,
@@ -52,6 +70,9 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
         };
 
         const name = getLockTxName(lockTx);
+        if (name === null) {
+            continue;
+        }
 
         if (map.hasOwnProperty(name) && txs.getHeight(map[name].txid) === height) {
             map[name].invalid = true;
@@ -61,7 +82,7 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
         // If this name is already registered, don't replace it
         // Unless the name expired before this tx even existed, in which case include it
         if (!map.hasOwnProperty(name) || map[name].expires < height) {
-            map[getLockTxName(lockTx)] = data;
+            map[name] = data;
         }
     }
 

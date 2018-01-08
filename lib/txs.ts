@@ -382,25 +382,38 @@ function extractCommitMetadata(inputScript: Script) {
     return {...meta, pubKey};
 }
 
-function getLockTxName(lockTx: TX): string {
-    const metadata = extractCommitMetadata(lockTx.inputs[0].script);
+function getLockTxName(lockTx: TX): string | null {
+    try {
+        const metadata = extractCommitMetadata(lockTx.inputs[0].script);
 
-    return metadata.name;
+        return metadata.name;
+    } catch (e) {
+        return null;
+    }
 }
 
-function getLockTxTime(lockTx: TX): number {
-    const metadata = extractCommitMetadata(lockTx.inputs[0].script);
+function getLockTxTime(lockTx: TX): number | null {
+    try {
+        const metadata = extractCommitMetadata(lockTx.inputs[0].script);
 
-    return metadata.locktime;
+        return metadata.locktime;
+    } catch (e) {
+        return null;
+    }
 }
 
-function getLockTxPubKey(lockTx: TX): Buffer {
-    const metadata = extractCommitMetadata(lockTx.inputs[0].script);
+function getLockTxPubKey(lockTx: TX): Buffer | null {
+    try {
+        const metadata = extractCommitMetadata(lockTx.inputs[0].script);
 
-    return metadata.pubKey;
+        return metadata.pubKey;
+    } catch (e) {
+        return null;
+    }
 }
 
 function genUnlockTx(lockTx: TX,
+                     commitTx: TX,
                      feeRate: number,
                      service: boolean,
                      ring: KeyRing,
@@ -408,7 +421,7 @@ function genUnlockTx(lockTx: TX,
     const servicePubKey =  service ? ring.getPublicKey() : otherPubKey;
     const userPubKey    = !service ? ring.getPublicKey() : otherPubKey;
 
-    if (!verifyLockTX(lockTx, servicePubKey)) {
+    if (!verifyLockTX(lockTx, commitTx, servicePubKey)) {
         throw new BadLockTransactionError();
     }
 
@@ -417,6 +430,9 @@ function genUnlockTx(lockTx: TX,
     }
 
     const locktime = getLockTxTime(lockTx);
+    if (locktime === null) {
+        throw new Error('Could not extract locktime');
+    }
 
     const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
 
