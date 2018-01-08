@@ -20,7 +20,7 @@ import {
 } from './errors';
 
 // import { config } from '../config';
-import { verifyLockTX, isURISafe } from './verify';
+import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
 // const NETWORK = config.network;
 
 function extractEncodedMetadata(opRetScript: Script): [number, Buffer] {
@@ -142,7 +142,11 @@ interface ICommitData {
     name: string;
 }
 
-function desrerializeCommitData(data: Buffer): ICommitData {
+function deserializeCommitData(data: Buffer): ICommitData {
+    if (data.length < 36) {
+        throw new Error('Invalid commit data');
+    }
+
     const nonce = data.slice(0, 32);
 
     const locktime = data.readUInt16BE(32);
@@ -265,6 +269,10 @@ function genLockTx(commitTX: TX,
         throw new Error('Invalid service public key');
     }
 
+    if (!verifyCommitTX(commitTX, userRing.getPublicKey(), servicePubKey, name, locktime)) {
+        throw new Error('Invalid commitment tx');
+    }
+
     const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
     const p2shAddr = genP2shAddr(redeemScript);
 
@@ -365,8 +373,11 @@ function genLockTx(commitTX: TX,
 }
 
 function extractCommitMetadata(inputScript: Script) {
-    const meta = desrerializeCommitData(inputScript.code[1].data);
-    const pubKey: Buffer = inputScript.code[0].data;
+    // console.log(Script.fromRaw(inputScript.code[2].data).code[6].data);
+    const meta = deserializeCommitData(inputScript.code[1].data);
+
+    const encumberScript = Script.fromRaw(inputScript.code[2].data);
+    const pubKey: Buffer = encumberScript.code[6].data;
 
     return {...meta, pubKey};
 }
@@ -397,9 +408,9 @@ function genUnlockTx(lockTx: TX,
     const servicePubKey =  service ? ring.getPublicKey() : otherPubKey;
     const userPubKey    = !service ? ring.getPublicKey() : otherPubKey;
 
-    // if (!verifyLockTX(lockTx, servicePubKey)) {
-    //     throw new BadLockTransactionError();
-    // }
+    if (!verifyLockTX(lockTx, servicePubKey)) {
+        throw new BadLockTransactionError();
+    }
 
     if (!crypto.secp256k1.publicKeyVerify(otherPubKey)) {
         throw new Error('Invalid service public key');
@@ -464,4 +475,5 @@ export {
     getLockTxPubKey,
     genCommitTx,
     genCommitRedeemScript,
+    extractCommitMetadata,
 };

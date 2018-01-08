@@ -1,3 +1,5 @@
+jest.mock('randombytes');
+
 import {
     coin as Coin,
     keyring as KeyRing,
@@ -8,6 +10,7 @@ import {
     genRedeemScript,
     genLockTx,
     genUnlockTx,
+    genCommitTx,
 } from '../lib/txs';
 import {
     BadUserPublicKeyError,
@@ -71,9 +74,13 @@ describe('tx generation', () => {
 
         const coins = [new Coin(testCoin)];
 
-        const tx = genLockTx(coins, 'google', 1, 1, 10, userRing, serviceKey, 1);
+        // const tx = genLockTx(coins, 'google', 1, 1, 10, userRing, serviceKey, 1);
 
-        expect(tx.hash('hex')).toBe('631525eccd821de5518730aa4d543f53ed4b0d919c6f8d48b17f0cc3d4b9a70b');
+        const commitTX = genCommitTx(coins, 'google', 400, 150, 1000, 1, userRing, serviceKey);
+
+        const tx = genLockTx(commitTX, 'google', 20, 20, 1, userRing, serviceKey, 400);
+
+        expect(tx.hash('hex')).toBe('194b2c60b2bdee8e8b207da88cb48f6c75ad038068ba6998e3f50ad9d4ba6548');
     });
 
     it('generates user unlocking transaction', () => {
@@ -87,7 +94,7 @@ describe('tx generation', () => {
 
         const tx = genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey());
 
-        expect(tx.hash('hex')).toBe('8ece940b4ef2692b6609e11f9933f624714f2256d7f003391c75df668e215f62');
+        expect(tx.hash('hex')).toBe('4427f7965d1f9697376dd35955aada422a67c1a7c83983a9403929a1c23459e3');
     });
 
     it('generates service unlocking transaction', () => {
@@ -101,7 +108,7 @@ describe('tx generation', () => {
 
         const tx = genUnlockTx(lockTX, 1, true, userRing, userRing.getPublicKey());
 
-        expect(tx.hash('hex')).toBe('9c9cc53211f58c83ca4d85bc7a15a44fd133cb6f1b7e3f55f3d052798bd9598d');
+        expect(tx.hash('hex')).toBe('ff2a93a6121400cba5059e2a3e18a99cb15e71a81e6f5018fea21a46dcacef45');
     });
 
     it('errors on unlocking with incorrect user pubkey', () => {

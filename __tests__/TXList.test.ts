@@ -19,13 +19,13 @@ describe('TXList class', () => {
         const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
         const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
         const lockTx = TX.fromRaw(lockTxData, 'hex');
-        const lockTxSpent = [false, false, false, true, false];
+        const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
 
         const txids = [
             '04accc0dce3a7ff28af27de7d63f55834a563bcfa5e62b746785a6e5e3c2576f',
-            '9464e553907a85188e28e0ace9bfa10e61a9c5b8aa4be826770e6ce47e92fe62',
+            '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb',
         ];
 
         expect(list.getTxids()).toEqual(txids);
@@ -42,13 +42,13 @@ describe('TXList class', () => {
         const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
         const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
         const lockTx = TX.fromRaw(lockTxData, 'hex');
-        const lockTxSpent = [false, false, false, true, false];
+        const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
 
         const txids = [
             '04accc0dce3a7ff28af27de7d63f55834a563bcfa5e62b746785a6e5e3c2576f',
-            '9464e553907a85188e28e0ace9bfa10e61a9c5b8aa4be826770e6ce47e92fe62',
+            '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb',
         ];
 
         const retTxs = txids.map((txid) => list.getTX(txid));
@@ -67,13 +67,13 @@ describe('TXList class', () => {
         const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
         const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
         const lockTx = TX.fromRaw(lockTxData, 'hex');
-        const lockTxSpent = [false, false, false, true, false];
+        const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
 
         const txids = [
             '04accc0dce3a7ff28af27de7d63f55834a563bcfa5e62b746785a6e5e3c2576f',
-            '9464e553907a85188e28e0ace9bfa10e61a9c5b8aa4be826770e6ce47e92fe62',
+            '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb',
         ];
 
         const retRandTxSpent = randTx.outputs.map((output, ind) => list.getOutputSpent(txids[0], ind));
@@ -94,7 +94,7 @@ describe('TXList class', () => {
         const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
         const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
         const lockTx = TX.fromRaw(lockTxData, 'hex');
-        const lockTxSpent = [false, false, false, true, false];
+        const lockTxSpent = [false, true, false];
 
         const heights = [1, 2];
 
@@ -102,7 +102,7 @@ describe('TXList class', () => {
 
         const txids = [
             '04accc0dce3a7ff28af27de7d63f55834a563bcfa5e62b746785a6e5e3c2576f',
-            '9464e553907a85188e28e0ace9bfa10e61a9c5b8aa4be826770e6ce47e92fe62',
+            '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb',
         ];
 
         const actualHeights = txids.map((txid) => list.getHeight(txid));
@@ -139,7 +139,7 @@ describe('TXList class', () => {
         const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
         const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
         const lockTx = TX.fromRaw(lockTxData, 'hex');
-        const lockTxSpent = [false, false, false, true, false];
+        const lockTxSpent = [false, true, false];
 
         expect(() => {
             return new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1]);
@@ -159,11 +159,11 @@ describe('TXList class', () => {
         const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, false, false, true, false, true];
 
-        const hash = '9464e553907a85188e28e0ace9bfa10e61a9c5b8aa4be826770e6ce47e92fe62';
+        const hash = '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb';
 
         expect(() => {
             return new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
-        }).toThrow(`Bad outputs for tx ${hash}; got 6, expected 5`);
+        }).toThrow(`Bad outputs for tx ${hash}; got 6, expected 3`);
     });
 
     it('throws on bad txid in TX lookup', () => {
@@ -177,7 +177,7 @@ describe('TXList class', () => {
         const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
         const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
         const lockTx = TX.fromRaw(lockTxData, 'hex');
-        const lockTxSpent = [false, false, false, true, false];
+        const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
 
@@ -197,7 +197,7 @@ describe('TXList class', () => {
         const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
         const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
         const lockTx = TX.fromRaw(lockTxData, 'hex');
-        const lockTxSpent = [false, false, false, true, false];
+        const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
 
@@ -217,11 +217,11 @@ describe('TXList class', () => {
         const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
         const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
         const lockTx = TX.fromRaw(lockTxData, 'hex');
-        const lockTxSpent = [false, false, false, true, false];
+        const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
 
-        const hash = '9464e553907a85188e28e0ace9bfa10e61a9c5b8aa4be826770e6ce47e92fe62';
+        const hash = '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb';
 
         expect(() => {
             list.getOutputSpent(hash, 64);
@@ -239,7 +239,7 @@ describe('TXList class', () => {
         const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
         const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
         const lockTx = TX.fromRaw(lockTxData, 'hex');
-        const lockTxSpent = [false, false, false, true, false];
+        const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
 

@@ -4,7 +4,7 @@ import {
     address as Address,
     crypto,
 } from 'bcoin';
-import { genRedeemScript, genCommitRedeemScript, getLockTxName, getLockTxTime } from './txs';
+import { genRedeemScript, genCommitRedeemScript, getLockTxName, getLockTxTime, extractCommitMetadata, getLockTxPubKey } from './txs';
 
 function isURISafe(str: string) {
     const re = /^[a-zA-Z0-9_\-\.\~]*$/;
@@ -70,60 +70,68 @@ function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name:
 }
 
 function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
-    if (tx.outputs.length < 4) {
+    if (tx.outputs.length < 2) {
+        console.log('failed at outputs length');
         return false;
     }
 
-    // Check that output 0 is an OP_RETURN of the correct form
-    if (!isValidOP_RETURN(tx.outputs[0])) {
+    // Check that input 0 contains a valid pubkey
+    try {
+        const pubKey = getLockTxPubKey(tx);
+        if (!crypto.secp256k1.publicKeyVerify(pubKey)) {
+            console.log('failed at pubkey verification');
+            return false;
+        }
+    } catch (e) {
         return false;
     }
 
-    // Check that output 0 contains a valid pubkey
-    const pubKey = tx.outputs[0].script.code[1].data;
-    if (!crypto.secp256k1.publicKeyVerify(pubKey)) {
+    // Check that input 0 name data is only 64 bytes in length
+    try {
+        const nameStr = getLockTxName(tx);
+        if (nameStr.length > 64) {
+            console.log('failed at name length');
+            return false;
+        }
+
+        // Check that output 1 name data contains only URL-safe characters
+        if (!isURISafe(nameStr)) {
+            console.log('failed at uri safety');
+            return false;
+        }
+    } catch (e) {
         return false;
     }
 
-    // Check that output 1 is an OP_RETURN of the correct form
-    if (!isValidOP_RETURN(tx.outputs[1])) {
+    // Check that output 0 is a P2PKH
+    if (!tx.outputs[0].script.isPubkeyhash()) {
+        console.log('failed at output 0 being pkh');
         return false;
     }
 
-    // Check that output 1 name data is only 64 bytes in length
-    const nameStr = getLockTxName(tx);
-    if (nameStr.length > 64) {
-        return false;
-    }
-
-    // Check that output 1 name data contains only URL-safe characters
-    if (!isURISafe(nameStr)) {
-        return false;
-    }
-
-    // Check that output 2 is a P2PKH
-    if (!tx.outputs[2].script.isPubkeyhash()) {
-        return false;
-    }
-
-    // Check that output 2 is sent to the service's address
+    // Check that output 0 is sent to the service's address
     const servicePKH = crypto.hash160(servicePubKey);
     const serviceAddr = Address.fromPubkeyhash(servicePKH);
-    if (tx.outputs[2].getAddress().toBase58('testnet') !== serviceAddr.toBase58('testnet')) {
+    if (tx.outputs[0].getAddress().toBase58('testnet') !== serviceAddr.toBase58('testnet')) {
         return false;
     }
 
-    // Check that output 3 is a P2SH
-    if (!tx.outputs[3].script.isScripthash()) {
+    // Check that output 1 is a P2SH
+    if (!tx.outputs[1].script.isScripthash()) {
         return false;
     }
 
-    // Check that output 3 script is correct
-    const locktime = getLockTxTime(tx);
-    const redeemScript = genRedeemScript(pubKey, servicePubKey, locktime);
-    const scriptHash = crypto.hash160(redeemScript.toRaw());
-    const p2shAddr = Address.fromScripthash(scriptHash);
-    if (tx.outputs[3].getAddress().toBase58('testnet') !== p2shAddr.toBase58('testnet')) {
+    try {
+        // Check that output 1 script is correct
+        const locktime = getLockTxTime(tx);
+        const pubKey = getLockTxPubKey(tx);
+        const redeemScript = genRedeemScript(pubKey, servicePubKey, locktime);
+        const scriptHash = crypto.hash160(redeemScript.toRaw());
+        const p2shAddr = Address.fromScripthash(scriptHash);
+        if (tx.outputs[1].getAddress().toBase58('testnet') !== p2shAddr.toBase58('testnet')) {
+            return false;
+        }
+    } catch (e) {
         return false;
     }
 
