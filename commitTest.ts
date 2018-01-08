@@ -1,4 +1,4 @@
-import {genCommitUnlockTx, genCommitTx, genLockTx} from './lib/txs';
+import {genCommitTx, genLockTx, genUnlockTx} from './lib/txs';
 
 import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from './lib/net';
 
@@ -67,12 +67,19 @@ async function register() {
     }
 
     try {
-        const commitTx = genCommitTx(coins, 'test', commitUpfrontFee, 2 * commitDelayFee, feeRate, ring, servicePubKey);
+        const commitTx = genCommitTx(coins,
+                                     'test',
+                                     1,
+                                     commitUpfrontFee,
+                                     2 * commitDelayFee,
+                                     feeRate,
+                                     ring,
+                                     servicePubKey);
         const txidStr = chalk`{green ${util.revHex(commitTx.hash('hex')) as string}}`;
 
         console.log(txidStr);
         console.log(commitTx.toRaw().toString('hex'));
-        console.log(verifyCommitTX(commitTx, ring.getPublicKey(), servicePubKey, 'test'));
+        console.log(verifyCommitTX(commitTx, ring.getPublicKey(), servicePubKey, 'test', 1));
 
         // const uncommitTx = genCommitUnlockTx(commitTx, feeRate, ring, 'test');
         // console.log('\n\n' + uncommitTx.toRaw().toString('hex'));
@@ -80,6 +87,9 @@ async function register() {
         const lockTx = genLockTx(commitTx, 'test', lockUpfrontFee, lockDelayFee, feeRate, ring, servicePubKey, 1);
         console.log('\n\n' + lockTx.toRaw().toString('hex'));
         console.log(verifyLockTX(lockTx, servicePubKey));
+
+        const unlockTx = genUnlockTx(lockTx, feeRate, false, ring, servicePubKey);
+        console.log('\n\n' + unlockTx.toRaw().toString('hex'));
     } catch (err) {
         return error('Could not generate transaction: ' + err.message);
     }

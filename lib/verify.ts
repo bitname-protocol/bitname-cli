@@ -4,7 +4,7 @@ import {
     address as Address,
     crypto,
 } from 'bcoin';
-import { genRedeemScript, extractEncodedMetadata, genCommitRedeemScript } from './txs';
+import { genRedeemScript, genCommitRedeemScript, getLockTxName, getLockTxTime } from './txs';
 
 function isURISafe(str: string) {
     const re = /^[a-zA-Z0-9_\-\.\~]*$/;
@@ -30,7 +30,7 @@ function isValidOP_RETURN(output: Output): boolean {
     return true;
 }
 
-function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name: string): boolean {
+function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name: string, locktime: number): boolean {
     if (tx.outputs.length < 3) {
         return false;
     }
@@ -59,7 +59,7 @@ function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name:
     }
 
     // Check that output 2 script is correct
-    const redeemScript = genCommitRedeemScript(userPubKey, nonce, name);
+    const redeemScript = genCommitRedeemScript(userPubKey, nonce, name, locktime);
     const scriptHash = crypto.hash160(redeemScript.toRaw());
     const p2shAddr = Address.fromScripthash(scriptHash);
     if (tx.outputs[2].getAddress().toBase58('testnet') !== p2shAddr.toBase58('testnet')) {
@@ -90,12 +90,9 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
         return false;
     }
 
-    const metadata = extractEncodedMetadata(tx.outputs[1].script);
-
     // Check that output 1 name data is only 64 bytes in length
-    const name = metadata[1];
-    const nameStr = name.toString('ascii');
-    if (name.length > 64) {
+    const nameStr = getLockTxName(tx);
+    if (nameStr.length > 64) {
         return false;
     }
 
@@ -122,7 +119,7 @@ function verifyLockTX(tx: TX, servicePubKey: Buffer): boolean {
     }
 
     // Check that output 3 script is correct
-    const locktime = metadata[0];
+    const locktime = getLockTxTime(tx);
     const redeemScript = genRedeemScript(pubKey, servicePubKey, locktime);
     const scriptHash = crypto.hash160(redeemScript.toRaw());
     const p2shAddr = Address.fromScripthash(scriptHash);

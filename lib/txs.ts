@@ -80,7 +80,7 @@ function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: n
     return script;
 }
 
-function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string): Script {
+function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string, locktime: number): Script {
     if (!crypto.secp256k1.publicKeyVerify(userPubkey)) {
         throw new BadUserPublicKeyError();
     }
@@ -92,9 +92,7 @@ function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string):
 
     script.pushSym('OP_HASH256');
 
-    const hexNameLen = name.length < 16 ? '0' + name.length.toString(16) : name.length.toString(16);
-    const nameLenBuff = Buffer.from(hexNameLen, 'hex');
-    const hashData = Buffer.concat([nonce, nameLenBuff, Buffer.from(name, 'ascii')]);
+    const hashData = serializeCommitData(nonce, locktime, name);
     const hash = crypto.hash256(hashData);
     script.pushData(hash);
     script.pushSym('OP_EQUALVERIFY');
@@ -113,8 +111,62 @@ function genP2shAddr(redeemScript: Script): Address {
     return p2shAddr;
 }
 
+function serializeCommitData(nonce: Buffer, locktime: number, name: string): Buffer {
+    if (nonce.length !== 32) {
+        throw new Error('Invalid nonce size');
+    }
+
+    if (locktime > 65535) {
+        throw new Error('Locktime must be 16 bits');
+    }
+
+    if (name.length > 64) {
+        throw new Error('Name is too long');
+    }
+
+    const outBuf = new Buffer(32 + 2 + 1 + name.length);
+    nonce.copy(outBuf);
+
+    outBuf.writeUInt16BE(locktime, 32);
+
+    outBuf.writeUInt8(name.length, 34);
+
+    outBuf.write(name, 35, name.length, 'ascii');
+
+    return outBuf;
+}
+
+interface ICommitData {
+    nonce: Buffer;
+    locktime: number;
+    name: string;
+}
+
+function desrerializeCommitData(data: Buffer): ICommitData {
+    const nonce = data.slice(0, 32);
+
+    const locktime = data.readUInt16BE(32);
+
+    const nameLen = data.readUInt8(34);
+
+    const nameRaw = data.slice(35);
+
+    if (nameRaw.length !== nameLen) {
+        throw new Error('Name has incorrect length');
+    }
+
+    const name = nameRaw.toString('ascii');
+
+    return {
+        nonce,
+        locktime,
+        name,
+    };
+}
+
 function genCommitTx(coins: Coin[],
                      name: string,
+                     locktime: number,
                      upfrontFee: number,
                      lockedFee: number,
                      feeRate: number,
@@ -134,7 +186,7 @@ function genCommitTx(coins: Coin[],
 
     const nonce = randomBytes(32);
     // console.log(nonce);
-    const redeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name);
+    const redeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name, locktime);
     const p2shAddr = genP2shAddr(redeemScript);
 
     const servicePKH = crypto.hash160(servicePubKey);
@@ -187,64 +239,6 @@ function genCommitTx(coins: Coin[],
     }
 
     return lockTx.toTX();
-}
-
-function genCommitUnlockTx(lockTx: TX,
-                           feeRate: number,
-                           ring: KeyRing,
-                           name: string) {
-    const userPubKey = ring.getPublicKey();
-
-    const nonce = lockTx.outputs[0].script.code[1].data;
-    // console.log(nonce);
-
-    // const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
-    const redeemScript = genCommitRedeemScript(userPubKey, nonce, name);
-
-    const val = lockTx.outputs[2].value;
-    const unlockTx = MTX.fromOptions({
-        version: 2,
-    });
-    unlockTx.addTX(lockTx, 2);
-
-    unlockTx.setSequence(0, 1);
-
-    unlockTx.addOutput({
-        address: ring.getAddress(),
-        value: val,
-    });
-
-    const hexNameLen = name.length < 16 ? '0' + name.length.toString(16) : name.length.toString(16);
-    const nameLenBuff = Buffer.from(hexNameLen, 'hex');
-    const hashData = Buffer.concat([nonce, nameLenBuff, Buffer.from(name, 'ascii')]);
-
-    const unlockScript = new Script();
-    unlockScript.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
-    unlockScript.pushData(hashData);
-    unlockScript.pushData(redeemScript.toRaw());
-    unlockScript.compile();
-
-    unlockTx.inputs[0].script = unlockScript;
-
-    // console.log(unlockTx.outputs);
-
-    // console.log('size: ', unlockTx.getVirtualSize());
-
-    const virtSize = unlockTx.getVirtualSize();
-    const fee = Math.ceil(virtSize / 1000 * feeRate);
-    unlockTx.subtractFee(fee);
-
-    // Remake script with the new signature
-    const unlockScript2 = new Script();
-    unlockScript2.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
-    unlockScript2.pushData(hashData);
-    // console.log('hashdata', hashData);
-    unlockScript2.pushData(redeemScript.toRaw());
-    unlockScript2.compile();
-
-    unlockTx.inputs[0].script = unlockScript2;
-
-    return unlockTx.toTX();
 }
 
 function genLockTx(commitTX: TX,
@@ -302,30 +296,19 @@ function genLockTx(commitTX: TX,
 
     const changeVal = total - upfrontFee - lockedFee;
 
-    // Add pubkey OP_RETURN as output 0
-    const pubkeyDataScript = Script.fromNulldata(userRing.getPublicKey());
-    lockTx.addOutput(Output.fromScript(pubkeyDataScript, 0));
-
-    // Add name OP_RETURN as output 1
-    const numStr = I64(locktime).toString(16, 4);
-    const numBuff = Buffer.from(numStr, 'hex');
-    const nameBuff = Buffer.from(name, 'ascii');
-    const dataScript = Script.fromNulldata(Buffer.concat([numBuff, nameBuff]));
-    lockTx.addOutput(Output.fromScript(dataScript, 0));
-
-    // Add upfront fee as output 2
+    // Add upfront fee as output 0
     lockTx.addOutput({
         address: serviceAddr,
         value: upfrontFee,
     });
 
-    // Add locked fee as output 3
+    // Add locked fee as output 1
     lockTx.addOutput({
         address: p2shAddr,
         value: lockedFee,
     });
 
-    // Add change output as 4
+    // Add change output as 2
     lockTx.addOutput({
         address: userRing.getAddress(),
         value: changeVal,
@@ -353,11 +336,9 @@ function genLockTx(commitTX: TX,
 
     const nonce = commitTX.outputs[0].script.code[1].data;
 
-    const hexNameLen = name.length < 16 ? '0' + name.length.toString(16) : name.length.toString(16);
-    const nameLenBuff = Buffer.from(hexNameLen, 'hex');
-    const hashData = Buffer.concat([nonce, nameLenBuff, Buffer.from(name, 'ascii')]);
+    const hashData = serializeCommitData(nonce, locktime, name);
 
-    const commitRedeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name);
+    const commitRedeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name, locktime);
 
     const unlockScript = new Script();
     unlockScript.pushData(hashData);
@@ -366,12 +347,14 @@ function genLockTx(commitTX: TX,
 
     lockTx.inputs[0].script = unlockScript;
 
+    // console.log(lockTx.inputs[0].script.code);
+
     // Add constant for signature
     const virtSize = lockTx.getVirtualSize() + 72;
 
     // Calculate fee to be paid
     const fee = Math.ceil(virtSize / 1000 * feeRate);
-    lockTx.subtractIndex(4, fee);
+    lockTx.subtractIndex(2, fee);
 
     // Add signature
     const sig = lockTx.signature(0, commitRedeemScript, total, userRing.getPrivateKey(), Script.hashType.ALL, 0);
@@ -381,20 +364,29 @@ function genLockTx(commitTX: TX,
     return lockTx.toTX();
 }
 
-function getLockTxName(lockTx: TX): string {
-    const metadata = extractEncodedMetadata(lockTx.outputs[1].script);
+function extractCommitMetadata(inputScript: Script) {
+    const meta = desrerializeCommitData(inputScript.code[1].data);
+    const pubKey: Buffer = inputScript.code[0].data;
 
-    return metadata[1].toString('ascii');
+    return {...meta, pubKey};
+}
+
+function getLockTxName(lockTx: TX): string {
+    const metadata = extractCommitMetadata(lockTx.inputs[0].script);
+
+    return metadata.name;
 }
 
 function getLockTxTime(lockTx: TX): number {
-    const metadata = extractEncodedMetadata(lockTx.outputs[1].script);
+    const metadata = extractCommitMetadata(lockTx.inputs[0].script);
 
-    return metadata[0];
+    return metadata.locktime;
 }
 
 function getLockTxPubKey(lockTx: TX): Buffer {
-    return lockTx.outputs[0].script.code[1].data;
+    const metadata = extractCommitMetadata(lockTx.inputs[0].script);
+
+    return metadata.pubKey;
 }
 
 function genUnlockTx(lockTx: TX,
@@ -405,23 +397,23 @@ function genUnlockTx(lockTx: TX,
     const servicePubKey =  service ? ring.getPublicKey() : otherPubKey;
     const userPubKey    = !service ? ring.getPublicKey() : otherPubKey;
 
-    if (!verifyLockTX(lockTx, servicePubKey)) {
-        throw new BadLockTransactionError();
-    }
+    // if (!verifyLockTX(lockTx, servicePubKey)) {
+    //     throw new BadLockTransactionError();
+    // }
 
     if (!crypto.secp256k1.publicKeyVerify(otherPubKey)) {
         throw new Error('Invalid service public key');
     }
 
-    const locktime = extractEncodedMetadata(lockTx.outputs[1].script)[0];
+    const locktime = getLockTxTime(lockTx);
 
     const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
 
-    const val = lockTx.outputs[3].value;
+    const val = lockTx.outputs[1].value;
     const unlockTx = MTX.fromOptions({
         version: 2,
     });
-    unlockTx.addTX(lockTx, 3);
+    unlockTx.addTX(lockTx, 1);
 
     const boolVal = service ? 0 : 1;
 
@@ -467,11 +459,9 @@ export {
     genUnlockTx,
     genRedeemScript,
     genP2shAddr,
-    extractEncodedMetadata,
     getLockTxName,
     getLockTxTime,
     getLockTxPubKey,
-    genCommitUnlockTx,
     genCommitTx,
     genCommitRedeemScript,
 };
