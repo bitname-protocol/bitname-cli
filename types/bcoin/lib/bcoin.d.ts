@@ -101,6 +101,7 @@ declare module 'bcoin' {
         pushSym(sym: string): script;
         pushData(data: Buffer): script;
         pushInt(num: number): script;
+        insertData(index: number, data: Buffer): script;
         compile(): script;
 
         toRaw(): Buffer;

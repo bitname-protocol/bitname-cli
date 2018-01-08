@@ -247,7 +247,7 @@ function genCommitUnlockTx(lockTx: TX,
     return unlockTx.toTX();
 }
 
-function genLockTx(coins: Coin[],
+function genLockTx(commitTX: TX,
                    name: string,
                    upfrontFee: number,
                    lockedFee: number,
@@ -277,31 +277,41 @@ function genLockTx(coins: Coin[],
     const servicePKH = crypto.hash160(servicePubKey);
     const serviceAddr = Address.fromPubkeyhash(servicePKH);
 
-    const lockTx = new MTX();
+    // const lockTx = new MTX();
+    const lockTx = MTX.fromOptions({
+        version: 2,
+    });
 
-    const total = coins.reduce((acc, cur) => acc + cur.value, 0);
+    lockTx.addTX(commitTX, 2);
 
-    for (const coin of coins) {
-        lockTx.addCoin(coin);
-    }
+    lockTx.setSequence(0, 1);
 
-    const opRetVal = 0;
+    const total = commitTX.outputs[2].value;
+    // console.log(total);
+
+    // const total = coins.reduce((acc, cur) => acc + cur.value, 0);
+
+    // for (const coin of coins) {
+    //     lockTx.addCoin(coin);
+    // }
+
+    // const opRetVal = 0;
 
     // console.log(total, opRetVal, upfrontFee, lockedFee, netFee);
     // console.log(opRetVal + upfrontFee + lockedFee + netFee);
 
-    const changeVal = total - opRetVal - upfrontFee - lockedFee;
+    const changeVal = total - upfrontFee - lockedFee;
 
     // Add pubkey OP_RETURN as output 0
     const pubkeyDataScript = Script.fromNulldata(userRing.getPublicKey());
-    lockTx.addOutput(Output.fromScript(pubkeyDataScript, opRetVal));
+    lockTx.addOutput(Output.fromScript(pubkeyDataScript, 0));
 
     // Add name OP_RETURN as output 1
     const numStr = I64(locktime).toString(16, 4);
     const numBuff = Buffer.from(numStr, 'hex');
     const nameBuff = Buffer.from(name, 'ascii');
     const dataScript = Script.fromNulldata(Buffer.concat([numBuff, nameBuff]));
-    lockTx.addOutput(Output.fromScript(dataScript, opRetVal));
+    lockTx.addOutput(Output.fromScript(dataScript, 0));
 
     // Add upfront fee as output 2
     lockTx.addOutput({
@@ -321,25 +331,52 @@ function genLockTx(coins: Coin[],
         value: changeVal,
     });
 
-    for (let i = 0; i < coins.length; ++i) {
-        const coin = coins[i];
-        lockTx.scriptInput(i, coin, userRing);
-        // lockTx.signInput(i, coin, ring, Script.hashType.ALL);
-    }
+    // for (let i = 0; i < coins.length; ++i) {
+    //     const coin = coins[i];
+    //     lockTx.scriptInput(i, coin, userRing);
+    //     // lockTx.signInput(i, coin, ring, Script.hashType.ALL);
+    // }
 
-    // Each signature is 72 bytes long
-    const virtSize = lockTx.getVirtualSize() + coins.length * 72;
-    // console.log(Math.ceil(virtSize / 1000 * feeRate));
-    lockTx.subtractIndex(4, Math.ceil(virtSize / 1000 * feeRate));
+    // // Each signature is 72 bytes long
+    // const virtSize = lockTx.getVirtualSize() + coins.length * 72;
+    // // console.log(Math.ceil(virtSize / 1000 * feeRate));
+    // lockTx.subtractIndex(4, Math.ceil(virtSize / 1000 * feeRate));
 
-    for (let i = 0; i < coins.length; ++i) {
-        const coin = coins[i];
-        // lockTx.scriptInput(i, coin, ring);
-        lockTx.signInput(i, coin, userRing, Script.hashType.ALL);
-    }
+    // for (let i = 0; i < coins.length; ++i) {
+    //     const coin = coins[i];
+    //     // lockTx.scriptInput(i, coin, ring);
+    //     lockTx.signInput(i, coin, userRing, Script.hashType.ALL);
+    // }
 
     // const virtSize = lockTx.getVirtualSize();
     // lockTx.subtractFee(Math.ceil(virtSize / 1000 * feeRate), 0);
+
+    const nonce = commitTX.outputs[0].script.code[1].data;
+
+    const hexNameLen = name.length < 16 ? '0' + name.length.toString(16) : name.length.toString(16);
+    const nameLenBuff = Buffer.from(hexNameLen, 'hex');
+    const hashData = Buffer.concat([nonce, nameLenBuff, Buffer.from(name, 'ascii')]);
+
+    const commitRedeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name);
+
+    const unlockScript = new Script();
+    unlockScript.pushData(hashData);
+    unlockScript.pushData(commitRedeemScript.toRaw());
+    unlockScript.compile();
+
+    lockTx.inputs[0].script = unlockScript;
+
+    // Add constant for signature
+    const virtSize = lockTx.getVirtualSize() + 72;
+
+    // Calculate fee to be paid
+    const fee = Math.ceil(virtSize / 1000 * feeRate);
+    lockTx.subtractIndex(4, fee);
+
+    // Add signature
+    const sig = lockTx.signature(0, commitRedeemScript, total, userRing.getPrivateKey(), Script.hashType.ALL, 0);
+    unlockScript.insertData(0, sig);
+    unlockScript.compile();
 
     return lockTx.toTX();
 }

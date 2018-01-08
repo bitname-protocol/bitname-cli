@@ -1,11 +1,11 @@
-import {genCommitUnlockTx, genCommitTx} from './lib/txs';
+import {genCommitUnlockTx, genCommitTx, genLockTx} from './lib/txs';
 
 import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from './lib/net';
 
 import {keyring as KeyRing, coin as Coin, util} from 'bcoin';
 
 import chalk from 'chalk';
-import { verifyCommitTX } from './lib/verify';
+import { verifyCommitTX, verifyLockTX } from './lib/verify';
 
 /* tslint:disable:no-console */
 function error(msg: string): never {
@@ -52,27 +52,34 @@ async function register() {
         return errorNoFees();
     }
 
-    const upfrontFee = 1000000;
-    const delayFee   = 1000000;
+    const commitUpfrontFee =  500000;
+    const commitDelayFee   = 1500000;
+
+    const lockUpfrontFee = commitUpfrontFee;
+    const lockDelayFee   = 1000000;
 
     // Fund up to a 2 KB transaction
     let coins: Coin[];
     try {
-        coins = await fundTx(addr, upfrontFee + delayFee + 2 * feeRate, net);
+        coins = await fundTx(addr, commitUpfrontFee + 2 * commitDelayFee + 2 * feeRate, net);
     } catch (err) {
         return error('Could not fund the transaction');
     }
 
     try {
-        const commitTx = genCommitTx(coins, 'test', upfrontFee, delayFee, feeRate, ring, servicePubKey);
+        const commitTx = genCommitTx(coins, 'test', commitUpfrontFee, 2 * commitDelayFee, feeRate, ring, servicePubKey);
         const txidStr = chalk`{green ${util.revHex(commitTx.hash('hex')) as string}}`;
 
         console.log(txidStr);
         console.log(commitTx.toRaw().toString('hex'));
         console.log(verifyCommitTX(commitTx, ring.getPublicKey(), servicePubKey, 'test'));
 
-        const uncommitTx = genCommitUnlockTx(commitTx, feeRate, ring, 'test');
-        console.log('\n\n' + uncommitTx.toRaw().toString('hex'));
+        // const uncommitTx = genCommitUnlockTx(commitTx, feeRate, ring, 'test');
+        // console.log('\n\n' + uncommitTx.toRaw().toString('hex'));
+
+        const lockTx = genLockTx(commitTx, 'test', lockUpfrontFee, lockDelayFee, feeRate, ring, servicePubKey, 1);
+        console.log('\n\n' + lockTx.toRaw().toString('hex'));
+        console.log(verifyLockTX(lockTx, servicePubKey));
     } catch (err) {
         return error('Could not generate transaction: ' + err.message);
     }
