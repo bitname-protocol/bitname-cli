@@ -68,13 +68,17 @@ async function commit(argv: yargs.Arguments) {
         return errorNoFees();
     }
 
-    const upfrontFee =  500000;
-    const delayFee   = 1500000;
+    // const upfrontFee =  500000;
+    // const delayFee   = 1500000;
+
+    const commitFee = 500000;
+    const registerFee = 500000;
+    const escrowFee = 1000000;
 
     // Fund up to a 2 KB transaction
     let coins: Coin[];
     try {
-        coins = await fundTx(addr, upfrontFee + delayFee + 8 * feeRate, net);
+        coins = await fundTx(addr, commitFee + registerFee + escrowFee + 8 * feeRate, net);
     } catch (err) {
         return error('Could not fund the transaction');
     }
@@ -83,8 +87,9 @@ async function commit(argv: yargs.Arguments) {
         const commitTx = genCommitTx(coins,
                                      argv.name,
                                      argv.locktime,
-                                     upfrontFee,
-                                     delayFee,
+                                     commitFee,
+                                     registerFee,
+                                     escrowFee,
                                      feeRate,
                                      ring,
                                      servicePubKey);

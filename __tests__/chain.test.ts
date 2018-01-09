@@ -44,13 +44,10 @@ describe('chain state', () => {
 
         // const info = extractInfo(txList, servicePubKey, 1257485);
 
-        const feeRate = 124099;
-
-        const commitUpfrontFee =  500000;
-        const commitDelayFee   = 1500000;
-
-        const lockUpfrontFee = commitUpfrontFee;
-        const lockDelayFee = 1000000;
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
 
         const rawCoin1 = {
             version: 1,
@@ -60,22 +57,27 @@ describe('chain state', () => {
         };
         const coin1 = new Coin(rawCoin1);
 
-        const commitTX1 = genCommitTx([coin1],
-                                      'test',
-                                      80,
-                                      commitUpfrontFee,
-                                      commitDelayFee,
-                                      feeRate,
-                                      userRing,
-                                      servicePubKey);
-        const lockTX1 = genLockTx(commitTX1,
-                                  'test',
-                                  lockUpfrontFee,
-                                  lockDelayFee,
-                                  feeRate,
-                                  userRing,
-                                  servicePubKey,
-                                  80);
+        const commitTX1 = genCommitTx(
+            [coin1],
+            'test',
+            80,
+            commitFee,
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+        );
+        const lockTX1 = genLockTx(
+            commitTX1,
+            'test',
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+            80,
+        );
 
         const rawCoin2 = {
             version: 1,
@@ -85,22 +87,26 @@ describe('chain state', () => {
         };
         const coin2 = new Coin(rawCoin2);
 
-        const commitTX2 = genCommitTx([coin2],
-                                      'test',
-                                      80,
-                                      commitUpfrontFee,
-                                      commitDelayFee,
-                                      feeRate,
-                                      userRing,
-                                      servicePubKey);
+        const commitTX2 = genCommitTx(
+            [coin2],
+            'test',
+            80,
+            commitFee,
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+        );
         const lockTX2 = genLockTx(commitTX2,
-                                  'test',
-                                  lockUpfrontFee,
-                                  lockDelayFee,
-                                  feeRate,
-                                  userRing,
-                                  servicePubKey,
-                                  80);
+            'test',
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+            80,
+        );
 
         const rawCoin3 = {
             version: 1,
@@ -110,22 +116,26 @@ describe('chain state', () => {
         };
         const coin3 = new Coin(rawCoin3);
 
-        const commitTX3 = genCommitTx([coin3],
-                                     'bepis',
-                                     80,
-                                     commitUpfrontFee,
-                                     commitDelayFee,
-                                     feeRate,
-                                     userRing,
-                                     servicePubKey);
+        const commitTX3 = genCommitTx(
+            [coin3],
+            'bepis',
+            80,
+            commitFee,
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+        );
         const lockTX3 = genLockTx(commitTX3,
-                                  'bepis',
-                                  lockUpfrontFee,
-                                  lockDelayFee,
-                                  feeRate,
-                                  userRing,
-                                  servicePubKey,
-                                  80);
+            'bepis',
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+            80,
+        );
 
         const txs = [lockTX3, lockTX2, lockTX1, commitTX3, commitTX2, commitTX1];
 
@@ -146,7 +156,7 @@ describe('chain state', () => {
 
         const expectedInfo = {
             bepis: {
-                txid: '2384181a47bcc28ba6bcb85ff0fd837065c16ca179aeb46e018d9f8c957f47a2',
+                txid: '0bfa628b8d4d06509af48b37c277798385ccb006ea36d34e1951e19065426bcb',
                 expires: 90,
                 pubKey: userPubKey,
             },
@@ -161,13 +171,10 @@ describe('chain state', () => {
         const userRing = KeyRing.fromSecret('cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB');
         const userPubKey = userRing.getPublicKey();
 
-        const feeRate = 124099;
-
-        const commitUpfrontFee =  500000;
-        const commitDelayFee   = 1500000;
-
-        const lockUpfrontFee = commitUpfrontFee;
-        const lockDelayFee = 1000000;
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
 
         const rawCoin1 = {
             version: 1,
@@ -177,22 +184,27 @@ describe('chain state', () => {
         };
         const coin1 = new Coin(rawCoin1);
 
-        const commitTX1 = genCommitTx([coin1],
-                                      'test',
-                                      80,
-                                      commitUpfrontFee,
-                                      commitDelayFee,
-                                      feeRate,
-                                      userRing,
-                                      servicePubKey);
-        const lockTX1 = genLockTx(commitTX1,
-                                  'test',
-                                  lockUpfrontFee,
-                                  lockDelayFee,
-                                  feeRate,
-                                  userRing,
-                                  servicePubKey,
-                                  80);
+        const commitTX1 = genCommitTx(
+            [coin1],
+            'test',
+            80,
+            commitFee,
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+        );
+        const lockTX1 = genLockTx(
+            commitTX1,
+            'test',
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+            80,
+        );
 
         const rawCoin2 = {
             version: 1,
@@ -202,22 +214,27 @@ describe('chain state', () => {
         };
         const coin2 = new Coin(rawCoin2);
 
-        const commitTX2 = genCommitTx([coin2],
-                                      'test',
-                                      80,
-                                      commitUpfrontFee,
-                                      commitDelayFee,
-                                      feeRate,
-                                      userRing,
-                                      servicePubKey);
-        const lockTX2 = genLockTx(commitTX2,
-                                  'test',
-                                  lockUpfrontFee,
-                                  lockDelayFee,
-                                  feeRate,
-                                  userRing,
-                                  servicePubKey,
-                                  80);
+        const commitTX2 = genCommitTx(
+            [coin2],
+            'test',
+            80,
+            commitFee,
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+        );
+        const lockTX2 = genLockTx(
+            commitTX2,
+            'test',
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+            80,
+        );
 
         const rawCoin3 = {
             version: 1,
@@ -227,22 +244,27 @@ describe('chain state', () => {
         };
         const coin3 = new Coin(rawCoin3);
 
-        const commitTX3 = genCommitTx([coin3],
-                                     'bepis',
-                                     80,
-                                     commitUpfrontFee,
-                                     commitDelayFee,
-                                     feeRate,
-                                     userRing,
-                                     servicePubKey);
-        const lockTX3 = genLockTx(commitTX3,
-                                  'bepis',
-                                  lockUpfrontFee,
-                                  lockDelayFee,
-                                  feeRate,
-                                  userRing,
-                                  servicePubKey,
-                                  80);
+        const commitTX3 = genCommitTx(
+            [coin3],
+            'bepis',
+            80,
+            commitFee,
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+        );
+        const lockTX3 = genLockTx(
+            commitTX3,
+            'bepis',
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+            80,
+        );
 
         const txs = [lockTX3, lockTX2, lockTX1, commitTX3, commitTX2, commitTX1];
 
@@ -263,12 +285,12 @@ describe('chain state', () => {
 
         const expectedInfo = {
             bepis: {
-                txid: '2384181a47bcc28ba6bcb85ff0fd837065c16ca179aeb46e018d9f8c957f47a2',
+                txid: '0bfa628b8d4d06509af48b37c277798385ccb006ea36d34e1951e19065426bcb',
                 expires: 90,
                 pubKey: userPubKey,
             },
             test: {
-                txid: '38ff293a6a38a1d2c30972d36892db80d97ead88c24e7d002691d7a1d5dfac42',
+                txid: '0f2cd13bc66afb8a15bfc10abf70b81d1741196dff42d9fc9cdda58c17012f0f',
                 expires: 88,
                 pubKey: userPubKey,
             },
@@ -283,13 +305,10 @@ describe('chain state', () => {
         const userRing = KeyRing.fromSecret('cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB');
         const userPubKey = userRing.getPublicKey();
 
-        const feeRate = 124099;
-
-        const commitUpfrontFee =  500000;
-        const commitDelayFee   = 1500000;
-
-        const lockUpfrontFee = commitUpfrontFee;
-        const lockDelayFee = 1000000;
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
 
         const rawCoin1 = {
             version: 1,
@@ -299,22 +318,27 @@ describe('chain state', () => {
         };
         const coin1 = new Coin(rawCoin1);
 
-        const commitTX1 = genCommitTx([coin1],
-                                      'test',
-                                      80,
-                                      commitUpfrontFee,
-                                      commitDelayFee,
-                                      feeRate,
-                                      userRing,
-                                      servicePubKey);
-        const lockTX1 = genLockTx(commitTX1,
-                                  'test',
-                                  lockUpfrontFee,
-                                  lockDelayFee,
-                                  feeRate,
-                                  userRing,
-                                  servicePubKey,
-                                  80);
+        const commitTX1 = genCommitTx(
+            [coin1],
+            'test',
+            80,
+            commitFee,
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+        );
+        const lockTX1 = genLockTx(
+            commitTX1,
+            'test',
+            registerFee,
+            escrowFee,
+            feeRate,
+            userRing,
+            servicePubKey,
+            80,
+        );
         const unlockTX1 = genUnlockTx(lockTX1, commitTX1, feeRate, false, userRing, servicePubKey);
 
         const txs = [unlockTX1, lockTX1, commitTX1];

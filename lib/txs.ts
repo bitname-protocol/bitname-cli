@@ -157,8 +157,9 @@ function deserializeCommitData(data: Buffer): ICommitData {
 function genCommitTx(coins: Coin[],
                      name: string,
                      locktime: number,
-                     upfrontFee: number,
-                     lockedFee: number,
+                     commitFee: number,
+                     registerFee: number,
+                     escrowFee: number,
                      feeRate: number,
                      userRing: KeyRing,
                      servicePubKey: Buffer): TX {
@@ -190,7 +191,7 @@ function genCommitTx(coins: Coin[],
         lockTx.addCoin(coin);
     }
 
-    const changeVal = total - upfrontFee - (lockedFee + 4 * feeRate);
+    const changeVal = total - (commitFee + registerFee + escrowFee) - (4 * feeRate);
 
     // Add nonce OP_RETURN as output 0
     const pubkeyDataScript = Script.fromNulldata(nonce);
@@ -199,13 +200,14 @@ function genCommitTx(coins: Coin[],
     // Add service upfront fee as output 1
     lockTx.addOutput({
         address: serviceAddr,
-        value: upfrontFee,
+        value: commitFee,
     });
 
     // Add locked fee as output 2
+    // Locks up the fee to register, the fee to be put in escrow, and enough for a 4kb tx at current rates
     lockTx.addOutput({
         address: p2shAddr,
-        value: lockedFee + 4 * feeRate,
+        value: registerFee + escrowFee + 4 * feeRate,
     });
 
     // Add change output as 3

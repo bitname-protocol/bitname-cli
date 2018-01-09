@@ -74,13 +74,24 @@ describe('tx generation', () => {
 
         const coins = [new Coin(testCoin)];
 
-        // const tx = genLockTx(coins, 'google', 1, 1, 10, userRing, serviceKey, 1);
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
 
-        const commitTX = genCommitTx(coins, 'google', 400, 150, 1000, 1, userRing, serviceKey);
+        const commitTX = genCommitTx(coins,
+                                     'google',
+                                     400,
+                                     commitFee,
+                                     registerFee,
+                                     escrowFee,
+                                     feeRate,
+                                     userRing,
+                                     serviceKey);
 
-        const tx = genLockTx(commitTX, 'google', 20, 20, 1, userRing, serviceKey, 400);
+        const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 400);
 
-        expect(tx.hash('hex')).toBe('01f55a080d0e33de011c7cdfc04729a1f43176f80fb81b1f39f22dbb633f0c46');
+        expect(tx.hash('hex')).toBe('27a8890dc30aa18764f2bbbab4aa04c2986c8bc355591b0d2686453452ebfdfb');
     });
 
     it('generates user unlocking transaction', () => {
@@ -136,8 +147,21 @@ describe('tx generation', () => {
 
         const coins = [new Coin(testCoin)];
 
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
         expect(() => {
-            const commitTX = genCommitTx(coins, name, 400, 150, 1000, 1, userRing, serviceKey);
+            const commitTX = genCommitTx(coins,
+                                         name,
+                                         400,
+                                         commitFee,
+                                         registerFee,
+                                         escrowFee,
+                                         feeRate,
+                                         userRing,
+                                         serviceKey);
         }).toThrow('Name is too long');
     });
 
@@ -158,8 +182,21 @@ describe('tx generation', () => {
 
         const coins = [new Coin(testCoin)];
 
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
         expect(() => {
-            const commitTX = genCommitTx(coins, name, 400, 150, 1000, 1, userRing, serviceKey);
+            const commitTX = genCommitTx(coins,
+                                         name,
+                                         400,
+                                         commitFee,
+                                         registerFee,
+                                         escrowFee,
+                                         feeRate,
+                                         userRing,
+                                         serviceKey);
         }).toThrow('Invalid character(s) in name');
     });
 
@@ -181,8 +218,21 @@ describe('tx generation', () => {
 
         const coins = [new Coin(testCoin)];
 
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
         expect(() => {
-            const commitTX = genCommitTx(coins, name, 400, 150, 1000, 1, userRing, serviceKey);
+            const commitTX = genCommitTx(coins,
+                                         name,
+                                         400,
+                                         commitFee,
+                                         registerFee,
+                                         escrowFee,
+                                         feeRate,
+                                         userRing,
+                                         serviceKey);
         }).toThrow('Invalid service public key');
     });
 
