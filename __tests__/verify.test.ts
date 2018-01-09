@@ -1,5 +1,14 @@
 import { verifyLockTX, verifyCommitTX } from '../lib/verify';
-import { genRedeemScript, genP2shAddr, genLockTx, getLockTxName, getLockTxPubKey, getLockTxTime, genCommitTx } from '../lib/txs';
+import {
+    genRedeemScript,
+    genP2shAddr,
+    genLockTx,
+    getLockTxName,
+    getLockTxPubKey,
+    getLockTxTime,
+    genCommitTx,
+    serializeCommitData,
+} from '../lib/txs';
 import {
     keyring as KeyRing,
     coin as Coin,
@@ -8,6 +17,8 @@ import {
     address as Address,
     script as Script,
     output as Output,
+    input as Input,
+    crypto,
 } from 'bcoin';
 
 import * as fs from 'fs';
@@ -25,7 +36,8 @@ describe('transaction verification', () => {
 
             const tx = TX.fromRaw(txData, 'hex');
 
-            const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
 
             expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(true);
         });
@@ -39,7 +51,8 @@ describe('transaction verification', () => {
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
 
-            const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
 
             mtx.outputs = mtx.outputs.slice(0, 1);
 
@@ -48,165 +61,127 @@ describe('transaction verification', () => {
             expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
         });
 
-        // it('fails on output 0 not being an OP_RETURN', () => {
-        //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        //     const txData = fs.readFileSync(txDataPath, 'utf8').trim();
-        //     const mtx = MTX.fromRaw(txData, 'hex');
+        it('fails if invalid data is in scriptSig', () => {
+            const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+            const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+            const ctx = TX.fromRaw(ctxData, 'hex');
 
-        //     const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
-        //     const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+            const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
+            const txData = fs.readFileSync(txDataPath, 'utf8').trim();
+            const mtx = MTX.fromRaw(txData, 'hex');
 
-        //     // Generate a script of any other kind
-        //     const newScript = Script.fromMultisig(1, 2, [servicePubKey, otherKey]);
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
 
-        //     const oldVal = mtx.outputs[0].value;
+            mtx.inputs[0].script.insertData(1, Buffer.from('zippity'));
+            mtx.inputs[0].script.remove(2);
+            mtx.inputs[0].script.compile();
 
-        //     // This new output will also be a P2SH, so we're sure it's not just checking for that
-        //     const newOutput = Output.fromScript(newScript.getAddress(), oldVal);
+            const tx = mtx.toTX();
 
-        //     mtx.outputs[0] = newOutput;
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+        });
 
-        //     const tx = mtx.toTX();
+        it('fails if name is too long', () => {
+            const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+            const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+            const ctx = TX.fromRaw(ctxData, 'hex');
 
-        //     expect(verifyLockTX(tx, servicePubKey)).toBe(false);
-        // });
+            const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
+            const txData = fs.readFileSync(txDataPath, 'utf8').trim();
+            const mtx = MTX.fromRaw(txData, 'hex');
 
-        // it('fails on output 0 having value > 0', () => {
-        //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        //     const txData = fs.readFileSync(txDataPath, 'utf8').trim();
-        //     const mtx = MTX.fromRaw(txData, 'hex');
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
 
-        //     const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+            const name = '000102030405060708090a0b0c0d0e0f1012131415161718191a1b1c1d1e1f20';
 
-        //     mtx.outputs[0].value = 10;
+            const data = serializeCommitData(new Buffer(32), 255, name);
+            data.writeUInt8(65, 34);
+            const newData = Buffer.concat([data, Buffer.from('h', 'ascii')]);
 
-        //     const tx = mtx.toTX();
+            mtx.inputs[0].script.insertData(1, newData);
+            mtx.inputs[0].script.remove(2);
+            mtx.inputs[0].script.compile();
 
-        //     expect(verifyLockTX(tx, servicePubKey)).toBe(false);
-        // });
+            const tx = mtx.toTX();
 
-        // it('fails on output 0 having more than 2 ops', () => {
-        //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        //     const txData = fs.readFileSync(txDataPath, 'utf8').trim();
-        //     const mtx = MTX.fromRaw(txData, 'hex');
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+        });
 
-        //     const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+        it('fails if name contains invalid characters', () => {
+            const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+            const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+            const ctx = TX.fromRaw(ctxData, 'hex');
 
-        //     const pubkeyDataScript = Script.fromNulldata(servicePubKey);
-        //     pubkeyDataScript.pushData(Buffer.from('asdf'));
-        //     pubkeyDataScript.compile();
-        //     mtx.outputs[0] = Output.fromScript(pubkeyDataScript, mtx.outputs[0].value);
+            const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
+            const txData = fs.readFileSync(txDataPath, 'utf8').trim();
+            const mtx = MTX.fromRaw(txData, 'hex');
 
-        //     const tx = mtx.toTX();
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
 
-        //     expect(verifyLockTX(tx, servicePubKey)).toBe(false);
-        // });
+            const name = '<(^_^)>'; // kawaii desu
 
-        // it('fails on output 0 not containing a public key', () => {
-        //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        //     const txData = fs.readFileSync(txDataPath, 'utf8').trim();
-        //     const mtx = MTX.fromRaw(txData, 'hex');
+            const data = serializeCommitData(new Buffer(32), 255, name);
 
-        //     const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+            mtx.inputs[0].script.insertData(1, data);
+            mtx.inputs[0].script.remove(2);
+            mtx.inputs[0].script.compile();
 
-        //     const pubkeyDataScript = Script.fromNulldata(Buffer.from('zip zap zop'));
-        //     pubkeyDataScript.compile();
-        //     mtx.outputs[0] = Output.fromScript(pubkeyDataScript, mtx.outputs[0].value);
+            const tx = mtx.toTX();
 
-        //     const tx = mtx.toTX();
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+        });
 
-        //     expect(verifyLockTX(tx, servicePubKey)).toBe(false);
-        // });
+        it('fails if input 0 is not a valid commit tx', () => {
+            const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+            const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+            const ctx = MTX.fromRaw(ctxData, 'hex');
 
-        // it('fails on output 1 not being an OP_RETURN', () => {
-        //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        //     const txData = fs.readFileSync(txDataPath, 'utf8').trim();
-        //     const mtx = MTX.fromRaw(txData, 'hex');
+            const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
+            const txData = fs.readFileSync(txDataPath, 'utf8').trim();
+            const mtx = MTX.fromRaw(txData, 'hex');
 
-        //     const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
-        //     const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
 
-        //     // Generate a script of any other kind
-        //     const newScript = Script.fromMultisig(1, 2, [servicePubKey, otherKey]);
+            // I shall begone to build a spiteful script
+            // Which holds some valid data when it's stripped.
+            // But if you hold it in discerning view,
+            // Its fallacies will become clear to you.
+            const script = new Script();
+            script.pushInt(1);
+            script.pushSym('OP_NEGATE');
+            script.pushSym('OP_DROP');
 
-        //     const oldVal = mtx.outputs[1].value;
+            script.pushSym('OP_HASH256');
 
-        //     // This new output will also be a P2SH, so we're sure it's not just checking for that
-        //     const newOutput = Output.fromScript(newScript.getAddress(), oldVal);
+            const hashData = serializeCommitData(new Buffer(32), 1, name);
+            const hash = crypto.hash256(hashData);
+            script.pushData(hash);
+            script.pushSym('OP_2DROP');
 
-        //     mtx.outputs[1] = newOutput;
+            script.pushData(servicePubKey);
+            script.pushSym('OP_CHECKSIG');
 
-        //     const tx = mtx.toTX();
+            script.compile();
 
-        //     expect(verifyLockTX(tx, servicePubKey)).toBe(false);
-        // });
+            const oldVal = ctx.outputs[2].value;
+            ctx.outputs[2] = Output.fromScript(script, oldVal);
 
-        // it('fails on output 1 having value > 0', () => {
-        //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        //     const txData = fs.readFileSync(txDataPath, 'utf8').trim();
-        //     const mtx = MTX.fromRaw(txData, 'hex');
+            const oldInputScript = mtx.inputs[0].script;
+            oldInputScript.insertData(2, script.toRaw());
+            oldInputScript.remove(3);
+            oldInputScript.compile();
 
-        //     const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+            mtx.inputs[0] = Input.fromTX(ctx, 2);
+            mtx.inputs[0].script = oldInputScript;
 
-        //     mtx.outputs[1].value = 10;
+            const tx = mtx.toTX();
 
-        //     const tx = mtx.toTX();
-
-        //     expect(verifyLockTX(tx, servicePubKey)).toBe(false);
-        // });
-
-        // it('fails on output 1 having more than 2 ops', () => {
-        //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        //     const txData = fs.readFileSync(txDataPath, 'utf8').trim();
-        //     const mtx = MTX.fromRaw(txData, 'hex');
-
-        //     const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
-
-        //     const pubkeyDataScript = Script.fromNulldata(servicePubKey);
-        //     pubkeyDataScript.pushData(Buffer.from('asdf'));
-        //     pubkeyDataScript.compile();
-        //     mtx.outputs[1] = Output.fromScript(pubkeyDataScript, mtx.outputs[1].value);
-
-        //     const tx = mtx.toTX();
-
-        //     expect(verifyLockTX(tx, servicePubKey)).toBe(false);
-        // });
-
-        // it('fails on output 1 name being too long', () => {
-        //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        //     const txData = fs.readFileSync(txDataPath, 'utf8').trim();
-        //     const mtx = MTX.fromRaw(txData, 'hex');
-
-        //     const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
-
-        //     // First two bytes are the encoded locktime
-        //     const name = '0123456789012345678901234567890123456789012345678901234567890123456';
-        //     const nameScript = Script.fromNulldata(Buffer.from(name, 'ascii'));
-        //     nameScript.compile();
-        //     mtx.outputs[1] = Output.fromScript(nameScript, mtx.outputs[1].value);
-
-        //     const tx = mtx.toTX();
-
-        //     expect(verifyLockTX(tx, servicePubKey)).toBe(false);
-        // });
-
-        // it('fails on output 1 name not being URI-safe', () => {
-        //     const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
-        //     const txData = fs.readFileSync(txDataPath, 'utf8').trim();
-        //     const mtx = MTX.fromRaw(txData, 'hex');
-
-        //     const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
-
-        //     // First two bytes are the encoded locktime
-        //     const name = '01^_^kawaii'; // No weeb shit
-        //     const nameScript = Script.fromNulldata(Buffer.from(name, 'ascii'));
-        //     nameScript.compile();
-        //     mtx.outputs[1] = Output.fromScript(nameScript, mtx.outputs[1].value);
-
-        //     const tx = mtx.toTX();
-
-        //     expect(verifyLockTX(tx, servicePubKey)).toBe(false);
-        // });
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+        });
 
         it('fails on output 0 not being a P2PKH', () => {
             const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
@@ -217,7 +192,8 @@ describe('transaction verification', () => {
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
 
-            const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
             const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
 
             // Generate a script of any other kind
@@ -244,7 +220,8 @@ describe('transaction verification', () => {
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
 
-            const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
 
             const oldVal = mtx.outputs[1].value;
 
@@ -269,7 +246,8 @@ describe('transaction verification', () => {
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
 
-            const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
             const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
 
             // Generate a script of any other kind

@@ -119,10 +119,7 @@ function verifyLockTX(tx: TX, commitTX: TX, servicePubKey: Buffer): boolean {
     }
 
     // Check that output 1 script is correct
-    const locktime = getLockTxTime(tx);
-    if (locktime === null) {
-        return false;
-    }
+    const locktime = getLockTxTime(tx) as number;
     const redeemScript = genRedeemScript(pubKey, servicePubKey, locktime);
     const scriptHash = crypto.hash160(redeemScript.toRaw());
     const p2shAddr = Address.fromScripthash(scriptHash);

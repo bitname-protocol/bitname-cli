@@ -364,10 +364,11 @@ function extractCommitMetadata(inputScript: Script) {
     // console.log(Script.fromRaw(inputScript.code[2].data).code[6].data);
     const meta = deserializeCommitData(inputScript.code[1].data);
 
-    const encumberScript = Script.fromRaw(inputScript.code[2].data);
-    const pubKey: Buffer = encumberScript.code[6].data;
+    // const encumberScript = Script.fromRaw(inputScript.code[2].data);
+    // const pubKey: Buffer = encumberScript.code[6].data;
 
-    return {...meta, pubKey};
+    // return {...meta, pubKey};
+    return meta;
 }
 
 function getLockTxName(lockTx: TX): string | null {
@@ -391,13 +392,21 @@ function getLockTxTime(lockTx: TX): number | null {
 }
 
 function getLockTxPubKey(lockTx: TX): Buffer | null {
-    try {
-        const metadata = extractCommitMetadata(lockTx.inputs[0].script);
+    const inputScript = lockTx.inputs[0].script;
 
-        return metadata.pubKey;
-    } catch (e) {
+    if (inputScript.code.length < 3) {
         return null;
     }
+
+    const encumberScript = Script.fromRaw(inputScript.code[2].data);
+
+    if (encumberScript.code.length < 7) {
+        return null;
+    }
+
+    const pubKey: Buffer = encumberScript.code[6].data;
+
+    return pubKey;
 }
 
 function genUnlockTx(lockTx: TX,
