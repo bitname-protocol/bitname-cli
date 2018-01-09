@@ -37,7 +37,6 @@ function isValidOP_RETURN(output: Output): boolean {
     return true;
 }
 
-/* tslint:disable:no-console */
 function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name: string, locktime: number): boolean {
     if (tx.outputs.length < 3) {
         return false;
@@ -45,15 +44,12 @@ function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name:
 
     // Check that output 0 is an OP_RETURN of the correct form
     if (!isValidOP_RETURN(tx.outputs[0])) {
-        console.log(tx.outputs[0]);
-        console.log('failed at opret');
         return false;
     }
 
     // Check that output 0 contains a 32-byte nonce
     const nonce = tx.outputs[0].script.code[1].data;
     if (nonce.length !== 32) {
-        console.log('failed at nonce');
         return false;
     }
 
@@ -82,14 +78,12 @@ function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name:
 
 function verifyLockTX(tx: TX, commitTX: TX, servicePubKey: Buffer): boolean {
     if (tx.outputs.length < 2) {
-        console.log('failed at outputs length');
         return false;
     }
 
     // Check that input 0 contains a valid pubkey
     const pubKey = getLockTxPubKey(tx);
     if (pubKey === null || !crypto.secp256k1.publicKeyVerify(pubKey)) {
-        console.log('failed at pubkey verification');
         return false;
     }
 
@@ -100,19 +94,16 @@ function verifyLockTX(tx: TX, commitTX: TX, servicePubKey: Buffer): boolean {
     }
 
     if (nameStr.length > 64) {
-        console.log('failed at name length');
         return false;
     }
 
     // Check that output 1 name data contains only URL-safe characters
     if (!isURISafe(nameStr)) {
-        console.log('failed at uri safety');
         return false;
     }
 
     // Check that output 0 is a P2PKH
     if (!tx.outputs[0].script.isPubkeyhash()) {
-        console.log('failed at output 0 being pkh');
         return false;
     }
 
@@ -142,7 +133,6 @@ function verifyLockTX(tx: TX, commitTX: TX, servicePubKey: Buffer): boolean {
 
     // Check that input 0 is a valid commit TX
     if (!verifyCommitTX(commitTX, pubKey, servicePubKey, nameStr, locktime)) {
-        console.log('failed at verifycommittx');
         return false;
     }
 

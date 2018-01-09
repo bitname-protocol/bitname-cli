@@ -35,23 +35,18 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
         try {
             ctx = txs.getTX(prevHash);
         } catch (e) {
-            console.log('couldn\'t get prevout');
             continue;
         }
 
         // Is this a valid lock tx or another random kind?
         const valid = verifyLockTX(txs.getTX(txid), ctx, servicePubKey);
         if (!valid) {
-            console.log('not valid lock tx')
             continue;
         }
 
         // Determine at what block this tx is spendable
         const height = txs.getHeight(txid);
-        const period = getLockTxTime(lockTx);
-        if (period === null) {
-            continue;
-        }
+        const period = getLockTxTime(lockTx) as number;
         const expires = height + period;
 
         // Has the P2SH fee been spent yet, signalling a revocation?
@@ -60,10 +55,7 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
             continue;
         }
 
-        const pubKey = getLockTxPubKey(lockTx);
-        if (pubKey === null) {
-            continue;
-        }
+        const pubKey = getLockTxPubKey(lockTx) as Buffer;
 
         const data = {
             txid,
@@ -72,10 +64,7 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
             invalid: false,
         };
 
-        const name = getLockTxName(lockTx);
-        if (name === null) {
-            continue;
-        }
+        const name = getLockTxName(lockTx) as string;
 
         if (map.hasOwnProperty(name) && txs.getHeight(map[name].txid) === height) {
             map[name].invalid = true;
