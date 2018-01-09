@@ -157,7 +157,7 @@ describe('transaction verification', () => {
 
             script.pushSym('OP_HASH256');
 
-            const hashData = serializeCommitData(new Buffer(32), 1, name);
+            const hashData = serializeCommitData(new Buffer(32), 1, 'test');
             const hash = crypto.hash256(hashData);
             script.pushData(hash);
             script.pushSym('OP_2DROP');
@@ -183,6 +183,28 @@ describe('transaction verification', () => {
             expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
         });
 
+        it('fails on input 0 not containing a valid pubkey', () => {
+            const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+            const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+            const ctx = TX.fromRaw(ctxData, 'hex');
+
+            const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
+            const txData = fs.readFileSync(txDataPath, 'utf8').trim();
+            const mtx = MTX.fromRaw(txData, 'hex');
+
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
+            const badPubKey = new Buffer(33);
+
+            mtx.inputs[0].script.insertData(2, badPubKey);
+            mtx.inputs[0].script.remove(3);
+            mtx.inputs[0].script.compile();
+
+            const tx = mtx.toTX();
+
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+        });
+
         it('fails on output 0 not being a P2PKH', () => {
             const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
             const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
@@ -202,7 +224,36 @@ describe('transaction verification', () => {
             const oldVal = mtx.outputs[0].value;
 
             // This new output will also be a P2SH, so we're sure it's not just checking for that
-            const newOutput = Output.fromScript(newScript.getAddress(), oldVal);
+            const newOutput = Output.fromScript(newScript, oldVal);
+
+            mtx.outputs[0] = newOutput;
+
+            const tx = mtx.toTX();
+
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+        });
+
+        it('fails on output 0 being sent to the wrong address', () => {
+            const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+            const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+            const ctx = TX.fromRaw(ctxData, 'hex');
+
+            const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
+            const txData = fs.readFileSync(txDataPath, 'utf8').trim();
+            const mtx = MTX.fromRaw(txData, 'hex');
+
+            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
+            const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+            // Generate a script of any other kind
+            // const newScript = A
+            const newAddr = Address.fromPubkeyhash(crypto.hash160(otherKey));
+
+            const oldVal = mtx.outputs[0].value;
+
+            // This new output will also be a P2SH, so we're sure it's not just checking for that
+            const newOutput = Output.fromScript(newAddr, oldVal);
 
             mtx.outputs[0] = newOutput;
 
@@ -256,7 +307,7 @@ describe('transaction verification', () => {
             const oldVal = mtx.outputs[1].value;
 
             // This new output will also be a P2SH, so we're sure it's not just checking for that
-            const newOutput = Output.fromScript(newScript.getAddress(), oldVal);
+            const newOutput = Output.fromScript(newScript.getAddress() as Address, oldVal);
 
             mtx.outputs[1] = newOutput;
 
@@ -325,7 +376,7 @@ describe('transaction verification', () => {
             const oldVal = ctx.outputs[0].value;
 
             // This new output will also be a P2SH, so we're sure it's not just checking for that
-            const newOutput = Output.fromScript(newScript.getAddress(), oldVal);
+            const newOutput = Output.fromScript(newScript, oldVal);
 
             ctx.outputs[0] = newOutput;
 
@@ -442,7 +493,7 @@ describe('transaction verification', () => {
             const oldVal = ctx.outputs[2].value;
 
             // This new output will also be a P2SH, so we're sure it's not just checking for that
-            const newOutput = Output.fromScript(newScript.getAddress(), oldVal);
+            const newOutput = Output.fromScript(newScript.getAddress() as Address, oldVal);
 
             ctx.outputs[2] = newOutput;
 

@@ -37,7 +37,7 @@
   },
   "scripts": {
     "start:dev": "ts-node index.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "start": "npm run build && node dist/index.js",
     "test": "jest"
   },

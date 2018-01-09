@@ -8,7 +8,7 @@ import { address as Address } from 'bcoin';
 describe('network data', () => {
     it('generates coins correctly', async () => {
         const addr = Address.fromBase58('mk8cJh83q2JKBNguuzamfN1LZ9aECtnVJ7');
-        const coins = await fundTx(addr, 1);
+        const coins = await fundTx(addr, 1, 'testnet');
 
         const expected = [
             {
@@ -31,7 +31,7 @@ describe('network data', () => {
 
     it('generates a tx list from network data', async () => {
         const addr = Address.fromBase58('mk8cJh83q2JKBNguuzamfN1LZ9aECtnVJ7');
-        const txList = await getAllTX(addr);
+        const txList = await getAllTX(addr, 'testnet');
 
         const expectedTxids = [
             '4725685d4df950f189fc2e0d7d13b9b96747da91468df0fec077530250323e7a',

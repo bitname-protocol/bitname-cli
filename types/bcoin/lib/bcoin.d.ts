@@ -85,8 +85,13 @@ declare module 'bcoin' {
         ANYONECANPAY: number;
     }
 
+    interface IScriptCode {
+        value: number,
+        data: Buffer,
+    }
+
     class script {
-        code: any[];
+        code: IScriptCode[];
         raw: Buffer | null;
         length: number;
         static hashType: SighashType;
@@ -96,6 +101,7 @@ declare module 'bcoin' {
         static fromNulldata(data: Buffer): script;
         static fromScripthash(hash: Hash): script;
         static fromRaw(data: Buffer | string, enc?: string): script;
+        static fromMultisig(m: number, n: number, keys: Buffer[]): script;
         hash160(data?: string): Hash;
 
         pushSym(sym: string): script;
@@ -108,6 +114,11 @@ declare module 'bcoin' {
         isNulldata(minimal?: boolean): boolean;
         isScripthash(minimal?: boolean): boolean;
         isPubkeyhash(minimal?: boolean): boolean;
+
+        insertData(index: number, data: Buffer): script;
+        remove(index: number): IScriptCode;
+        toASM(decode?: boolean): string;
+        getAddress(): address | null;
     }
 
     // TODO: Define these
@@ -129,6 +140,7 @@ declare module 'bcoin' {
 
     class input {
         constructor(options?: NakedInput);
+        static fromTX(tx: tx, index: number): input;
 
         script: script;
         prevout: outpoint;
@@ -163,7 +175,7 @@ declare module 'bcoin' {
         getVirtualSize(): number;
 
         static fromOptions(options: NakedTX): tx;
-        static fromRaw(data: Buffer, enc?: string): tx;
+        static fromRaw(data: Buffer | string, enc?: string): tx;
 
         toRaw(): Buffer;
 
@@ -174,6 +186,7 @@ declare module 'bcoin' {
     }
 
     class mtx extends tx {
+        static fromRaw(data: Buffer | string, enc?: string): mtx;
         addCoin(coin: coin): input;
         addOutput(script: address | script | output | Object, value?: amount): output;
         scriptInput(index: number, coin: coin | output, ring: keyring): boolean;
@@ -209,6 +222,7 @@ declare module 'bcoin' {
     export {
         script,
         address,
+        input,
         output,
         tx,
         mtx,
