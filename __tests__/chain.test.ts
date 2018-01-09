@@ -3,6 +3,7 @@ import { fetchUnspentTX, fetchAllTX } from '../lib/netUtils';
 
 import {
     address as Address,
+    crypto,
 } from 'bcoin';
 import { fundTx, getAllTX } from '../lib/net';
 
@@ -10,18 +11,20 @@ import { extractInfo } from '../lib/chain';
 
 describe('chain state', () => {
     it('finds the one current name', async () => {
-        const addr = Address.fromBase58('mk8cJh83q2JKBNguuzamfN1LZ9aECtnVJ7');
-        const txList = await getAllTX(addr, 'testnet');
+        const servicePubKey = Buffer.from('032b9429c7553028aea2464021c7680a408885a49c62af6adba435ec751d467237', 'hex');
+        const userPubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
 
-        const servicePubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+        const addr = Address.fromPubkeyhash(crypto.hash160(servicePubKey));
+        console.log(addr);
+        const txList = await getAllTX(addr, 'testnet');
 
         const info = extractInfo(txList, servicePubKey, 1257057);
 
         const expectedInfo = {
-            test: {
-                txid: 'd9b495951954e29aa4f07dacdeef7f858d1f5e0099009ac159496375c427c99e',
-                expires: 1257089,
-                pubKey: servicePubKey,
+            colin: {
+                txid: '205c16dc3440d83754558d028eb94d19cce857852c4a63e3daf24f5a7d14674f',
+                expires: 1257888 + 30,
+                pubKey: userPubKey,
             },
         };
 

@@ -3,6 +3,7 @@ import { verifyLockTX, verifyCommitTX } from './verify';
 import { getLockTxTime, getLockTxName, getLockTxPubKey } from './txs';
 import {
     tx as TX,
+    util,
 } from 'bcoin';
 
 interface IReadonlyNameInfo {
@@ -28,18 +29,20 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
     for (const txid of ([...txs.getTxids()].reverse() as ReadonlyArray<string>)) {
         const lockTx = txs.getTX(txid);
 
-        const prevHash = lockTx.inputs[0].prevout.hash as string;
+        const prevHash = util.revHex(lockTx.inputs[0].prevout.hash as string);
 
         let ctx: TX;
         try {
             ctx = txs.getTX(prevHash);
         } catch (e) {
+            console.log('couldn\'t get prevout');
             continue;
         }
 
         // Is this a valid lock tx or another random kind?
         const valid = verifyLockTX(txs.getTX(txid), ctx, servicePubKey);
         if (!valid) {
+            console.log('not valid lock tx')
             continue;
         }
 
@@ -52,7 +55,7 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
         const expires = height + period;
 
         // Has the P2SH fee been spent yet, signalling a revocation?
-        const revoked = txs.getOutputSpent(txid, 3);
+        const revoked = txs.getOutputSpent(txid, 1);
         if (revoked) {
             continue;
         }

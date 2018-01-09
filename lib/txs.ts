@@ -204,7 +204,7 @@ function genCommitTx(coins: Coin[],
         lockTx.addCoin(coin);
     }
 
-    const changeVal = total - upfrontFee - lockedFee;
+    const changeVal = total - upfrontFee - (lockedFee + 4 * feeRate);
 
     // Add nonce OP_RETURN as output 0
     const pubkeyDataScript = Script.fromNulldata(nonce);
@@ -219,7 +219,7 @@ function genCommitTx(coins: Coin[],
     // Add locked fee as output 2
     lockTx.addOutput({
         address: p2shAddr,
-        value: lockedFee,
+        value: lockedFee + 4 * feeRate,
     });
 
     // Add change output as 3

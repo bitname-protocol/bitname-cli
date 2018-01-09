@@ -4,7 +4,14 @@ import {
     address as Address,
     crypto,
 } from 'bcoin';
-import { genRedeemScript, genCommitRedeemScript, getLockTxName, getLockTxTime, extractCommitMetadata, getLockTxPubKey } from './txs';
+import {
+    genRedeemScript,
+    genCommitRedeemScript,
+    getLockTxName,
+    getLockTxTime,
+    extractCommitMetadata,
+    getLockTxPubKey,
+} from './txs';
 
 function isURISafe(str: string) {
     const re = /^[a-zA-Z0-9_\-\.\~]*$/;
@@ -30,6 +37,7 @@ function isValidOP_RETURN(output: Output): boolean {
     return true;
 }
 
+/* tslint:disable:no-console */
 function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name: string, locktime: number): boolean {
     if (tx.outputs.length < 3) {
         return false;
@@ -45,7 +53,7 @@ function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name:
     // Check that output 0 contains a 32-byte nonce
     const nonce = tx.outputs[0].script.code[1].data;
     if (nonce.length !== 32) {
-        console.log('failed at nonce')
+        console.log('failed at nonce');
         return false;
     }
 

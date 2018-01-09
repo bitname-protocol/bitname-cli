@@ -96,6 +96,8 @@ async function getAllTX(addr: Address, network: string): Promise<TXList> {
 async function getTX(txid: string, network: string): Promise<TX> {
     const txData = await fetchTX(txid, network);
 
+    console.log(txData);
+
     const hex = txData.hex;
 
     return TX.fromRaw(Buffer.from(hex, 'hex'));

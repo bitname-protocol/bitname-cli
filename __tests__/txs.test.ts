@@ -80,7 +80,7 @@ describe('tx generation', () => {
 
         const tx = genLockTx(commitTX, 'google', 20, 20, 1, userRing, serviceKey, 400);
 
-        expect(tx.hash('hex')).toBe('194b2c60b2bdee8e8b207da88cb48f6c75ad038068ba6998e3f50ad9d4ba6548');
+        expect(tx.hash('hex')).toBe('01f55a080d0e33de011c7cdfc04729a1f43176f80fb81b1f39f22dbb633f0c46');
     });
 
     it('generates user unlocking transaction', () => {
