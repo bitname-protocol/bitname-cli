@@ -19,21 +19,7 @@ import {
     BadLockTransactionError,
 } from './errors';
 
-// import { config } from '../config';
 import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
-// const NETWORK = config.network;
-
-function extractEncodedMetadata(opRetScript: Script): [number, Buffer] {
-    const rawNameData = opRetScript.code[1].data;
-    const name = rawNameData.slice(2);
-
-    const locktimeData = rawNameData.slice(0, 2);
-    const locktimeI64 = I64.fromString(locktimeData.toString('hex'), 16);
-
-    const lockTimeNum = locktimeI64.toNumber();
-
-    return [lockTimeNum, name];
-}
 
 function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number): Script {
     if (!crypto.secp256k1.publicKeyVerify(userPubkey)) {

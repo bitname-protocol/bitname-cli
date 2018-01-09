@@ -119,8 +119,6 @@ async function register(argv: yargs.Arguments) {
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
 
-    const addr = ring.getAddress();
-
     let feeRate: number;
     try {
         feeRate = await getFeesSatoshiPerKB(net);

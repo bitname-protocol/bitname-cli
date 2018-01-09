@@ -9,7 +9,6 @@ import {
     genCommitRedeemScript,
     getLockTxName,
     getLockTxTime,
-    extractCommitMetadata,
     getLockTxPubKey,
 } from './txs';
 

@@ -1,5 +1,5 @@
 import TXList from './TXList';
-import { verifyLockTX, verifyCommitTX } from './verify';
+import { verifyLockTX } from './verify';
 import { getLockTxTime, getLockTxName, getLockTxPubKey } from './txs';
 import {
     tx as TX,
