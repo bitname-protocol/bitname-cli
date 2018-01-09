@@ -4,6 +4,7 @@ import {
     coin as Coin,
     keyring as KeyRing,
     tx as TX,
+    crypto,
 } from 'bcoin';
 
 import {
@@ -11,6 +12,8 @@ import {
     genLockTx,
     genUnlockTx,
     genCommitTx,
+    genCommitRedeemScript,
+    serializeCommitData,
 } from '../lib/txs';
 import {
     BadUserPublicKeyError,
@@ -22,7 +25,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 describe('tx generation', () => {
-    it('generates a valid redeem script', () => {
+    it('generates a valid registration redeem script', () => {
         const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
         const userKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
         const script = genRedeemScript(userKey, serviceKey, 5);
@@ -41,6 +44,67 @@ describe('tx generation', () => {
         ];
 
         expect(script.toASM().split(' ')).toEqual(expected);
+    });
+
+    it('generates a valid commit redeem script', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+        const userKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
+
+        const nonce = new Buffer(32);
+        const name = 'boop';
+        const locktime = 5;
+        const script = genCommitRedeemScript(userKey, nonce, name, locktime);
+
+        const serializedInfoHash = crypto.hash256(serializeCommitData(nonce, locktime, name));
+
+        const expected = [
+            'OP_1',
+            'OP_CHECKSEQUENCEVERIFY',
+            'OP_DROP',
+            'OP_HASH256',
+            serializedInfoHash.toString('hex'),
+            'OP_EQUALVERIFY',
+            userKey.toString('hex'),
+            'OP_CHECKSIG',
+        ];
+
+        expect(script.toASM().split(' ')).toEqual(expected);
+    });
+
+    it('throws generating a commit redeem script with a bad pubkey', () => {
+        const nonce = new Buffer(32);
+        const name = 'boop';
+        const locktime = 5;
+        expect(() => {
+            genCommitRedeemScript(nonce, nonce, name, locktime);
+        }).toThrow(BadUserPublicKeyError);
+    });
+
+    it('throws serializing with a bad nonce length', () => {
+        const nonce = new Buffer(39);
+        const name = 'boop';
+        const locktime = 5;
+        expect(() => {
+            serializeCommitData(nonce, locktime, name);
+        }).toThrow('Invalid nonce size');
+    });
+
+    it('throws serializing with a bad locktime size', () => {
+        const nonce = new Buffer(32);
+        const name = 'boop';
+        const locktime = 65536;
+        expect(() => {
+            serializeCommitData(nonce, locktime, name);
+        }).toThrow('Locktime must be 16 bits');
+    });
+
+    it('throws serializing with a bad name size', () => {
+        const nonce = new Buffer(32);
+        const name = '000102030405060708090a0b0c0d0e0f1012131415161718191a1b1c1d1e1f2021';
+        const locktime = 65;
+        expect(() => {
+            serializeCommitData(nonce, locktime, name);
+        }).toThrow('Name is too long');
     });
 
     it('fails if user pubkey is invalid', () => {

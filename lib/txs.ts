@@ -479,5 +479,5 @@ export {
     getLockTxPubKey,
     genCommitTx,
     genCommitRedeemScript,
-    extractCommitMetadata,
+    serializeCommitData,
 };
