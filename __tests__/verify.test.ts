@@ -1,5 +1,5 @@
 import { verifyLockTX, verifyCommitTX } from '../lib/verify';
-import { genRedeemScript, genP2shAddr, genLockTx, getLockTxName, getLockTxPubKey, getLockTxTime } from '../lib/txs';
+import { genRedeemScript, genP2shAddr, genLockTx, getLockTxName, getLockTxPubKey, getLockTxTime, genCommitTx } from '../lib/txs';
 import {
     keyring as KeyRing,
     coin as Coin,
@@ -471,6 +471,34 @@ describe('transaction verification', () => {
             const tx = ctx.toTX();
 
             expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toBe(false);
+        });
+
+        it('verifies generated commitment txs', () => {
+            const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
+            const ring = KeyRing.fromSecret(wif);
+
+            const servicePubKeyHex = '02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc';
+            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
+
+            const testCoin = {
+                version: 1,
+                height: -1,
+                value: 100000000,
+                hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+            };
+
+            const name = 'zoop';
+
+            const coins = [new Coin(testCoin)];
+
+            const commitFee = 10000;
+            const registerFee = 10000;
+            const escrowFee = 20000;
+            const feeRate = 1000;
+
+            const ctx = genCommitTx(coins, name, 600, commitFee, registerFee, escrowFee, feeRate, ring, servicePubKey);
+
+            expect(verifyCommitTX(ctx, ring.getPublicKey(), servicePubKey, name, 600)).toBe(true);
         });
     });
 });
