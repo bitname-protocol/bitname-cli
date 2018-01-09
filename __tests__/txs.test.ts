@@ -119,6 +119,73 @@ describe('tx generation', () => {
         expect(tx.hash('hex')).toBe('ff2a93a6121400cba5059e2a3e18a99cb15e71a81e6f5018fea21a46dcacef45');
     });
 
+    it('errors on committing with name too long', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const name = 'If music be the food of love, play on. / Give me excess of it that, surfeiting...';
+
+        const coins = [new Coin(testCoin)];
+
+        expect(() => {
+            const commitTX = genCommitTx(coins, name, 400, 150, 1000, 1, userRing, serviceKey);
+        }).toThrow('Name is too long');
+    });
+
+    it('errors on committing with bad characters in name', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const name = 'zip zap zop';
+
+        const coins = [new Coin(testCoin)];
+
+        expect(() => {
+            const commitTX = genCommitTx(coins, name, 400, 150, 1000, 1, userRing, serviceKey);
+        }).toThrow('Invalid character(s) in name');
+    });
+
+    it('errors on committing with bad characters in name', () => {
+        // const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+        const serviceKey = new Buffer(33);
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const name = 'zoop';
+
+        const coins = [new Coin(testCoin)];
+
+        expect(() => {
+            const commitTX = genCommitTx(coins, name, 400, 150, 1000, 1, userRing, serviceKey);
+        }).toThrow('Invalid service public key');
+    });
+
     it('errors on unlocking with incorrect user pubkey', () => {
         const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
         const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
