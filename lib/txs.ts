@@ -480,4 +480,5 @@ export {
     genCommitTx,
     genCommitRedeemScript,
     serializeCommitData,
+    deserializeCommitData,
 };

@@ -14,6 +14,7 @@ import {
     genCommitTx,
     genCommitRedeemScript,
     serializeCommitData,
+    deserializeCommitData,
 } from '../lib/txs';
 import {
     BadUserPublicKeyError,
@@ -105,6 +106,17 @@ describe('tx generation', () => {
         expect(() => {
             serializeCommitData(nonce, locktime, name);
         }).toThrow('Name is too long');
+    });
+
+    it('throws on name data being of incorrect length', () => {
+        const nonce = new Buffer(32);
+        const name = 'google';
+        const locktime = 65;
+        const data = Buffer.concat([serializeCommitData(nonce, locktime, name), Buffer.from('abcd')]);
+
+        expect(() => {
+            deserializeCommitData(data);
+        }).toThrow('Name has incorrect length');
     });
 
     it('fails if user pubkey is invalid', () => {
