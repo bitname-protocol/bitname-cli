@@ -167,7 +167,42 @@ describe('tx generation', () => {
 
         const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 400);
 
-        expect(tx.hash('hex')).toBe('27a8890dc30aa18764f2bbbab4aa04c2986c8bc355591b0d2686453452ebfdfb');
+        expect(tx.hash('hex')).toBe('9415809c1c746b5cf063db4312bd66c08dbec42f406acf3422f8305a22856b49');
+    });
+
+    it('generates locking transactions for 65535 blocks', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const coins = [new Coin(testCoin)];
+
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
+        const commitTX = genCommitTx(coins,
+                                     'google',
+                                     65535,
+                                     commitFee,
+                                     registerFee,
+                                     escrowFee,
+                                     feeRate,
+                                     userRing,
+                                     serviceKey);
+
+        const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 65535);
+
+        expect(tx.hash('hex')).toBe('ba46f7a24a0bd62b3f0d772a6f5fd12dc25c16c9da9103daa3ff9eed2d970a6d');
     });
 
     it('generates user unlocking transaction', () => {

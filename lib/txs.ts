@@ -39,20 +39,7 @@ function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: n
 
     script.pushSym('OP_ELSE');
 
-    const num = I64(rlocktime);
-
-    const numBuff = num.toLE(Buffer);
-
-    let min = numBuff.length - 1;
-    while (min > 1) {
-        if (numBuff[min] === 0) {
-            min -= 1;
-        } else {
-            break;
-        }
-    }
-    script.pushData(numBuff.slice(0, min));
-
+    script.pushInt(rlocktime);
     script.pushSym('OP_CHECKSEQUENCEVERIFY');
     script.pushSym('OP_DROP');
 

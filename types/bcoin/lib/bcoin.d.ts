@@ -49,12 +49,20 @@ declare module 'bcoin' {
     }
 
     type Hash = Buffer | string;
-    type amount = number;
+    type Amount = number;
+
+    class amount {
+        constructor(value: string | number, unit?: string, num?: boolean);
+
+        static fromBTC(value: number | string, num?: boolean): amount;
+
+        toSatoshis(num?: boolean): string | Amount;
+    }
 
     interface NakedCoin {
         version?: number;
         height?: number;
-        value?: amount;
+        value?: Amount;
         script?: script;
         coinbase?: boolean;
         hash?: Hash;
@@ -66,7 +74,7 @@ declare module 'bcoin' {
 
         version: number;
         height: number;
-        value: amount;
+        value: Amount;
         script: script;
         coinbase: boolean;
         hash: Hash;
@@ -147,16 +155,16 @@ declare module 'bcoin' {
     }
 
     interface NakedOutput {
-        value: amount;
+        value: Amount;
         script: NakedScript;
     }
 
     class output {
-        value: amount;
+        value: Amount;
         script: script;
         constructor(options: NakedOutput);
 
-        static fromScript(script: script | address, value: amount): output;
+        static fromScript(script: script | address, value: Amount): output;
 
         getAddress(): address;
     }
@@ -188,16 +196,16 @@ declare module 'bcoin' {
     class mtx extends tx {
         static fromRaw(data: Buffer | string, enc?: string): mtx;
         addCoin(coin: coin): input;
-        addOutput(script: address | script | output | Object, value?: amount): output;
+        addOutput(script: address | script | output | Object, value?: Amount): output;
         scriptInput(index: number, coin: coin | output, ring: keyring): boolean;
-        subtractFee(fee: amount): void;
-        subtractIndex(index: number, fee: amount): void;
+        subtractFee(fee: Amount): void;
+        subtractIndex(index: number, fee: Amount): void;
         signInput(index: number, coin: coin | output, ring: keyring, type: number): boolean;
         toTX(): tx;
         static fromOptions(options: NakedTX): mtx;
 
         addTX(tx: tx, index: number, height?: number): input;
-        signature(index: number, prev: script, value: amount, privKey: Buffer, type: number, version: number): Buffer;
+        signature(index: number, prev: script, value: Amount, privKey: Buffer, type: number, version: number): Buffer;
         setSequence(index: number, locktime: number, seconds?: boolean): void;
     }
 
@@ -226,6 +234,7 @@ declare module 'bcoin' {
         output,
         tx,
         mtx,
+        Amount,
         amount,
         keyring,
         coin,
