@@ -1,6 +1,6 @@
 <h1 align="center">
     <br />
-    <img src="graphics/logo.png" alt="bitname" width="256" />
+    <img src="graphics/logo.png" alt="bitname" width="512" />
     <br />
 </h1>
 
