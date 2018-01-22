@@ -21,7 +21,7 @@ import {
 
 import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
 
-function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: number): Script {
+function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, alocktime: number): Script {
     if (!crypto.secp256k1.publicKeyVerify(userPubkey)) {
         throw new BadUserPublicKeyError();
     }
@@ -34,13 +34,17 @@ function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, rlocktime: n
 
     script.pushSym('OP_IF');
 
+    script.pushInt(0);
+    script.pushSym('OP_CHECKSEQUENCEVERIFY');
+    script.pushSym('OP_DROP');
+
     script.pushData(userPubkey);
     script.pushSym('OP_CHECKSIG');
 
     script.pushSym('OP_ELSE');
 
-    script.pushInt(rlocktime);
-    script.pushSym('OP_CHECKSEQUENCEVERIFY');
+    script.pushInt(alocktime);
+    script.pushSym('OP_CHECKLOCKTIMEVERIFY');
     script.pushSym('OP_DROP');
 
     script.pushData(servicePubkey);
@@ -89,22 +93,22 @@ function serializeCommitData(nonce: Buffer, locktime: number, name: string): Buf
         throw new Error('Invalid nonce size');
     }
 
-    if (locktime > 65535) {
-        throw new Error('Locktime must be 16 bits');
+    if (locktime > 500000000) {
+        throw new Error('Locktime must be less than 500000000 blocks');
     }
 
     if (name.length > 64) {
         throw new Error('Name is too long');
     }
 
-    const outBuf = new Buffer(32 + 2 + 1 + name.length);
+    const outBuf = new Buffer(32 + 4 + 1 + name.length);
     nonce.copy(outBuf);
 
-    outBuf.writeUInt16BE(locktime, 32);
+    outBuf.writeUInt32BE(locktime, 32);
 
-    outBuf.writeUInt8(name.length, 34);
+    outBuf.writeUInt8(name.length, 36);
 
-    outBuf.write(name, 35, name.length, 'ascii');
+    outBuf.write(name, 37, name.length, 'ascii');
 
     return outBuf;
 }
@@ -116,17 +120,17 @@ interface ICommitData {
 }
 
 function deserializeCommitData(data: Buffer): ICommitData {
-    if (data.length < 36) {
+    if (data.length < 38) {
         throw new Error('Invalid commit data');
     }
 
     const nonce = data.slice(0, 32);
 
-    const locktime = data.readUInt16BE(32);
+    const locktime = data.readUInt32BE(32);
 
-    const nameLen = data.readUInt8(34);
+    const nameLen = data.readUInt8(36);
 
-    const nameRaw = data.slice(35);
+    const nameRaw = data.slice(37);
 
     if (nameRaw.length !== nameLen) {
         throw new Error('Name has incorrect length');
@@ -197,6 +201,8 @@ function genCommitTx(coins: Coin[],
         value: registerFee + escrowFee + 4 * feeRate,
     });
 
+    console.log(changeVal);
+
     // Add change output as 3
     lockTx.addOutput({
         address: userRing.getAddress(),
@@ -228,8 +234,8 @@ function genLockTx(commitTX: TX,
                    userRing: KeyRing,
                    servicePubKey: Buffer,
                    locktime: number) {
-    if (locktime > 65535) {
-        throw new Error('Locktime must be 16-bits');
+    if (locktime > 500000000) {
+        throw new Error('Locktime must be less than 500000000 blocks');
     }
 
     if (name.length > 64) {
@@ -429,7 +435,10 @@ function genUnlockTx(lockTx: TX,
     const boolVal = service ? 0 : 1;
 
     if (service) {
-        unlockTx.setSequence(0, locktime);
+        // unlockTx.setSequence(0, locktime);
+        unlockTx.setLocktime(locktime);
+    } else {
+        unlockTx.setSequence(0, 0);
     }
 
     unlockTx.addOutput({

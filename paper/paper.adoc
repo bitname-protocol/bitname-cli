@@ -96,16 +96,17 @@ The redeem script is of the form:
 [source]
 ----
 IF
+    0 CHECKSEQUENCEVERIFY
     [user pubkey] CHECKSIG
 ELSE
-    [time] CHECKSEQUENCEVERIFY
+    [absolute time] CHECKLOCKTIMEVERIFY
     DROP
     [service pubkey] CHECKSIG
 ENDIF
 ----
 
 [user pubkey]:: The user's spending pubkey
-[time]:: The encoded time lock length
+[absolute time]:: The encoded time lock length
 [service pubkey]:: The service's spending pubkey
 
 Note that as of this version, the spending transaction is limited to a single pubkey. This may be changed in later versions.

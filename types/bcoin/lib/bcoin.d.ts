@@ -207,6 +207,7 @@ declare module 'bcoin' {
         addTX(tx: tx, index: number, height?: number): input;
         signature(index: number, prev: script, value: Amount, privKey: Buffer, type: number, version: number): Buffer;
         setSequence(index: number, locktime: number, seconds?: boolean): void;
+        setLocktime(locktime: number): void;
     }
 
     interface KeyRingOpts {

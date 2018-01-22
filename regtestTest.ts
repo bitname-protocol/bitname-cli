@@ -30,7 +30,7 @@ child_process.exec(`bitcoin-cli -regtest listunspent 0 9999999 "[\\"${addr}\\"]"
     const unspentData = JSON.parse(stdout);
     // console.log(unspentData);
 
-    const coins = [];
+    const coins: Coin[] = [];
     for (const utxo of unspentData) {
         const amt = Amount.fromBTC(utxo.amount).toSatoshis(true) as number;
         // console.log(typeof(amt));
@@ -46,29 +46,46 @@ child_process.exec(`bitcoin-cli -regtest listunspent 0 9999999 "[\\"${addr}\\"]"
         coins.push(new Coin(coinOpts));
     }
 
-    console.log(coins);
+    console.log(addr);
 
     const commitFee = 500000;
     const registerFee = 500000;
     const escrowFee = 1000000;
     const feeRate = 11000;
 
-    const name = 'colin';
-    const locktime = 65535;
+    child_process.exec('bitcoin-cli -regtest getblockchaininfo', (err2, stdout2, stderr2) => {
+        if (err2) {
+            console.log(err2);
+            // node couldn't execute the command
+            return;
+        }
 
-    const commitTX = genCommitTx(
-        coins, name, locktime, commitFee, registerFee, escrowFee, feeRate, ring, servicePubKey,
-    );
+        const blockchainData = JSON.parse(stdout2);
+        // console.log(blockchainData);
+        const height = blockchainData.blocks;
+        // console.log(height, typeof height);
 
-    console.log('Commit');
-    console.log(commitTX.toRaw().toString('hex'));
+        const name = 'colin';
+        const locktime = height + 10;
 
-    const lockTX = genLockTx(commitTX, name, registerFee, escrowFee, feeRate, ring, servicePubKey, locktime);
+        const commitTX = genCommitTx(
+            coins, name, locktime, commitFee, registerFee, escrowFee, feeRate, ring, servicePubKey,
+        );
 
-    console.log('Lock');
-    console.log(lockTX.toRaw().toString('hex'));
+        console.log('Commit');
+        console.log(commitTX.toRaw().toString('hex'));
 
-    const serviceUnlockTX = genUnlockTx(lockTX, commitTX, feeRate, true, serviceRing, ring.getPublicKey());
-    console.log('Unlock');
-    console.log(serviceUnlockTX.toRaw().toString('hex'));
+        const lockTX = genLockTx(commitTX, name, registerFee, escrowFee, feeRate, ring, servicePubKey, locktime);
+
+        console.log('Lock');
+        console.log(lockTX.toRaw().toString('hex'));
+
+        const serviceUnlockTX = genUnlockTx(lockTX, commitTX, feeRate * 2, true, serviceRing, ring.getPublicKey());
+        console.log('Service Unlock');
+        console.log(serviceUnlockTX.toRaw().toString('hex'));
+
+        const userUnlockTX = genUnlockTx(lockTX, commitTX, feeRate, false, ring, servicePubKey);
+        console.log('User Unlock');
+        console.log(userUnlockTX.toRaw().toString('hex'));
+    });
 });
