@@ -25,7 +25,7 @@ describe('TXList class', () => {
 
         const txids = [
             '04accc0dce3a7ff28af27de7d63f55834a563bcfa5e62b746785a6e5e3c2576f',
-            '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb',
+            'a8511e3a8adebe0e677c8d7f55b238bc26812886478670def865acca634ba608',
         ];
 
         expect(list.getTxids()).toEqual(txids);
@@ -48,7 +48,7 @@ describe('TXList class', () => {
 
         const txids = [
             '04accc0dce3a7ff28af27de7d63f55834a563bcfa5e62b746785a6e5e3c2576f',
-            '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb',
+            'a8511e3a8adebe0e677c8d7f55b238bc26812886478670def865acca634ba608',
         ];
 
         const retTxs = txids.map((txid) => list.getTX(txid));
@@ -73,7 +73,7 @@ describe('TXList class', () => {
 
         const txids = [
             '04accc0dce3a7ff28af27de7d63f55834a563bcfa5e62b746785a6e5e3c2576f',
-            '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb',
+            'a8511e3a8adebe0e677c8d7f55b238bc26812886478670def865acca634ba608',
         ];
 
         const retRandTxSpent = randTx.outputs.map((output, ind) => list.getOutputSpent(txids[0], ind));
@@ -102,7 +102,7 @@ describe('TXList class', () => {
 
         const txids = [
             '04accc0dce3a7ff28af27de7d63f55834a563bcfa5e62b746785a6e5e3c2576f',
-            '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb',
+            'a8511e3a8adebe0e677c8d7f55b238bc26812886478670def865acca634ba608',
         ];
 
         const actualHeights = txids.map((txid) => list.getHeight(txid));
@@ -159,7 +159,7 @@ describe('TXList class', () => {
         const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, false, false, true, false, true];
 
-        const hash = '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb';
+        const hash = 'a8511e3a8adebe0e677c8d7f55b238bc26812886478670def865acca634ba608';
 
         expect(() => {
             return new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
@@ -221,7 +221,7 @@ describe('TXList class', () => {
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
 
-        const hash = '329cfdb3e05cf2e468b9b5e5b8d7499d720e49fa8876f2ab5b2a6640987085fb';
+        const hash = 'a8511e3a8adebe0e677c8d7f55b238bc26812886478670def865acca634ba608';
 
         expect(() => {
             list.getOutputSpent(hash, 64);

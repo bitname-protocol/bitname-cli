@@ -201,7 +201,7 @@ function genCommitTx(coins: Coin[],
         value: registerFee + escrowFee + 4 * feeRate,
     });
 
-    console.log(changeVal);
+    // console.log(changeVal);
 
     // Add change output as 3
     lockTx.addOutput({

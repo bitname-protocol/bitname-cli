@@ -16,8 +16,8 @@ import { genCommitTx, genLockTx, genUnlockTx } from '../lib/txs';
 
 describe('chain state', () => {
     it('finds the one current name', async () => {
-        const servicePubKey = Buffer.from('032b9429c7553028aea2464021c7680a408885a49c62af6adba435ec751d467237', 'hex');
-        const userPubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
+        const servicePubKey = Buffer.from('0320263f7b82e3885d89be9ef997b3d0fe80c5799ac6656884a49f3ec184746d93', 'hex');
+        const userPubKey = Buffer.from('03c7ea37388348c29a52cbc02fc29bc85d7962c1eb4f72fe57d44b5cbe619b34c1', 'hex');
 
         const addr = Address.fromPubkeyhash(crypto.hash160(servicePubKey));
         const txList = await getAllTX(addr, 'testnet');
@@ -26,8 +26,8 @@ describe('chain state', () => {
 
         const expectedInfo = {
             colin: {
-                txid: '205c16dc3440d83754558d028eb94d19cce857852c4a63e3daf24f5a7d14674f',
-                expires: 1257888 + 30,
+                txid: 'cb3cec44f339b1ad95b8aac98839690d2d5b7aceffb5e57fb74e78ec766b379d',
+                expires: 1260159,
                 pubKey: userPubKey,
             },
         };
@@ -156,8 +156,8 @@ describe('chain state', () => {
 
         const expectedInfo = {
             bepis: {
-                txid: '0bfa628b8d4d06509af48b37c277798385ccb006ea36d34e1951e19065426bcb',
-                expires: 90,
+                txid: 'c43d556ce1ce1c64d9ad1c54fda6a925681f0c0b19016cf94f3c261625f2547e',
+                expires: 80,
                 pubKey: userPubKey,
             },
         };
@@ -285,13 +285,13 @@ describe('chain state', () => {
 
         const expectedInfo = {
             bepis: {
-                txid: '0bfa628b8d4d06509af48b37c277798385ccb006ea36d34e1951e19065426bcb',
-                expires: 90,
+                txid: 'c43d556ce1ce1c64d9ad1c54fda6a925681f0c0b19016cf94f3c261625f2547e',
+                expires: 80,
                 pubKey: userPubKey,
             },
             test: {
-                txid: '0f2cd13bc66afb8a15bfc10abf70b81d1741196dff42d9fc9cdda58c17012f0f',
-                expires: 88,
+                txid: '3e916f1f2298e00185b3a1aa73d0e2c00407f9dbb771e6dc4af13303593b27c6',
+                expires: 80,
                 pubKey: userPubKey,
             },
         };

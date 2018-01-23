@@ -8,6 +8,7 @@ import {
     getLockTxTime,
     genCommitTx,
     serializeCommitData,
+    deserializeCommitData,
 } from '../lib/txs';
 import {
     keyring as KeyRing,
@@ -36,7 +37,7 @@ describe('transaction verification', () => {
 
             const tx = TX.fromRaw(txData, 'hex');
 
-            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
+            const servicePubKeyHex = '02875b39c2d0afb1596b807b40d8faa4fe8ff4142034453c5791775970a8ea8a69';
             const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
 
             expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(true);
@@ -91,13 +92,18 @@ describe('transaction verification', () => {
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
 
-            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
-            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
+            const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
+            const ring = KeyRing.fromSecret(wif);
+            const userPubKey = ring.getPublicKey();
+
+            const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+            const serviceRing = KeyRing.fromSecret(serviceWif);
+            const servicePubKey = serviceRing.getPublicKey();
 
             const name = '000102030405060708090a0b0c0d0e0f1012131415161718191a1b1c1d1e1f20';
 
             const data = serializeCommitData(new Buffer(32), 255, name);
-            data.writeUInt8(65, 34);
+            data.writeUInt8(65, 36);
             const newData = Buffer.concat([data, Buffer.from('h', 'ascii')]);
 
             mtx.inputs[0].script.insertData(1, newData);
@@ -143,8 +149,13 @@ describe('transaction verification', () => {
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
 
-            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
-            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
+            const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
+            const ring = KeyRing.fromSecret(wif);
+            const userPubKey = ring.getPublicKey();
+
+            const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+            const serviceRing = KeyRing.fromSecret(serviceWif);
+            const servicePubKey = serviceRing.getPublicKey();
 
             // I shall begone to build a spiteful script
             // Which holds some valid data when it's stripped.
@@ -157,12 +168,12 @@ describe('transaction verification', () => {
 
             script.pushSym('OP_HASH256');
 
-            const hashData = serializeCommitData(new Buffer(32), 1, 'test');
+            const hashData = serializeCommitData(new Buffer(32), 66129, 'colin');
             const hash = crypto.hash256(hashData);
             script.pushData(hash);
             script.pushSym('OP_2DROP');
 
-            script.pushData(servicePubKey);
+            script.pushData(userPubKey);
             script.pushSym('OP_CHECKSIG');
 
             script.compile();
@@ -271,8 +282,9 @@ describe('transaction verification', () => {
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
 
-            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
-            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
+            const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+            const serviceRing = KeyRing.fromSecret(serviceWif);
+            const servicePubKey = serviceRing.getPublicKey();
 
             const oldVal = mtx.outputs[1].value;
 
@@ -297,8 +309,10 @@ describe('transaction verification', () => {
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
 
-            const servicePubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
-            const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
+            const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+            const serviceRing = KeyRing.fromSecret(serviceWif);
+            const servicePubKey = serviceRing.getPublicKey();
+
             const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
 
             // Generate a script of any other kind
@@ -317,21 +331,29 @@ describe('transaction verification', () => {
         });
 
         it('verifies generated locking txs', () => {
-            const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
+            const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
             const ring = KeyRing.fromSecret(wif);
+            const userPubKey = ring.getPublicKey();
+
+            const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+            const serviceRing = KeyRing.fromSecret(serviceWif);
+            const servicePubKey = serviceRing.getPublicKey();
 
             const txDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const commitTX = TX.fromRaw(txData, 'hex');
 
-            const upfrontFee = 1000000;
-            const delayFee = 1000000;
+            // deserializeCommitData()
+
+            const upfrontFee = 100000;
+            // const upfrontFee = 1544000;
+            const delayFee = 100000;
             const feeRate = 1;
 
             // const tx = genLockTx(coins, 'testName', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), 5);
-            const tx = genLockTx(commitTX, 'test', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), 1);
+            const tx = genLockTx(commitTX, 'colin', upfrontFee, delayFee, feeRate, ring, servicePubKey, 66129);
 
-            expect(verifyLockTX(tx, commitTX, ring.getPublicKey())).toBe(true);
+            expect(verifyLockTX(tx, commitTX, servicePubKey)).toBe(true);
         });
     });
 
@@ -341,11 +363,15 @@ describe('transaction verification', () => {
             const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
             const ctx = TX.fromRaw(ctxData, 'hex');
 
-            const pubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
-            const servicePubKey = Buffer.from(pubKeyHex, 'hex');
-            const userPubKey = Buffer.from(pubKeyHex, 'hex');
+            const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
+            const ring = KeyRing.fromSecret(wif);
+            const userPubKey = ring.getPublicKey();
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toBe(true);
+            const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+            const serviceRing = KeyRing.fromSecret(serviceWif);
+            const servicePubKey = serviceRing.getPublicKey();
+
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66129)).toBe(true);
         });
 
         it('fails on fewer than 3 outputs', () => {
@@ -463,9 +489,13 @@ describe('transaction verification', () => {
             const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
             const ctx = MTX.fromRaw(ctxData, 'hex');
 
-            const pubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
-            const servicePubKey = Buffer.from(pubKeyHex, 'hex');
-            const userPubKey = Buffer.from(pubKeyHex, 'hex');
+            const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
+            const ring = KeyRing.fromSecret(wif);
+            const userPubKey = ring.getPublicKey();
+
+            const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+            const serviceRing = KeyRing.fromSecret(serviceWif);
+            const servicePubKey = serviceRing.getPublicKey();
 
             const oldVal = ctx.outputs[2].value;
 
@@ -474,7 +504,7 @@ describe('transaction verification', () => {
 
             ctx.outputs[2] = newOutput;
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66129)).toBe(false);
         });
 
         it('fails on bad lock script format', () => {
@@ -482,9 +512,14 @@ describe('transaction verification', () => {
             const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
             const ctx = MTX.fromRaw(ctxData, 'hex');
 
-            const pubKeyHex = '036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36';
-            const servicePubKey = Buffer.from(pubKeyHex, 'hex');
-            const userPubKey = Buffer.from(pubKeyHex, 'hex');
+            const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
+            const ring = KeyRing.fromSecret(wif);
+            const userPubKey = ring.getPublicKey();
+
+            const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+            const serviceRing = KeyRing.fromSecret(serviceWif);
+            const servicePubKey = serviceRing.getPublicKey();
+
             const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
 
             // Generate a script of any other kind
@@ -499,7 +534,7 @@ describe('transaction verification', () => {
 
             const tx = ctx.toTX();
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66129)).toBe(false);
         });
 
         it('verifies generated commitment txs', () => {

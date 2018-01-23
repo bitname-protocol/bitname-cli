@@ -47,7 +47,7 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
         // Determine at what block this tx is spendable
         const height = txs.getHeight(txid);
         const period = getLockTxTime(lockTx) as number;
-        const expires = height + period;
+        const expires = period;
 
         // Has the P2SH fee been spent yet, signalling a revocation?
         const revoked = txs.getOutputSpent(txid, 1);

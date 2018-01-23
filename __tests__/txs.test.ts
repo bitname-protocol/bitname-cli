@@ -33,15 +33,18 @@ describe('tx generation', () => {
 
         const expected = [
             'OP_IF',
+            'OP_0',
+            'OP_CHECKSEQUENCEVERIFY',
+            'OP_DROP',
             userKey.toString('hex'),
             'OP_CHECKSIG',
             'OP_ELSE',
             'OP_5',
-            'OP_CHECKSEQUENCEVERIFY',
+            'OP_CHECKLOCKTIMEVERIFY',
             'OP_DROP',
             serviceKey.toString('hex'),
             'OP_CHECKSIG',
-            'OP_ENDIF',
+            'OP_ENDIF'
         ];
 
         expect(script.toASM().split(' ')).toEqual(expected);
@@ -93,10 +96,10 @@ describe('tx generation', () => {
     it('throws serializing with a bad locktime size', () => {
         const nonce = new Buffer(32);
         const name = 'boop';
-        const locktime = 65536;
+        const locktime = 500000001;
         expect(() => {
             serializeCommitData(nonce, locktime, name);
-        }).toThrow('Locktime must be 16 bits');
+        }).toThrow('Locktime must be less than 500000000 blocks');
     });
 
     it('throws serializing with a bad name size', () => {
@@ -167,10 +170,10 @@ describe('tx generation', () => {
 
         const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 400);
 
-        expect(tx.hash('hex')).toBe('9415809c1c746b5cf063db4312bd66c08dbec42f406acf3422f8305a22856b49');
+        expect(tx.hash('hex')).toBe('b2b42129806d9e5cad26156028e2e57acab456c39a4edfa24ec6d130d112bf9d');
     });
 
-    it('generates locking transactions for 65535 blocks', () => {
+    it('generates locking transactions until block 500000000', () => {
         const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
@@ -192,7 +195,7 @@ describe('tx generation', () => {
 
         const commitTX = genCommitTx(coins,
                                      'google',
-                                     65535,
+                                     500000000,
                                      commitFee,
                                      registerFee,
                                      escrowFee,
@@ -200,12 +203,12 @@ describe('tx generation', () => {
                                      userRing,
                                      serviceKey);
 
-        const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 65535);
+        const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 500000000);
 
-        expect(tx.hash('hex')).toBe('ba46f7a24a0bd62b3f0d772a6f5fd12dc25c16c9da9103daa3ff9eed2d970a6d');
+        expect(tx.hash('hex')).toBe('4ff2b81f1564b2cb7f75cdac6297837a9380f472b9659a330fd2d7082ff72af9');
     });
 
-    it('errors generating locking transactions for 65536 blocks', () => {
+    it('errors generating locking transactions for 500000001 blocks', () => {
         const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
@@ -227,7 +230,7 @@ describe('tx generation', () => {
 
         const commitTX = genCommitTx(coins,
                                      'google',
-                                     65535,
+                                     500000000,
                                      commitFee,
                                      registerFee,
                                      escrowFee,
@@ -236,8 +239,8 @@ describe('tx generation', () => {
                                      serviceKey);
 
         expect(() => {
-            genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 65536);
-        }).toThrow('Locktime must be 16-bits');
+            genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 500000001);
+        }).toThrow('Locktime must be less than 500000000 blocks');
     });
 
     it('errors generating locking transactions for 65-character name', () => {
@@ -376,12 +379,17 @@ describe('tx generation', () => {
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
-        const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
-        const userRing = KeyRing.fromSecret(wif);
+        const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
+        const ring = KeyRing.fromSecret(wif);
+        const addr = ring.getAddress().toBase58('testnet');
 
-        const tx = genUnlockTx(lockTX, ctx, 1, false, userRing, userRing.getPublicKey());
+        const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+        const serviceRing = KeyRing.fromSecret(serviceWif);
+        const servicePubKey = serviceRing.getPublicKey();
 
-        expect(tx.hash('hex')).toBe('4427f7965d1f9697376dd35955aada422a67c1a7c83983a9403929a1c23459e3');
+        const tx = genUnlockTx(lockTX, ctx, 1, false, ring, servicePubKey);
+
+        expect(tx.hash('hex')).toBe('08c952e53bad73a3b62b12fa47802f728be7aa987d1334d6da12227ad3aad999');
     });
 
     it('generates service unlocking transaction', () => {
@@ -394,12 +402,17 @@ describe('tx generation', () => {
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
-        const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
-        const userRing = KeyRing.fromSecret(wif);
+        const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
+        const ring = KeyRing.fromSecret(wif);
+        const userPubKey = ring.getPublicKey();
 
-        const tx = genUnlockTx(lockTX, ctx, 1, true, userRing, userRing.getPublicKey());
+        const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+        const serviceRing = KeyRing.fromSecret(serviceWif);
+        const servicePubKey = serviceRing.getPublicKey();
 
-        expect(tx.hash('hex')).toBe('ff2a93a6121400cba5059e2a3e18a99cb15e71a81e6f5018fea21a46dcacef45');
+        const tx = genUnlockTx(lockTX, ctx, 1, true, serviceRing, userPubKey);
+
+        expect(tx.hash('hex')).toBe('aa6185eaa3aef7ce23797a76eff10adb561af56c1a2fc81b4cfec2fabc648d6d');
     });
 
     it('errors on committing with name too long', () => {
