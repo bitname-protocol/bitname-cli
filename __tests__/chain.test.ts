@@ -156,7 +156,7 @@ describe('chain state', () => {
 
         const expectedInfo = {
             bepis: {
-                txid: 'c43d556ce1ce1c64d9ad1c54fda6a925681f0c0b19016cf94f3c261625f2547e',
+                txid: '28ef422e58800dd92ce5b3d68dccf04cefff8ef8112ce727aa1212c4e41d46b8',
                 expires: 80,
                 pubKey: userPubKey,
             },
@@ -285,12 +285,12 @@ describe('chain state', () => {
 
         const expectedInfo = {
             bepis: {
-                txid: 'c43d556ce1ce1c64d9ad1c54fda6a925681f0c0b19016cf94f3c261625f2547e',
+                txid: '28ef422e58800dd92ce5b3d68dccf04cefff8ef8112ce727aa1212c4e41d46b8',
                 expires: 80,
                 pubKey: userPubKey,
             },
             test: {
-                txid: '3e916f1f2298e00185b3a1aa73d0e2c00407f9dbb771e6dc4af13303593b27c6',
+                txid: 'd8593d257bac950c78b42e007b17e19311dec11ce9615ea0335640702fa7baf6',
                 expires: 80,
                 pubKey: userPubKey,
             },

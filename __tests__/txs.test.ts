@@ -44,7 +44,7 @@ describe('tx generation', () => {
             'OP_DROP',
             serviceKey.toString('hex'),
             'OP_CHECKSIG',
-            'OP_ENDIF'
+            'OP_ENDIF',
         ];
 
         expect(script.toASM().split(' ')).toEqual(expected);
@@ -62,7 +62,7 @@ describe('tx generation', () => {
         const serializedInfoHash = crypto.hash256(serializeCommitData(nonce, locktime, name));
 
         const expected = [
-            'OP_1',
+            'OP_6',
             'OP_CHECKSEQUENCEVERIFY',
             'OP_DROP',
             'OP_HASH256',
@@ -170,7 +170,7 @@ describe('tx generation', () => {
 
         const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 400);
 
-        expect(tx.hash('hex')).toBe('b2b42129806d9e5cad26156028e2e57acab456c39a4edfa24ec6d130d112bf9d');
+        expect(tx.hash('hex')).toBe('be8ddfbdc7ed6c7b0ecf343592a300ced80ee2c14eeb36cf6a4c9fdbacd40009');
     });
 
     it('generates locking transactions until block 500000000', () => {
@@ -205,7 +205,7 @@ describe('tx generation', () => {
 
         const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 500000000);
 
-        expect(tx.hash('hex')).toBe('4ff2b81f1564b2cb7f75cdac6297837a9380f472b9659a330fd2d7082ff72af9');
+        expect(tx.hash('hex')).toBe('08af431b12f5894e88b8d164c7969a5f288a17daa3f4868d8f4470b8221553a5');
     });
 
     it('errors generating locking transactions for 500000001 blocks', () => {
@@ -389,7 +389,7 @@ describe('tx generation', () => {
 
         const tx = genUnlockTx(lockTX, ctx, 1, false, ring, servicePubKey);
 
-        expect(tx.hash('hex')).toBe('08c952e53bad73a3b62b12fa47802f728be7aa987d1334d6da12227ad3aad999');
+        expect(tx.hash('hex')).toBe('130fdd54eef21b7718b6faea8a8a05a16ea6b315a7725bd70bf1ea7e7067d891');
     });
 
     it('generates service unlocking transaction', () => {
@@ -412,7 +412,7 @@ describe('tx generation', () => {
 
         const tx = genUnlockTx(lockTX, ctx, 1, true, serviceRing, userPubKey);
 
-        expect(tx.hash('hex')).toBe('aa6185eaa3aef7ce23797a76eff10adb561af56c1a2fc81b4cfec2fabc648d6d');
+        expect(tx.hash('hex')).toBe('04d0a072b5cb74d74259c93f1c14b656c999978ead92e2555fc5f6427c4ee567');
     });
 
     it('errors on committing with name too long', () => {

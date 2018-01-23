@@ -168,7 +168,7 @@ describe('transaction verification', () => {
 
             script.pushSym('OP_HASH256');
 
-            const hashData = serializeCommitData(new Buffer(32), 66129, 'colin');
+            const hashData = serializeCommitData(new Buffer(32), 66072, 'colin');
             const hash = crypto.hash256(hashData);
             script.pushData(hash);
             script.pushSym('OP_2DROP');
@@ -351,7 +351,7 @@ describe('transaction verification', () => {
             const feeRate = 1;
 
             // const tx = genLockTx(coins, 'testName', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), 5);
-            const tx = genLockTx(commitTX, 'colin', upfrontFee, delayFee, feeRate, ring, servicePubKey, 66129);
+            const tx = genLockTx(commitTX, 'colin', upfrontFee, delayFee, feeRate, ring, servicePubKey, 66072);
 
             expect(verifyLockTX(tx, commitTX, servicePubKey)).toBe(true);
         });
@@ -371,7 +371,7 @@ describe('transaction verification', () => {
             const serviceRing = KeyRing.fromSecret(serviceWif);
             const servicePubKey = serviceRing.getPublicKey();
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66129)).toBe(true);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toBe(true);
         });
 
         it('fails on fewer than 3 outputs', () => {
@@ -384,7 +384,7 @@ describe('transaction verification', () => {
             const servicePubKey = Buffer.from(pubKeyHex, 'hex');
             const userPubKey = Buffer.from(pubKeyHex, 'hex');
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toBe(false);
         });
 
         it('fails on output 0 not being an OP_RETURN', () => {
@@ -504,7 +504,7 @@ describe('transaction verification', () => {
 
             ctx.outputs[2] = newOutput;
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66129)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toBe(false);
         });
 
         it('fails on bad lock script format', () => {
@@ -534,7 +534,7 @@ describe('transaction verification', () => {
 
             const tx = ctx.toTX();
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66129)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toBe(false);
         });
 
         it('verifies generated commitment txs', () => {

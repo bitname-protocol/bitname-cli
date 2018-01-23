@@ -63,7 +63,7 @@ function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string, 
     }
 
     const script = new Script();
-    script.pushInt(1);
+    script.pushInt(6);
     script.pushSym('OP_CHECKSEQUENCEVERIFY');
     script.pushSym('OP_DROP');
 
@@ -267,7 +267,7 @@ function genLockTx(commitTX: TX,
 
     lockTx.addTX(commitTX, 2);
 
-    lockTx.setSequence(0, 1);
+    lockTx.setSequence(0, 6);
 
     const total = commitTX.outputs[2].value;
     // console.log(total);
