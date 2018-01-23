@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`tx generation generates locking transactions 1`] = `"be8ddfbdc7ed6c7b0ecf343592a300ced80ee2c14eeb36cf6a4c9fdbacd40009"`;
+
+exports[`tx generation generates locking transactions until block 500000000 1`] = `"08af431b12f5894e88b8d164c7969a5f288a17daa3f4868d8f4470b8221553a5"`;
+
+exports[`tx generation generates service unlocking transaction 1`] = `"04d0a072b5cb74d74259c93f1c14b656c999978ead92e2555fc5f6427c4ee567"`;
+
+exports[`tx generation generates user unlocking transaction 1`] = `"130fdd54eef21b7718b6faea8a8a05a16ea6b315a7725bd70bf1ea7e7067d891"`;

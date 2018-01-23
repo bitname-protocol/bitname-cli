@@ -40,7 +40,7 @@ describe('transaction verification', () => {
             const servicePubKeyHex = '02875b39c2d0afb1596b807b40d8faa4fe8ff4142034453c5791775970a8ea8a69';
             const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(true);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(true);
         });
 
         it('fails on fewer than 2 outputs', () => {
@@ -59,7 +59,7 @@ describe('transaction verification', () => {
 
             const tx = mtx.toTX();
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(false);
         });
 
         it('fails if invalid data is in scriptSig', () => {
@@ -80,7 +80,7 @@ describe('transaction verification', () => {
 
             const tx = mtx.toTX();
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(false);
         });
 
         it('fails if name is too long', () => {
@@ -112,7 +112,7 @@ describe('transaction verification', () => {
 
             const tx = mtx.toTX();
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(false);
         });
 
         it('fails if name contains invalid characters', () => {
@@ -137,7 +137,7 @@ describe('transaction verification', () => {
 
             const tx = mtx.toTX();
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(false);
         });
 
         it('fails if input 0 is not a valid commit tx', () => {
@@ -191,7 +191,7 @@ describe('transaction verification', () => {
 
             const tx = mtx.toTX();
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(false);
         });
 
         it('fails on input 0 not containing a valid pubkey', () => {
@@ -213,7 +213,7 @@ describe('transaction verification', () => {
 
             const tx = mtx.toTX();
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(false);
         });
 
         it('fails on output 0 not being a P2PKH', () => {
@@ -241,7 +241,7 @@ describe('transaction verification', () => {
 
             const tx = mtx.toTX();
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(false);
         });
 
         it('fails on output 0 being sent to the wrong address', () => {
@@ -270,7 +270,7 @@ describe('transaction verification', () => {
 
             const tx = mtx.toTX();
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(false);
         });
 
         it('fails on output 1 not being a P2SH', () => {
@@ -297,7 +297,7 @@ describe('transaction verification', () => {
 
             const tx = mtx.toTX();
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(false);
         });
 
         it('fails on bad lock script format', () => {
@@ -327,7 +327,7 @@ describe('transaction verification', () => {
 
             const tx = mtx.toTX();
 
-            expect(verifyLockTX(tx, ctx, servicePubKey)).toBe(false);
+            expect(verifyLockTX(tx, ctx, servicePubKey)).toEqual(false);
         });
 
         it('verifies generated locking txs', () => {
@@ -353,7 +353,7 @@ describe('transaction verification', () => {
             // const tx = genLockTx(coins, 'testName', upfrontFee, delayFee, feeRate, ring, ring.getPublicKey(), 5);
             const tx = genLockTx(commitTX, 'colin', upfrontFee, delayFee, feeRate, ring, servicePubKey, 66072);
 
-            expect(verifyLockTX(tx, commitTX, servicePubKey)).toBe(true);
+            expect(verifyLockTX(tx, commitTX, servicePubKey)).toEqual(true);
         });
     });
 
@@ -371,7 +371,7 @@ describe('transaction verification', () => {
             const serviceRing = KeyRing.fromSecret(serviceWif);
             const servicePubKey = serviceRing.getPublicKey();
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toBe(true);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toEqual(true);
         });
 
         it('fails on fewer than 3 outputs', () => {
@@ -384,7 +384,7 @@ describe('transaction verification', () => {
             const servicePubKey = Buffer.from(pubKeyHex, 'hex');
             const userPubKey = Buffer.from(pubKeyHex, 'hex');
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toEqual(false);
         });
 
         it('fails on output 0 not being an OP_RETURN', () => {
@@ -406,7 +406,7 @@ describe('transaction verification', () => {
 
             ctx.outputs[0] = newOutput;
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toEqual(false);
         });
 
         it('fails on output 0 containing a value other than 0', () => {
@@ -420,7 +420,7 @@ describe('transaction verification', () => {
 
             ctx.outputs[0].value = 10;
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toEqual(false);
         });
 
         it('fails on output 0 not containing 32 bytes of data', () => {
@@ -440,7 +440,7 @@ describe('transaction verification', () => {
 
             ctx.outputs[0] = newOutput;
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toEqual(false);
         });
 
         it('fails on output 0 having more than 2 ops', () => {
@@ -462,7 +462,7 @@ describe('transaction verification', () => {
 
             ctx.outputs[0] = newOutput;
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toEqual(false);
         });
 
         it('fails on output 1 being sent to an incorrect address', () => {
@@ -481,7 +481,7 @@ describe('transaction verification', () => {
 
             ctx.outputs[1] = newOutput;
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'test', 1)).toEqual(false);
         });
 
         it('fails on output 2 not being P2SH', () => {
@@ -504,7 +504,7 @@ describe('transaction verification', () => {
 
             ctx.outputs[2] = newOutput;
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toEqual(false);
         });
 
         it('fails on bad lock script format', () => {
@@ -534,7 +534,7 @@ describe('transaction verification', () => {
 
             const tx = ctx.toTX();
 
-            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toBe(false);
+            expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toEqual(false);
         });
 
         it('verifies generated commitment txs', () => {
@@ -562,7 +562,7 @@ describe('transaction verification', () => {
 
             const ctx = genCommitTx(coins, name, 600, commitFee, registerFee, escrowFee, feeRate, ring, servicePubKey);
 
-            expect(verifyCommitTX(ctx, ring.getPublicKey(), servicePubKey, name, 600)).toBe(true);
+            expect(verifyCommitTX(ctx, ring.getPublicKey(), servicePubKey, name, 600)).toEqual(true);
         });
     });
 });

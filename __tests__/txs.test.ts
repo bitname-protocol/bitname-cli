@@ -170,7 +170,7 @@ describe('tx generation', () => {
 
         const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 400);
 
-        expect(tx.hash('hex')).toBe('be8ddfbdc7ed6c7b0ecf343592a300ced80ee2c14eeb36cf6a4c9fdbacd40009');
+        expect(tx.hash('hex')).toMatchSnapshot();
     });
 
     it('generates locking transactions until block 500000000', () => {
@@ -205,7 +205,7 @@ describe('tx generation', () => {
 
         const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 500000000);
 
-        expect(tx.hash('hex')).toBe('08af431b12f5894e88b8d164c7969a5f288a17daa3f4868d8f4470b8221553a5');
+        expect(tx.hash('hex')).toMatchSnapshot();
     });
 
     it('errors generating locking transactions for 500000001 blocks', () => {
@@ -389,7 +389,7 @@ describe('tx generation', () => {
 
         const tx = genUnlockTx(lockTX, ctx, 1, false, ring, servicePubKey);
 
-        expect(tx.hash('hex')).toBe('130fdd54eef21b7718b6faea8a8a05a16ea6b315a7725bd70bf1ea7e7067d891');
+        expect(tx.hash('hex')).toMatchSnapshot();
     });
 
     it('generates service unlocking transaction', () => {
@@ -412,7 +412,7 @@ describe('tx generation', () => {
 
         const tx = genUnlockTx(lockTX, ctx, 1, true, serviceRing, userPubKey);
 
-        expect(tx.hash('hex')).toBe('04d0a072b5cb74d74259c93f1c14b656c999978ead92e2555fc5f6427c4ee567');
+        expect(tx.hash('hex')).toMatchSnapshot();
     });
 
     it('errors on committing with name too long', () => {
