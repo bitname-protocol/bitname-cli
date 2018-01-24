@@ -22,12 +22,12 @@ describe('chain state', () => {
         const addr = Address.fromPubkeyhash(crypto.hash160(servicePubKey));
         const txList = await getAllTX(addr, 'testnet');
 
-        const info = extractInfo(txList, servicePubKey, 1257057);
+        const info = extractInfo(txList, servicePubKey, 1260170);
 
         const expectedInfo = {
             colin: {
-                txid: 'cb3cec44f339b1ad95b8aac98839690d2d5b7aceffb5e57fb74e78ec766b379d',
-                expires: 1260159,
+                txid: 'a066cf6ddeded4f7185d264466f5401e3bff96efaafa0b404c33fe2874d828f1',
+                expires: 1260172,
                 pubKey: userPubKey,
             },
         };
