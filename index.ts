@@ -472,7 +472,6 @@ function main() {
                     describe: 'the WIF file containing the private key',
                 });
         }, keyInfo)
-        .version('0.0.1')
         .help()
         .argv;
 }

@@ -1,6 +1,6 @@
 {
   "name": "bitname-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js",
   "author": "Colin Atkinson",
   "description": "Associate public keys with names on the Bitcoin blockchain",
