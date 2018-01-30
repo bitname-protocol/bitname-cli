@@ -1,6 +1,6 @@
 <h1 align="center">
     <br />
-    <img src="graphics/logo.png" alt="bitname" width="256" />
+    <img src="graphics/logo.png" alt="bitname" width="512" />
     <br />
 </h1>
 
@@ -11,10 +11,10 @@
         <img src="https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=for-the-badge" alt="Chat on Gitter" />
     </a>
     <a href="https://travis-ci.org/colatkinson/bitname-cli">
-        <img src="https://img.shields.io/travis/colatkinson/bitname-cli.svg?style=for-the-badge" alt="Travis" />
+        <img src="https://img.shields.io/travis/colatkinson/bitname-cli/master.svg?style=for-the-badge" alt="Travis" />
     </a>
     <a href="https://codecov.io/gh/colatkinson/bitname-cli">
-        <img src="https://img.shields.io/codecov/c/github/colatkinson/bitname-cli.svg?style=for-the-badge" alt="Codecov" />
+        <img src="https://img.shields.io/codecov/c/github/colatkinson/bitname-cli/master.svg?style=for-the-badge" alt="Codecov" />
     </a>
     <a href="https://waffle.io/colatkinson/bitname-cli">
         <img src="https://img.shields.io/github/issues/colatkinson/bitname-cli.svg?style=for-the-badge" alt="Issues" />

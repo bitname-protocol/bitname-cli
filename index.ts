@@ -9,7 +9,7 @@ import {
     crypto,
     util,
 } from 'bcoin';
-import { genLockTx, genUnlockTx } from './lib/txs';
+import { genLockTx, genUnlockTx, genCommitTx } from './lib/txs';
 import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from './lib/net';
 import { extractInfo } from './lib/chain';
 
@@ -47,7 +47,7 @@ function errorCantPush() {
     return error('There was a problem publishing the tx. Try again later.');
 }
 
-async function register(argv: yargs.Arguments) {
+async function commit(argv: yargs.Arguments) {
     const decoded = bech32Decode(argv.servicePubKey);
     if (decoded === null) {
         return errorBadHRP();
@@ -68,19 +68,81 @@ async function register(argv: yargs.Arguments) {
         return errorNoFees();
     }
 
-    const upfrontFee = 1000000;
-    const delayFee   = 1000000;
+    // const upfrontFee =  500000;
+    // const delayFee   = 1500000;
+
+    const commitFee = 500000;
+    const registerFee = 500000;
+    const escrowFee = 1000000;
 
     // Fund up to a 2 KB transaction
     let coins: Coin[];
     try {
-        coins = await fundTx(addr, upfrontFee + delayFee + 2 * feeRate, net);
+        coins = await fundTx(addr, commitFee + registerFee + escrowFee + 8 * feeRate, net);
     } catch (err) {
         return error('Could not fund the transaction');
     }
 
     try {
-        const lockTx = genLockTx(coins,
+        const commitTx = genCommitTx(coins,
+                                     argv.name,
+                                     argv.locktime,
+                                     commitFee,
+                                     registerFee,
+                                     escrowFee,
+                                     feeRate,
+                                     ring,
+                                     servicePubKey);
+        const txidStr = chalk`{green ${util.revHex(commitTx.hash('hex')) as string}}`;
+
+        if (argv.push) {
+            try {
+                await postTX(commitTx, net);
+                console.log(txidStr);
+            } catch (err) {
+                console.log(err);
+                return errorCantPush();
+            }
+        } else {
+            console.log(txidStr);
+            console.log(commitTx.toRaw().toString('hex'));
+        }
+    } catch (err) {
+        return error('Could not generate transaction: ' + err.message);
+    }
+}
+
+async function register(argv: yargs.Arguments) {
+    const decoded = bech32Decode(argv.servicePubKey);
+    if (decoded === null) {
+        return errorBadHRP();
+    }
+
+    const net = decoded.network;
+    const servicePubKey = decoded.pubKey;
+
+    const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
+    const ring = KeyRing.fromSecret(wifData.trim());
+
+    let feeRate: number;
+    try {
+        feeRate = await getFeesSatoshiPerKB(net);
+    } catch (err) {
+        return errorNoFees();
+    }
+
+    const upfrontFee =  500000;
+    const delayFee   = 1000000;
+
+    let commitTX: TX;
+    try {
+        commitTX = await getTX(argv.txid, net);
+    } catch (err) {
+        return error('Could not find the commit tx');
+    }
+
+    try {
+        const lockTx = genLockTx(commitTX,
                                  argv.name,
                                  upfrontFee,
                                  delayFee,
@@ -124,10 +186,20 @@ async function revoke(argv: yargs.Arguments) {
     try {
         lockTX = await getTX(argv.txid, net);
     } catch (err) {
+        // console.log(err);
         return errorUnfoundTx();
     }
 
-    if (!verifyLockTX(lockTX, servicePubKey)) {
+    let commitTX: TX;
+    try {
+        console.log(lockTX.inputs[0].prevout.hash.toString());
+        commitTX = await getTX(util.revHex(lockTX.inputs[0].prevout.hash) as string, net);
+    } catch (err) {
+        console.log(err);
+        return errorUnfoundTx();
+    }
+
+    if (!verifyLockTX(lockTX, commitTX, servicePubKey)) {
         return errorInvalidLock();
     }
 
@@ -138,7 +210,7 @@ async function revoke(argv: yargs.Arguments) {
         return errorNoFees();
     }
 
-    const unlockTx = genUnlockTx(lockTX, feeRate, false, ring, servicePubKey);
+    const unlockTx = genUnlockTx(lockTX, commitTX, feeRate, false, ring, servicePubKey);
     const txidStr = chalk`{green ${util.revHex(unlockTx.hash('hex')) as string}}`;
 
     if (argv.push) {
@@ -169,7 +241,14 @@ async function serviceSpend(argv: yargs.Arguments) {
         return errorUnfoundTx();
     }
 
-    if (!verifyLockTX(lockTX, servicePubKey)) {
+    let commitTX: TX;
+    try {
+        commitTX = await getTX(lockTX.inputs[0].prevout.hash as string, net);
+    } catch (err) {
+        return errorUnfoundTx();
+    }
+
+    if (!verifyLockTX(lockTX, commitTX, servicePubKey)) {
         return errorInvalidLock();
     }
 
@@ -180,7 +259,7 @@ async function serviceSpend(argv: yargs.Arguments) {
         return errorNoFees();
     }
 
-    const unlockTx = genUnlockTx(lockTX, feeRate, true, ring, servicePubKey);
+    const unlockTx = genUnlockTx(lockTX, commitTX, feeRate, true, ring, servicePubKey);
     const txidStr = chalk`{green ${util.revHex(unlockTx.hash('hex')) as string}}`;
 
     if (argv.push) {
@@ -270,11 +349,41 @@ function main() {
     yargs
         .strict()
         .demandCommand(1, 'Please specify a command')
-        .command('register <servicePubKey> <name> <locktime>', 'register a name with the service', (yargsObj) => {
+        .command('commit <servicePubKey> <name> <locktime>', 'commit to intent to register a name', (yargsObj) => {
             return yargsObj
                 .positional('servicePubKey', {
                     type: 'string',
                     describe: 'the public key of the service',
+                })
+                .positional('name', {
+                    type: 'string',
+                    describe: 'the name to register',
+                })
+                .positional('locktime', {
+                    type: 'number',
+                    describe: 'how many blocks (up to 65535) to hold the name for',
+                })
+                .option('wif', {
+                    alias: 'w',
+                    type: 'string',
+                    describe: 'path to WIF file',
+                    demandOption: true,
+                })
+                .option('push', {
+                    type: 'boolean',
+                    describe: 'whether to push this transaction to the network',
+                });
+        }, commit)
+        .command('register <servicePubKey> <txid> <name> <locktime>',
+                 'register a name with the service', (yargsObj) => {
+            return yargsObj
+                .positional('servicePubKey', {
+                    type: 'string',
+                    describe: 'the public key of the service',
+                })
+                .positional('txid', {
+                    type: 'string',
+                    describe: 'the txid of the commit transaction',
                 })
                 .positional('name', {
                     type: 'string',
@@ -363,7 +472,6 @@ function main() {
                     describe: 'the WIF file containing the private key',
                 });
         }, keyInfo)
-        .version('0.0.1')
         .help()
         .argv;
 }
