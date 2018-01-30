@@ -1,4 +1,4 @@
-#!/bin/env node
+#!/usr/bin/env node
 
 import * as yargs from 'yargs';
 import {
