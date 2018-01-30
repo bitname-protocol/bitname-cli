@@ -32,16 +32,18 @@ An OP_RETURN containing the nonce value.
 
 ===== 1
 
+A P2PKH to the service's address.
+
+===== 2
+
 A P2SH for a script of the following form:
 
 [source]
 ----
-[256-bit nonce]
-DROP
 6 CHECKSEQUENCEVERIFY
 DROP
 HASH256
-[hash of 256-bit nonce + 2-byte locktime + 1-byte length of name + name] EQUALVERIFY
+[hash of 256-bit nonce + 2-byte locktime (BE) + 1-byte length of name + name] EQUALVERIFY
 [user pubkey] CHECKSIG
 ----
 
@@ -52,8 +54,14 @@ Ths scriptSig for this output will be:
 [source]
 ----
 [user sig]
-[256-bit nonce + 2-byte locktime + 1-byte length of name + name]
+[256-bit nonce + 2-byte locktime (BE) + 1-byte length of name + name]
 ----
+
+Note that the name must contain 1-64 URL-safe characters (see https://tools.ietf.org/html/rfc3986#section-2.3[RFC 3986])
+
+===== [3..∞)
+
+Change outputs. These may be of any form.
 
 === Locking Transactions
 
@@ -69,21 +77,13 @@ The outputs are as follows:
 
 ===== 0
 
-An OP_RETURN containing the locktime in blocks, encoded as 2 bytes, and the controlling pubkey for the name. This should contain a value of 0 satoshis.
+A P2PKH output to the service's set address. This represents the upfront fee for the service. The value should be determined by the service.
 
 ===== 1
 
-An OP_RETURN containing the name to be registered. This should contain 1-64 URL-safe characters (see https://tools.ietf.org/html/rfc3986#section-2.3[RFC 3986]). This should contain a value of 0 satoshis.
-
-===== 2
-
-A P2PKH output to the service's set address. This represents the upfront fee for the service. The value should be determined by the service.
-
-===== 3
-
 A P2SH output to the time-lock script's address. This is the fee that incentivizes the registrar to provide the service as promised. More information about these script contracts will be provided later. The value should be determined by the service.
 
-===== [4..∞)
+===== [2..∞)
 
 Change outputs. These may be of any form.
 
@@ -96,16 +96,17 @@ The redeem script is of the form:
 [source]
 ----
 IF
+    0 CHECKSEQUENCEVERIFY
     [user pubkey] CHECKSIG
 ELSE
-    [time] CHECKSEQUENCEVERIFY
+    [absolute time] CHECKLOCKTIMEVERIFY
     DROP
     [service pubkey] CHECKSIG
 ENDIF
 ----
 
 [user pubkey]:: The user's spending pubkey
-[time]:: The encoded time lock length
+[absolute time]:: The encoded time lock length
 [service pubkey]:: The service's spending pubkey
 
 Note that as of this version, the spending transaction is limited to a single pubkey. This may be changed in later versions.

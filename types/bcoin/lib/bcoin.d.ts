@@ -49,12 +49,20 @@ declare module 'bcoin' {
     }
 
     type Hash = Buffer | string;
-    type amount = number;
+    type Amount = number;
+
+    class amount {
+        constructor(value: string | number, unit?: string, num?: boolean);
+
+        static fromBTC(value: number | string, num?: boolean): amount;
+
+        toSatoshis(num?: boolean): string | Amount;
+    }
 
     interface NakedCoin {
         version?: number;
         height?: number;
-        value?: amount;
+        value?: Amount;
         script?: script;
         coinbase?: boolean;
         hash?: Hash;
@@ -66,7 +74,7 @@ declare module 'bcoin' {
 
         version: number;
         height: number;
-        value: amount;
+        value: Amount;
         script: script;
         coinbase: boolean;
         hash: Hash;
@@ -85,8 +93,13 @@ declare module 'bcoin' {
         ANYONECANPAY: number;
     }
 
+    interface IScriptCode {
+        value: number,
+        data: Buffer,
+    }
+
     class script {
-        code: any[];
+        code: IScriptCode[];
         raw: Buffer | null;
         length: number;
         static hashType: SighashType;
@@ -96,25 +109,38 @@ declare module 'bcoin' {
         static fromNulldata(data: Buffer): script;
         static fromScripthash(hash: Hash): script;
         static fromRaw(data: Buffer | string, enc?: string): script;
+        static fromMultisig(m: number, n: number, keys: Buffer[]): script;
         hash160(data?: string): Hash;
 
         pushSym(sym: string): script;
         pushData(data: Buffer): script;
         pushInt(num: number): script;
+        insertData(index: number, data: Buffer): script;
         compile(): script;
 
         toRaw(): Buffer;
         isNulldata(minimal?: boolean): boolean;
         isScripthash(minimal?: boolean): boolean;
         isPubkeyhash(minimal?: boolean): boolean;
+
+        insertData(index: number, data: Buffer): script;
+        remove(index: number): IScriptCode;
+        toASM(decode?: boolean): string;
+        getAddress(): address | null;
     }
 
     // TODO: Define these
-    type Outpoint = any;
     type Witness = any;
 
+    class outpoint {
+        constructor(hash?: Hash, index?: number);
+
+        public hash: Hash;
+        public index: number;
+    }
+
     interface NakedInput {
-        prevout?: Outpoint;
+        prevout?: outpoint;
         script?: NakedScript;
         sequence?: number;
         witness?: Witness;
@@ -122,21 +148,23 @@ declare module 'bcoin' {
 
     class input {
         constructor(options?: NakedInput);
+        static fromTX(tx: tx, index: number): input;
 
         script: script;
+        prevout: outpoint;
     }
 
     interface NakedOutput {
-        value: amount;
+        value: Amount;
         script: NakedScript;
     }
 
     class output {
-        value: amount;
+        value: Amount;
         script: script;
         constructor(options: NakedOutput);
 
-        static fromScript(script: script | address, value: amount): output;
+        static fromScript(script: script | address, value: Amount): output;
 
         getAddress(): address;
     }
@@ -155,7 +183,7 @@ declare module 'bcoin' {
         getVirtualSize(): number;
 
         static fromOptions(options: NakedTX): tx;
-        static fromRaw(data: Buffer, enc?: string): tx;
+        static fromRaw(data: Buffer | string, enc?: string): tx;
 
         toRaw(): Buffer;
 
@@ -166,18 +194,20 @@ declare module 'bcoin' {
     }
 
     class mtx extends tx {
+        static fromRaw(data: Buffer | string, enc?: string): mtx;
         addCoin(coin: coin): input;
-        addOutput(script: address | script | output | Object, value?: amount): output;
+        addOutput(script: address | script | output | Object, value?: Amount): output;
         scriptInput(index: number, coin: coin | output, ring: keyring): boolean;
-        subtractFee(fee: amount): void;
-        subtractIndex(index: number, fee: amount): void;
+        subtractFee(fee: Amount): void;
+        subtractIndex(index: number, fee: Amount): void;
         signInput(index: number, coin: coin | output, ring: keyring, type: number): boolean;
         toTX(): tx;
         static fromOptions(options: NakedTX): mtx;
 
         addTX(tx: tx, index: number, height?: number): input;
-        signature(index: number, prev: script, value: amount, privKey: Buffer, type: number, version: number): Buffer;
+        signature(index: number, prev: script, value: Amount, privKey: Buffer, type: number, version: number): Buffer;
         setSequence(index: number, locktime: number, seconds?: boolean): void;
+        setLocktime(locktime: number): void;
     }
 
     interface KeyRingOpts {
@@ -201,9 +231,11 @@ declare module 'bcoin' {
     export {
         script,
         address,
+        input,
         output,
         tx,
         mtx,
+        Amount,
         amount,
         keyring,
         coin,

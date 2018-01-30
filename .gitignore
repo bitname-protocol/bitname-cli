@@ -5,6 +5,7 @@ paper.html
 paper.pdf
 
 dist/
+out/
 
 # Logs
 logs

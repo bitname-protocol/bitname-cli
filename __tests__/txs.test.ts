@@ -1,13 +1,20 @@
+jest.mock('randombytes');
+
 import {
     coin as Coin,
     keyring as KeyRing,
     tx as TX,
+    crypto,
 } from 'bcoin';
 
 import {
     genRedeemScript,
     genLockTx,
     genUnlockTx,
+    genCommitTx,
+    genCommitRedeemScript,
+    serializeCommitData,
+    deserializeCommitData,
 } from '../lib/txs';
 import {
     BadUserPublicKeyError,
@@ -19,18 +26,21 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 describe('tx generation', () => {
-    it('generates a valid redeem script', () => {
+    it('generates a valid registration redeem script', () => {
         const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
         const userKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
         const script = genRedeemScript(userKey, serviceKey, 5);
 
         const expected = [
             'OP_IF',
+            'OP_0',
+            'OP_CHECKSEQUENCEVERIFY',
+            'OP_DROP',
             userKey.toString('hex'),
             'OP_CHECKSIG',
             'OP_ELSE',
             'OP_5',
-            'OP_CHECKSEQUENCEVERIFY',
+            'OP_CHECKLOCKTIMEVERIFY',
             'OP_DROP',
             serviceKey.toString('hex'),
             'OP_CHECKSIG',
@@ -38,6 +48,78 @@ describe('tx generation', () => {
         ];
 
         expect(script.toASM().split(' ')).toEqual(expected);
+    });
+
+    it('generates a valid commit redeem script', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+        const userKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
+
+        const nonce = new Buffer(32);
+        const name = 'boop';
+        const locktime = 5;
+        const script = genCommitRedeemScript(userKey, nonce, name, locktime);
+
+        const serializedInfoHash = crypto.hash256(serializeCommitData(nonce, locktime, name));
+
+        const expected = [
+            'OP_6',
+            'OP_CHECKSEQUENCEVERIFY',
+            'OP_DROP',
+            'OP_HASH256',
+            serializedInfoHash.toString('hex'),
+            'OP_EQUALVERIFY',
+            userKey.toString('hex'),
+            'OP_CHECKSIG',
+        ];
+
+        expect(script.toASM().split(' ')).toEqual(expected);
+    });
+
+    it('throws generating a commit redeem script with a bad pubkey', () => {
+        const nonce = new Buffer(32);
+        const name = 'boop';
+        const locktime = 5;
+        expect(() => {
+            genCommitRedeemScript(nonce, nonce, name, locktime);
+        }).toThrow(BadUserPublicKeyError);
+    });
+
+    it('throws serializing with a bad nonce length', () => {
+        const nonce = new Buffer(39);
+        const name = 'boop';
+        const locktime = 5;
+        expect(() => {
+            serializeCommitData(nonce, locktime, name);
+        }).toThrow('Invalid nonce size');
+    });
+
+    it('throws serializing with a bad locktime size', () => {
+        const nonce = new Buffer(32);
+        const name = 'boop';
+        const locktime = 500000001;
+        expect(() => {
+            serializeCommitData(nonce, locktime, name);
+        }).toThrow('Locktime must be less than 500000000 blocks');
+    });
+
+    it('throws serializing with a bad name size', () => {
+        const nonce = new Buffer(32);
+        const name = '000102030405060708090a0b0c0d0e0f1012131415161718191a1b1c1d1e1f2021';
+        const locktime = 65;
+        expect(() => {
+            serializeCommitData(nonce, locktime, name);
+        }).toThrow('Name is too long');
+    });
+
+    it('throws on name data being of incorrect length', () => {
+        const nonce = new Buffer(32);
+        const name = 'google';
+        const locktime = 65;
+        const data = Buffer.concat([serializeCommitData(nonce, locktime, name), Buffer.from('abcd')]);
+
+        expect(() => {
+            deserializeCommitData(data);
+        }).toThrow('Name has incorrect length');
     });
 
     it('fails if user pubkey is invalid', () => {
@@ -71,40 +153,379 @@ describe('tx generation', () => {
 
         const coins = [new Coin(testCoin)];
 
-        const tx = genLockTx(coins, 'google', 1, 1, 10, userRing, serviceKey, 1);
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
 
-        expect(tx.hash('hex')).toBe('631525eccd821de5518730aa4d543f53ed4b0d919c6f8d48b17f0cc3d4b9a70b');
+        const commitTX = genCommitTx(coins,
+                                     'google',
+                                     400,
+                                     commitFee,
+                                     registerFee,
+                                     escrowFee,
+                                     feeRate,
+                                     userRing,
+                                     serviceKey);
+
+        const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 400);
+
+        expect(tx.hash('hex')).toMatchSnapshot();
+    });
+
+    it('generates locking transactions until block 500000000', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const coins = [new Coin(testCoin)];
+
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
+        const commitTX = genCommitTx(coins,
+                                     'google',
+                                     500000000,
+                                     commitFee,
+                                     registerFee,
+                                     escrowFee,
+                                     feeRate,
+                                     userRing,
+                                     serviceKey);
+
+        const tx = genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 500000000);
+
+        expect(tx.hash('hex')).toMatchSnapshot();
+    });
+
+    it('errors generating locking transactions for 500000001 blocks', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const coins = [new Coin(testCoin)];
+
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
+        const commitTX = genCommitTx(coins,
+                                     'google',
+                                     500000000,
+                                     commitFee,
+                                     registerFee,
+                                     escrowFee,
+                                     feeRate,
+                                     userRing,
+                                     serviceKey);
+
+        expect(() => {
+            genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 500000001);
+        }).toThrow('Locktime must be less than 500000000 blocks');
+    });
+
+    it('errors generating locking transactions for 65-character name', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const coins = [new Coin(testCoin)];
+
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
+        const commitTX = genCommitTx(coins,
+                                     'google',
+                                     65535,
+                                     commitFee,
+                                     registerFee,
+                                     escrowFee,
+                                     feeRate,
+                                     userRing,
+                                     serviceKey);
+
+        const name = (new Buffer(65)).fill('a').toString('ascii');
+        expect(() => {
+            genLockTx(commitTX, name, registerFee, escrowFee, feeRate, userRing, serviceKey, 65535);
+        }).toThrow('Name is too long');
+    });
+
+    it('errors generating locking transactions for non-URI safe name', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const coins = [new Coin(testCoin)];
+
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
+        const commitTX = genCommitTx(coins,
+                                     'google',
+                                     65535,
+                                     commitFee,
+                                     registerFee,
+                                     escrowFee,
+                                     feeRate,
+                                     userRing,
+                                     serviceKey);
+
+        expect(() => {
+            genLockTx(commitTX, '`name', registerFee, escrowFee, feeRate, userRing, serviceKey, 65535);
+        }).toThrow('Invalid character(s) in name');
+    });
+
+    it('errors generating locking transaction with invalid public key', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const coins = [new Coin(testCoin)];
+
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
+        const commitTX = genCommitTx(coins,
+                                     'google',
+                                     65535,
+                                     commitFee,
+                                     registerFee,
+                                     escrowFee,
+                                     feeRate,
+                                     userRing,
+                                     serviceKey);
+
+        expect(() => {
+            genLockTx(commitTX, 'google', registerFee, escrowFee, feeRate, userRing, new Buffer(33), 65535);
+        }).toThrow('Invalid service public key');
+    });
+
+    it('errors generating locking transaction with invalid public key', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
+        const ctxDataPath = path.resolve(__dirname, 'data', '04accc0d.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
+        expect(() => {
+            genLockTx(ctx, 'google', registerFee, escrowFee, feeRate, userRing, serviceKey, 65535);
+        }).toThrow('Invalid commitment tx');
     });
 
     it('generates user unlocking transaction', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
-        const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
-        const userRing = KeyRing.fromSecret(wif);
+        const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
+        const ring = KeyRing.fromSecret(wif);
+        const addr = ring.getAddress().toBase58('testnet');
 
-        const tx = genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey());
+        const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+        const serviceRing = KeyRing.fromSecret(serviceWif);
+        const servicePubKey = serviceRing.getPublicKey();
 
-        expect(tx.hash('hex')).toBe('8ece940b4ef2692b6609e11f9933f624714f2256d7f003391c75df668e215f62');
+        const tx = genUnlockTx(lockTX, ctx, 1, false, ring, servicePubKey);
+
+        expect(tx.hash('hex')).toMatchSnapshot();
     });
 
     it('generates service unlocking transaction', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
         const lockTX = TX.fromRaw(txData, 'hex');
 
-        const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
+        const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
+        const ring = KeyRing.fromSecret(wif);
+        const userPubKey = ring.getPublicKey();
+
+        const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
+        const serviceRing = KeyRing.fromSecret(serviceWif);
+        const servicePubKey = serviceRing.getPublicKey();
+
+        const tx = genUnlockTx(lockTX, ctx, 1, true, serviceRing, userPubKey);
+
+        expect(tx.hash('hex')).toMatchSnapshot();
+    });
+
+    it('errors on committing with name too long', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
 
-        const tx = genUnlockTx(lockTX, 1, true, userRing, userRing.getPublicKey());
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
 
-        expect(tx.hash('hex')).toBe('9c9cc53211f58c83ca4d85bc7a15a44fd133cb6f1b7e3f55f3d052798bd9598d');
+        const name = 'If music be the food of love, play on. / Give me excess of it that, surfeiting...';
+
+        const coins = [new Coin(testCoin)];
+
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
+        expect(() => {
+            const commitTX = genCommitTx(coins,
+                                         name,
+                                         400,
+                                         commitFee,
+                                         registerFee,
+                                         escrowFee,
+                                         feeRate,
+                                         userRing,
+                                         serviceKey);
+        }).toThrow('Name is too long');
+    });
+
+    it('errors on committing with bad characters in name', () => {
+        const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const name = 'zip zap zop';
+
+        const coins = [new Coin(testCoin)];
+
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
+        expect(() => {
+            const commitTX = genCommitTx(coins,
+                                         name,
+                                         400,
+                                         commitFee,
+                                         registerFee,
+                                         escrowFee,
+                                         feeRate,
+                                         userRing,
+                                         serviceKey);
+        }).toThrow('Invalid character(s) in name');
+    });
+
+    it('errors on committing with bad characters in name', () => {
+        // const serviceKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
+        const serviceKey = new Buffer(33);
+
+        const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
+        const userRing = KeyRing.fromSecret(wif);
+
+        const testCoin = {
+            version: 1,
+            height: -1,
+            value: 100000000,
+            hash: '453bbd02d4ef04be090ec79691e7f1749ac14141456c3394a513055fbc904bac',
+        };
+
+        const name = 'zoop';
+
+        const coins = [new Coin(testCoin)];
+
+        const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
+
+        expect(() => {
+            const commitTX = genCommitTx(coins,
+                                         name,
+                                         400,
+                                         commitFee,
+                                         registerFee,
+                                         escrowFee,
+                                         feeRate,
+                                         userRing,
+                                         serviceKey);
+        }).toThrow('Invalid service public key');
     });
 
     it('errors on unlocking with incorrect user pubkey', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
@@ -116,11 +537,15 @@ describe('tx generation', () => {
         const serviceKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
 
         expect(() => {
-            genUnlockTx(lockTX, 1, false, userRing, serviceKey);
+            genUnlockTx(lockTX, ctx, 1, false, userRing, serviceKey);
         }).toThrow(BadLockTransactionError);
     });
 
     it('errors on unlocking with incorrect service pubkey', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
@@ -132,11 +557,15 @@ describe('tx generation', () => {
         const userKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
 
         expect(() => {
-            genUnlockTx(lockTX, 1, true, serviceRing, userKey);
+            genUnlockTx(lockTX, ctx, 1, true, serviceRing, userKey);
         }).toThrow(BadLockTransactionError);
     });
 
     it('errors on unlocking with incorrect privkey', () => {
+        const ctxDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
+        const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
+        const ctx = TX.fromRaw(ctxData, 'hex');
+
         const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
         const txData = fs.readFileSync(txDataPath, 'utf8').trim();
 
@@ -146,7 +575,7 @@ describe('tx generation', () => {
         const userRing = KeyRing.fromSecret(wif);
 
         expect(() => {
-            genUnlockTx(lockTX, 1, false, userRing, userRing.getPublicKey());
+            genUnlockTx(lockTX, ctx, 1, false, userRing, userRing.getPublicKey());
         }).toThrow(BadLockTransactionError);
     });
 });
