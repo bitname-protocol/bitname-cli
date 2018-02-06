@@ -25,6 +25,7 @@
     "ts-jest": "^22.0.0",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
+    "typedoc": "^0.10.0",
     "typescript": "^2.6.2"
   },
   "dependencies": {
@@ -39,7 +40,8 @@
     "start:dev": "ts-node index.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "npm run build && node dist/index.js",
-    "test": "jest"
+    "test": "jest",
+    "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/__mocks__/**\" --name bitname ./lib"
   },
   "jest": {
     "transform": {
