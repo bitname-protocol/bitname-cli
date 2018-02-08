@@ -10,6 +10,7 @@ script:
  - yarn test --coverage
  - codecov
  - yarn build:docs
+ - touch docs/.nojekyll
 deploy:
   provider: pages
   skip-cleanup: true
