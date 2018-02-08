@@ -50,7 +50,7 @@ async function getFeesSatoshiPerKB(network: string): Promise<number> {
     return feeRateSat;
 }
 
-async function getBlockHeight(network: string) {
+async function getBlockHeight(network: string): Promise<number> {
     const [server, port] = selectServer(network);
 
     const ecl = new ElectrumClient(port, server, 'tls');

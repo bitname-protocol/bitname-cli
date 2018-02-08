@@ -2,17 +2,23 @@ jest.mock('../lib/netUtils');
 
 import { fetchUnspentTX, fetchAllTX } from '../lib/netUtils';
 
-import { fundTx, getAllTX, getFeesSatoshiPerKB } from '../lib/net';
+import { fundTx, getAllTX, getFeesSatoshiPerKB, getBlockHeight } from '../lib/net';
 
 jest.mock('electrum-client');
 
 import { address as Address } from 'bcoin';
 
 describe('network data', () => {
-    it('correctly gets the estimated fee', async () => {
+    it('gets the estimated fee', async () => {
         const fee = await getFeesSatoshiPerKB('testnet');
 
         expect(fee).toBe(100);
+    });
+
+    it('gets the current block height', async () => {
+        const height = await getBlockHeight('testnet');
+
+        expect(height).toBe(1280175);
     });
 
     it('generates coins correctly', async () => {
