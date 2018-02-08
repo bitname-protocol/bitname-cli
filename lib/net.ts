@@ -4,7 +4,10 @@ import {
     address as Address,
     util,
     tx as TX,
+    amount as Amount,
 } from 'bcoin';
+
+import ElectrumClient = require('electrum-client');
 
 import CustomSet from './CustomSet';
 import TXList from './TXList';
@@ -14,9 +17,20 @@ const revHex = util.revHex;
 import { fetchUnspentTX, fetchAllTX, fetchMetadata, fetchTX, fetchPostTX } from './netUtils';
 
 async function getFeesSatoshiPerKB(network: string): Promise<number> {
-    const data = await fetchMetadata(network);
+    const ecl = new ElectrumClient(51002, 'electrum.akinbo.org', 'tls');
+    await ecl.connect();
 
-    return data.medium_fee_per_kb;
+    // Must use protocol >= 1.1
+    await ecl.server_version('3.0.5', '1.1');
+
+    const feeRate = await ecl.blockchainEstimatefee(2);
+
+    // Electrum returns BTC/kb, and we want sat/kb
+    const feeRateSat = Amount.fromBTC(feeRate).toSatoshis(true) as number;
+
+    await ecl.close();
+
+    return feeRateSat;
 }
 
 async function getBlockHeight(network: string) {
