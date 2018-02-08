@@ -16,8 +16,15 @@ const revHex = util.revHex;
 
 import { fetchUnspentTX, fetchAllTX, fetchMetadata, fetchTX, fetchPostTX } from './netUtils';
 
+/**
+ * Get the estimated fee to have a transaction confirmed in 2 blocks in sat/kb
+ * @param network The network from which to get info. Currently either 'main' or 'testnet'
+ * @returns The estimated fee in sat/kb
+ */
 async function getFeesSatoshiPerKB(network: string): Promise<number> {
-    const ecl = new ElectrumClient(51002, 'electrum.akinbo.org', 'tls');
+    const server = (network === 'main') ? 'bitcoins.sk' : 'electrum.akinbo.org';
+    const port = (network === 'main') ? 50002 : 51002;
+    const ecl = new ElectrumClient(port, server, 'tls');
     await ecl.connect();
 
     // Must use protocol >= 1.1
