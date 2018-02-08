@@ -9,7 +9,6 @@ import {
 
 import ElectrumClient = require('electrum-client');
 
-import CustomSet from './CustomSet';
 import TXList from './TXList';
 
 const revHex = util.revHex;
@@ -77,37 +76,26 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
     // Must use protocol >= 1.1
     await ecl.server_version('3.0.5', '1.1');
 
-    console.log(addr.toBase58(network));
-
-    // const data = await ecl.blockchainHeaders_subscribe();
     const txs = await ecl.blockchainAddress_listunspent(addr.toBase58(network));
-    console.log(txs);
-    console.log(target);
 
     if (txs.length === 0) {
+        await ecl.close();
         throw new Error(`No unspent txs found for ${addr}`);
     }
 
+    // Sort txs by largest value first
     txs.sort((a, b) => {
         return b.value - a.value;
     });
 
     let totalVal = 0;
 
-    const set = new CustomSet();
-
     for (const tx of txs) {
-        if (set.has(tx.tx_hash)) {
-            continue;
-        }
-        set.add(tx.tx_hash);
-
-        // console.log(tx.tx_hash);
-
+        // Now get the full tx for each utxo
         const rawTx  = await ecl.blockchainTransaction_get(tx.tx_hash, 1);
-        console.log(tx.tx_hash, rawTx);
-
         const fullTx = TX.fromRaw(rawTx, 'hex');
+
+        // Create a Coin referencing the given output number
         const coin = Coin.fromTX(fullTx, tx.tx_pos, tx.height);
         coins.push(coin);
 
@@ -120,6 +108,7 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
 
     await ecl.close();
 
+    // Error if all utxos checked and still not enough funds
     if (totalVal < target) {
         throw new Error('Insufficient funds available');
     }

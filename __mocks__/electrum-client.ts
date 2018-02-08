@@ -1,3 +1,15 @@
+interface IUtxo {
+    tx_pos: number;
+    value: number;
+    tx_hash: string;
+    height: number;
+}
+
+// tslint:disable-next-line:no-var-requires
+const unspentTxs: {[hash: string]: string} = require('./unspent_txs.json');
+// tslint:disable-next-line:no-var-requires
+const unspentShort: {[addr: string]: IUtxo[]} = require('./unspent.json');
+
 class ElectrumClient {
     constructor(port: number, host: string, protocol: string, options?: any) {
         return;
@@ -29,6 +41,21 @@ class ElectrumClient {
             bits: 486604799,
             nonce: 532817604,
         };
+    }
+
+    public async blockchainAddress_listunspent(address: string): Promise<IUtxo[]> {
+        if (!(address in unspentShort)) {
+            return [];
+        }
+
+        return unspentShort[address];
+    }
+    public async blockchainTransaction_get(txHash: string, height?: number): Promise<string> {
+        if (!(txHash in unspentTxs)) {
+            throw new Error('Unknown transaction');
+        }
+
+        return unspentTxs[txHash];
     }
 }
 

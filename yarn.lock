@@ -913,7 +913,7 @@ ecc-jsbn@~0.1.1:
 
 "electrum-client@https://github.com/colatkinson/node-electrum-client.git#scripthash":
   version "0.0.5"
-  resolved "https://github.com/colatkinson/node-electrum-client.git#57ab7bf0aacf0b82906922ce043e4d61d7c83d49"
+  resolved "https://github.com/colatkinson/node-electrum-client.git#8ed71b1e492c1f41a2307d001a873d206f327262"
 
 elliptic@6.4.0, elliptic@^6.2.3:
   version "6.4.0"

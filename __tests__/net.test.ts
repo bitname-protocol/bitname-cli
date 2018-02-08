@@ -21,27 +21,35 @@ describe('network data', () => {
         expect(height).toBe(1280175);
     });
 
-    it('generates coins correctly', async () => {
-        const addr = Address.fromBase58('mk8cJh83q2JKBNguuzamfN1LZ9aECtnVJ7');
-        const coins = await fundTx(addr, 1, 'testnet');
+    it('correctly funds a transaction', async () => {
+        const addr = Address.fromBase58('mmGx9VsBsn1Mv3gERhXTAChASu8vqkeke6');
+        const coins = await fundTx(addr, 2024152, 'testnet');
 
         const expected = [
             {
                 version: 1,
-                height: -1,
-                value: 280463407,
-                script: '76a914329ecab2c7fc540c96295a507a367a46a0ee649488ac',
-                address: '15cf1e351zs4QGDJCRcPqSo1h9yXFsMY2A',
+                height: 1260163,
+                value: 115368335,
+                script: '76a9143f2acedfda87b9a111bdd4a0b0d8b04cb34e515488ac',
+                address: '16kzrSnD4ka78wCci8Z5LHUqauYDxLS8QD',
                 coinbase: false,
-                hash: 'd5dfe44619e5e2a806399309880944714fdbfe4524852be97287ef80eb844332',
-                index: 0,
+                hash: '3a03f98f6f5632c7cebc3d1a9eb3ac64c8bd23fb5b0fdeeba29c835a545642be',
+                index: 3,
             },
         ];
 
-        const expectedStr = JSON.stringify(expected);
-        const actualStr = JSON.stringify(coins);
+        expect(JSON.stringify(coins)).toBe(JSON.stringify(expected));
+    });
 
-        expect(actualStr).toBe(expectedStr);
+    it('errors if there are insufficient funds for a tx', async () => {
+        const addr = Address.fromBase58('muYWRM71cj5LH1aJ16FLFP2PHn2SHs3FpA');
+        expect(fundTx(addr, 2024152, 'testnet')).rejects.toThrow('Insufficient funds available');
+    });
+
+    it('errors if there are no funds for a tx', async () => {
+        const addrStr = '14qyvufyTr9j52SPaXN1iY18vE8nyXi37b';
+        const addr = Address.fromBase58(addrStr);
+        expect(fundTx(addr, 2024152, 'main')).rejects.toThrow(`No unspent txs found for ${addrStr}`);
     });
 
     it('generates a tx list from network data', async () => {
