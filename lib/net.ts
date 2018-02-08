@@ -16,15 +16,23 @@ const revHex = util.revHex;
 
 import { fetchUnspentTX, fetchAllTX, fetchMetadata, fetchTX, fetchPostTX } from './netUtils';
 
+function selectServer(network: string): [string, number] {
+    if (network === 'testnet') {
+        return ['testnet.qtornado.com', 51002];
+    } else if (network === 'main') {
+        return ['bitcoins.sk', 50002];
+    } else {
+        throw new Error(`Unknown network '${network}'`);
+    }
+}
+
 /**
  * Get the estimated fee to have a transaction confirmed in 2 blocks in sat/kb
  * @param network The network from which to get info. Currently either 'main' or 'testnet'
  * @returns The estimated fee in sat/kb
  */
 async function getFeesSatoshiPerKB(network: string): Promise<number> {
-    // For now, use a couple of hardcoded servers
-    const server = (network === 'main') ? 'bitcoins.sk' : 'electrum.akinbo.org';
-    const port = (network === 'main') ? 50002 : 51002;
+    const [server, port] = selectServer(network);
 
     const ecl = new ElectrumClient(port, server, 'tls');
     await ecl.connect();
@@ -43,9 +51,19 @@ async function getFeesSatoshiPerKB(network: string): Promise<number> {
 }
 
 async function getBlockHeight(network: string) {
-    const data = await fetchMetadata(network);
+    const [server, port] = selectServer(network);
 
-    return data.height;
+    const ecl = new ElectrumClient(port, server, 'tls');
+    await ecl.connect();
+
+    // Must use protocol >= 1.1
+    await ecl.server_version('3.0.5', '1.1');
+
+    const data = await ecl.blockchainHeaders_subscribe();
+
+    await ecl.close();
+
+    return data.block_height;
 }
 
 async function fundTx(addr: Address, target: number, network: string): Promise<Coin[]> {
