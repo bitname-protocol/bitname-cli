@@ -21,11 +21,21 @@ import {
 
 import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
 
+/**
+ * Generate a redeem script, removing a name/key pair from the blockchain.
+ * Validates `userPubkey` and `servicePubkey`.
+ * 
+ * @param userPubkey The user's public key.
+ * @param servicePubkey The service's public key.
+ * @param alocktime An absolute lock time, in blocks.
+ */
 function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, alocktime: number): Script {
+    // Validate user public key
     if (!crypto.secp256k1.publicKeyVerify(userPubkey)) {
         throw new BadUserPublicKeyError();
     }
 
+    // Validate service public key
     if (!crypto.secp256k1.publicKeyVerify(servicePubkey)) {
         throw new BadServicePublicKeyError();
     }
@@ -34,19 +44,29 @@ function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, alocktime: n
 
     script.pushSym('OP_IF');
 
+    //
+    // If spending as user, execute this branch
+    
+    // Verify that 0 <= current block size - commit block size
     script.pushInt(0);
     script.pushSym('OP_CHECKSEQUENCEVERIFY');
     script.pushSym('OP_DROP');
 
+    // Check the provided user signature
     script.pushData(userPubkey);
     script.pushSym('OP_CHECKSIG');
 
     script.pushSym('OP_ELSE');
 
+    //
+    // Otherwise, if spending as service, execute this branch
+
+    // Verify that alocktime <= current block size
     script.pushInt(alocktime);
     script.pushSym('OP_CHECKLOCKTIMEVERIFY');
     script.pushSym('OP_DROP');
 
+    // Check the provided service signature
     script.pushData(servicePubkey);
     script.pushSym('OP_CHECKSIG');
 
@@ -57,16 +77,29 @@ function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, alocktime: n
     return script;
 }
 
+/**
+ * Generate a commit redeem script.
+ * @param userPubkey The user's public key.
+ * @param nonce A 256-bit buffer representing a nonce.
+ * @param name A name of at most 64 characters composed of URL-safe characters.
+ * @param locktime An absolute lock time, in blocks.
+ */
 function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string, locktime: number): Script {
+    // Validate user public key
     if (!crypto.secp256k1.publicKeyVerify(userPubkey)) {
         throw new BadUserPublicKeyError();
     }
 
     const script = new Script();
+
+    // Verify that at least six blocks have passed since commit
     script.pushInt(6);
     script.pushSym('OP_CHECKSEQUENCEVERIFY');
     script.pushSym('OP_DROP');
 
+    //
+    // Hash [256-bit nonce + 2-byte locktime (BE) + 1-byte length of name + name]
+    // and check against parameters.
     script.pushSym('OP_HASH256');
 
     const hashData = serializeCommitData(nonce, locktime, name);
@@ -74,6 +107,7 @@ function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string, 
     script.pushData(hash);
     script.pushSym('OP_EQUALVERIFY');
 
+    // Check user signature
     script.pushData(userPubkey);
     script.pushSym('OP_CHECKSIG');
 
@@ -81,6 +115,10 @@ function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string, 
     return script;
 }
 
+/**
+ * Generate a P2SH address from a redeem script.
+ * @param redeemScript The script to use.
+ */
 function genP2shAddr(redeemScript: Script): Address {
     const outputScript = Script.fromScripthash(redeemScript.hash160());
     const p2shAddr = Address.fromScript(outputScript);
@@ -88,19 +126,28 @@ function genP2shAddr(redeemScript: Script): Address {
     return p2shAddr;
 }
 
+/**
+ * Encode `nonce`, `locktime`, and `name` into a buffer of length
+ * `32 + 4 + 1 + name.length`.
+ * @param nonce 256-bit nonce.
+ * @param locktime Lock time of at most 500000000 blocks.
+ * @param name Name of at most length 64 containing URL-safe characters.
+ */
 function serializeCommitData(nonce: Buffer, locktime: number, name: string): Buffer {
+    // Verify nonce size
     if (nonce.length !== 32) {
         throw new Error('Invalid nonce size');
     }
-
+    // Verify lock time is within bounds
     if (locktime > 500000000) {
         throw new Error('Locktime must be less than 500000000 blocks');
     }
-
+    // Verify name is within bounds
     if (name.length > 64) {
         throw new Error('Name is too long');
     }
-
+    //
+    // Create a new buffer. Write no
     const outBuf = new Buffer(32 + 4 + 1 + name.length);
     nonce.copy(outBuf);
 
@@ -109,6 +156,7 @@ function serializeCommitData(nonce: Buffer, locktime: number, name: string): Buf
     outBuf.writeUInt8(name.length, 36);
 
     outBuf.write(name, 37, name.length, 'ascii');
+
 
     return outBuf;
 }
@@ -119,6 +167,13 @@ interface ICommitData {
     name: string;
 }
 
+/**
+ * Convert bytestream `data` into human-readable form. The first 32 bytes are
+ * the nonce, followed by 32 bytes representing the locktime, then a 4-byte
+ * integer representing the name length, then up to 64 bytes representing the
+ * name.
+ * @param data Binary data to decode.
+ */
 function deserializeCommitData(data: Buffer): ICommitData {
     if (data.length < 38) {
         throw new Error('Invalid commit data');
@@ -132,6 +187,7 @@ function deserializeCommitData(data: Buffer): ICommitData {
 
     const nameRaw = data.slice(37);
 
+    // Verify the specified name length equals the actual length
     if (nameRaw.length !== nameLen) {
         throw new Error('Name has incorrect length');
     }
@@ -145,6 +201,18 @@ function deserializeCommitData(data: Buffer): ICommitData {
     };
 }
 
+/**
+ * Generate a commit transaction.
+ * @param coins Array of coins to fund the transaction.
+ * @param name Name for name/key pair.
+ * @param locktime Absolute locktime
+ * @param commitFee Commit fee, in satoshis.
+ * @param registerFee Registration fee, in satoshis.
+ * @param escrowFee Escrow fee, in satoshis.
+ * @param feeRate Fee rate, in satoshis/kilobyte.
+ * @param userRing The user's key ring.
+ * @param servicePubKey Service public key.
+ */
 function genCommitTx(coins: Coin[],
                      name: string,
                      locktime: number,
@@ -154,6 +222,8 @@ function genCommitTx(coins: Coin[],
                      feeRate: number,
                      userRing: KeyRing,
                      servicePubKey: Buffer): TX {
+    //
+    // Validate name and the service public key
     if (name.length > 64) {
         throw new Error('Name is too long');
     }
@@ -166,22 +236,25 @@ function genCommitTx(coins: Coin[],
         throw new Error('Invalid service public key');
     }
 
-    const nonce = randomBytes(32);
-    // console.log(nonce);
+    // Generate a P2SH address from a redeem script, using a random nonce
+    const nonce = randomBytes(32); 
     const redeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name, locktime);
     const p2shAddr = genP2shAddr(redeemScript);
 
+    // Generate service address from service public key
     const servicePKH = crypto.hash160(servicePubKey);
     const serviceAddr = Address.fromPubkeyhash(servicePKH);
 
     const lockTx = new MTX();
 
+    // Compute total value of coins
     const total = coins.reduce((acc, cur) => acc + cur.value, 0);
 
     for (const coin of coins) {
         lockTx.addCoin(coin);
     }
 
+    // Compute change amount
     const changeVal = total - (commitFee + registerFee + escrowFee) - (4 * feeRate);
 
     // Add nonce OP_RETURN as output 0
@@ -201,14 +274,13 @@ function genCommitTx(coins: Coin[],
         value: registerFee + escrowFee + 4 * feeRate,
     });
 
-    // console.log(changeVal);
-
     // Add change output as 3
     lockTx.addOutput({
         address: userRing.getAddress(),
         value: changeVal,
     });
 
+    // Add coins as inputs
     for (let i = 0; i < coins.length; ++i) {
         const coin = coins[i];
         lockTx.scriptInput(i, coin, userRing);
@@ -218,6 +290,7 @@ function genCommitTx(coins: Coin[],
     const virtSize = lockTx.getVirtualSize() + coins.length * 72;
     lockTx.subtractIndex(3, Math.ceil(virtSize / 1000 * feeRate));
 
+    // Sign the coins
     for (let i = 0; i < coins.length; ++i) {
         const coin = coins[i];
         lockTx.signInput(i, coin, userRing, Script.hashType.ALL);
@@ -226,6 +299,19 @@ function genCommitTx(coins: Coin[],
     return lockTx.toTX();
 }
 
+/**
+ * Generate a lock transaction.
+ * @param commitTX The corresponding commit transaction.
+ * @param name The name to use.
+ * @param upfrontFee The upfront fee in satoshis to use the service, as 
+ * determined by the service.
+ * @param lockedFee Fee incentivizing registrar to provide service, as
+ * determined by the service.
+ * @param feeRate Fee rate in satoshi/KB.
+ * @param userRing The user key ring.
+ * @param servicePubKey Service public key.
+ * @param locktime Absolute lock time in blocks.
+ */
 function genLockTx(commitTX: TX,
                    name: string,
                    upfrontFee: number,
@@ -233,7 +319,9 @@ function genLockTx(commitTX: TX,
                    feeRate: number,
                    userRing: KeyRing,
                    servicePubKey: Buffer,
-                   locktime: number) {
+                   locktime: number): TX {
+    //
+    // Input validation
     if (locktime > 500000000) {
         throw new Error('Locktime must be less than 500000000 blocks');
     }
@@ -254,13 +342,14 @@ function genLockTx(commitTX: TX,
         throw new Error('Invalid commitment tx');
     }
 
+    // Generate a P2SH address from redeem script
     const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
     const p2shAddr = genP2shAddr(redeemScript);
 
+    // Generate address from service public key
     const servicePKH = crypto.hash160(servicePubKey);
     const serviceAddr = Address.fromPubkeyhash(servicePKH);
 
-    // const lockTx = new MTX();
     const lockTx = MTX.fromOptions({
         version: 2,
     });
@@ -270,18 +359,6 @@ function genLockTx(commitTX: TX,
     lockTx.setSequence(0, 6);
 
     const total = commitTX.outputs[2].value;
-    // console.log(total);
-
-    // const total = coins.reduce((acc, cur) => acc + cur.value, 0);
-
-    // for (const coin of coins) {
-    //     lockTx.addCoin(coin);
-    // }
-
-    // const opRetVal = 0;
-
-    // console.log(total, opRetVal, upfrontFee, lockedFee, netFee);
-    // console.log(opRetVal + upfrontFee + lockedFee + netFee);
 
     const changeVal = total - upfrontFee - lockedFee;
 
@@ -303,26 +380,6 @@ function genLockTx(commitTX: TX,
         value: changeVal,
     });
 
-    // for (let i = 0; i < coins.length; ++i) {
-    //     const coin = coins[i];
-    //     lockTx.scriptInput(i, coin, userRing);
-    //     // lockTx.signInput(i, coin, ring, Script.hashType.ALL);
-    // }
-
-    // // Each signature is 72 bytes long
-    // const virtSize = lockTx.getVirtualSize() + coins.length * 72;
-    // // console.log(Math.ceil(virtSize / 1000 * feeRate));
-    // lockTx.subtractIndex(4, Math.ceil(virtSize / 1000 * feeRate));
-
-    // for (let i = 0; i < coins.length; ++i) {
-    //     const coin = coins[i];
-    //     // lockTx.scriptInput(i, coin, ring);
-    //     lockTx.signInput(i, coin, userRing, Script.hashType.ALL);
-    // }
-
-    // const virtSize = lockTx.getVirtualSize();
-    // lockTx.subtractFee(Math.ceil(virtSize / 1000 * feeRate), 0);
-
     const nonce = commitTX.outputs[0].script.code[1].data;
 
     const hashData = serializeCommitData(nonce, locktime, name);
@@ -335,8 +392,6 @@ function genLockTx(commitTX: TX,
     unlockScript.compile();
 
     lockTx.inputs[0].script = unlockScript;
-
-    // console.log(lockTx.inputs[0].script.code);
 
     // Add constant for signature
     const virtSize = lockTx.getVirtualSize() + 72;
@@ -353,17 +408,21 @@ function genLockTx(commitTX: TX,
     return lockTx.toTX();
 }
 
-function extractCommitMetadata(inputScript: Script) {
-    // console.log(Script.fromRaw(inputScript.code[2].data).code[6].data);
+/**
+ * Extract metadata from a script (i.e. the nonce, locktime, and name).
+ * @param inputScript Script to read from.
+ */
+function extractCommitMetadata(inputScript: Script): ICommitData {
     const meta = deserializeCommitData(inputScript.code[1].data);
 
-    // const encumberScript = Script.fromRaw(inputScript.code[2].data);
-    // const pubKey: Buffer = encumberScript.code[6].data;
-
-    // return {...meta, pubKey};
     return meta;
 }
 
+/**
+ * Attempt to extract a name from a lock transaction.
+ * @param lockTx Lock transaction to read from.
+ * @returns The name if present, and `null` otherwise.
+ */
 function getLockTxName(lockTx: TX): string | null {
     try {
         const metadata = extractCommitMetadata(lockTx.inputs[0].script);
@@ -374,6 +433,11 @@ function getLockTxName(lockTx: TX): string | null {
     }
 }
 
+/**
+ * Attempt to extract a time lock from a lock transaction.
+ * @param lockTx Lock transaction to read from.
+ * @returns The lock time if present, and `null` otherwise.
+ */
 function getLockTxTime(lockTx: TX): number | null {
     try {
         const metadata = extractCommitMetadata(lockTx.inputs[0].script);
@@ -384,6 +448,11 @@ function getLockTxTime(lockTx: TX): number | null {
     }
 }
 
+/**
+ * Attempt to extract a public key from a lock transaction.
+ * @param lockTx Lock transaction to read from.
+ * @returns The public key if present, and `null` otherwise.
+ */
 function getLockTxPubKey(lockTx: TX): Buffer | null {
     const inputScript = lockTx.inputs[0].script;
 
@@ -402,15 +471,27 @@ function getLockTxPubKey(lockTx: TX): Buffer | null {
     return pubKey;
 }
 
+/**
+ * Generate an unlock transaction.
+ * @param lockTx The corresponding lock transaction.
+ * @param commitTx The corresponding commit transaction.
+ * @param feeRate The fee rate in satoshi/KB.
+ * @param service Whether to use the script as service.
+ * @param ring The service key ring if `service`, otherwise user key ring.
+ * @param otherPubKey The user key ring if `service`, otherwise service key ring.
+ */
 function genUnlockTx(lockTx: TX,
                      commitTx: TX,
                      feeRate: number,
                      service: boolean,
                      ring: KeyRing,
-                     otherPubKey: Buffer) {
+                     otherPubKey: Buffer): TX {
+    // Disambiguate ring public key and the other public key
     const servicePubKey =  service ? ring.getPublicKey() : otherPubKey;
     const userPubKey    = !service ? ring.getPublicKey() : otherPubKey;
 
+    //
+    // Input validation
     if (!verifyLockTX(lockTx, commitTx, servicePubKey)) {
         throw new BadLockTransactionError();
     }
@@ -423,19 +504,19 @@ function genUnlockTx(lockTx: TX,
     if (locktime === null) {
         throw new Error('Could not extract locktime');
     }
-
+    
     const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
 
-    const val = lockTx.outputs[1].value;
+    const val = lockTx.outputs[1].value; // the P2SH output
     const unlockTx = MTX.fromOptions({
         version: 2,
     });
+
     unlockTx.addTX(lockTx, 1);
 
     const boolVal = service ? 0 : 1;
 
     if (service) {
-        // unlockTx.setSequence(0, locktime);
         unlockTx.setLocktime(locktime);
     } else {
         unlockTx.setSequence(0, 0);
@@ -446,6 +527,7 @@ function genUnlockTx(lockTx: TX,
         value: val,
     });
 
+    // Generate new script: <sig> <isUser> <redeemScript>
     const unlockScript = new Script();
     unlockScript.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
     unlockScript.pushInt(boolVal);
@@ -454,10 +536,7 @@ function genUnlockTx(lockTx: TX,
 
     unlockTx.inputs[0].script = unlockScript;
 
-    // console.log(unlockTx.outputs);
-
-    // console.log('size: ', unlockTx.getVirtualSize());
-
+    // Compute a fee by multiplying the size by the rate, then account for it
     const virtSize = unlockTx.getVirtualSize();
     const fee = Math.ceil(virtSize / 1000 * feeRate);
     unlockTx.subtractFee(fee);
