@@ -20,4 +20,4 @@ deploy:
   fqdn: "docs.bitname.xyz"
   on:
     node: "node"
-    branch: "docs-deploy"
+    branch: "master"

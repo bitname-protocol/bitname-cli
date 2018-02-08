@@ -101,7 +101,7 @@ Fill in your own registration's txid, and bam, you've got half your money back.
 
 ## I'm a developer, can I use this in my app?
 
-Sure thing! Read our handy-dandy [API docs](https://bitname-protocol.github.io/bitname-cli).
+Sure thing! Read our handy-dandy [API docs](https://docs.bitname.xyz/).
 
 ## Tell me more!
 
