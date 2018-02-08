@@ -1,11 +1,20 @@
 jest.mock('../lib/netUtils');
+
 import { fetchUnspentTX, fetchAllTX } from '../lib/netUtils';
 
-import { fundTx, getAllTX } from '../lib/net';
+import { fundTx, getAllTX, getFeesSatoshiPerKB } from '../lib/net';
+
+jest.mock('electrum-client');
 
 import { address as Address } from 'bcoin';
 
 describe('network data', () => {
+    it('correctly gets the estimated fee', async () => {
+        const fee = await getFeesSatoshiPerKB('testnet');
+
+        expect(fee).toBe(100);
+    });
+
     it('generates coins correctly', async () => {
         const addr = Address.fromBase58('mk8cJh83q2JKBNguuzamfN1LZ9aECtnVJ7');
         const coins = await fundTx(addr, 1, 'testnet');

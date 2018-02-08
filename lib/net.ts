@@ -22,8 +22,10 @@ import { fetchUnspentTX, fetchAllTX, fetchMetadata, fetchTX, fetchPostTX } from 
  * @returns The estimated fee in sat/kb
  */
 async function getFeesSatoshiPerKB(network: string): Promise<number> {
+    // For now, use a couple of hardcoded servers
     const server = (network === 'main') ? 'bitcoins.sk' : 'electrum.akinbo.org';
     const port = (network === 'main') ? 50002 : 51002;
+
     const ecl = new ElectrumClient(port, server, 'tls');
     await ecl.connect();
 
