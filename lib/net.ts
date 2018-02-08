@@ -69,18 +69,27 @@ async function getBlockHeight(network: string): Promise<number> {
 async function fundTx(addr: Address, target: number, network: string): Promise<Coin[]> {
     const coins: Coin[] = [];
 
-    const data = await fetchUnspentTX(addr, network);
+    const [server, port] = selectServer(network);
 
-    // console.log(data);
+    const ecl = new ElectrumClient(port, server, 'tls');
+    await ecl.connect();
 
-    const txs = data.txrefs;
+    // Must use protocol >= 1.1
+    await ecl.server_version('3.0.5', '1.1');
 
-    if (typeof txs === 'undefined') {
+    console.log(addr.toBase58(network));
+
+    // const data = await ecl.blockchainHeaders_subscribe();
+    const txs = await ecl.blockchainAddress_listunspent(addr.toBase58(network));
+    console.log(txs);
+    console.log(target);
+
+    if (txs.length === 0) {
         throw new Error(`No unspent txs found for ${addr}`);
     }
 
-    txs.sort((a: number, b: number) => {
-        return a - b;
+    txs.sort((a, b) => {
+        return b.value - a.value;
     });
 
     let totalVal = 0;
@@ -93,23 +102,23 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
         }
         set.add(tx.tx_hash);
 
-        const coinOpts = {
-            version: 1,
-            height: -1,
-            value: tx.value,
-            script: Script.fromRaw(tx.script, 'hex'),
-            hash: revHex(tx.tx_hash),
-            index: tx.tx_output_n,
-        };
+        // console.log(tx.tx_hash);
 
-        coins.push(new Coin(coinOpts));
+        const rawTx  = await ecl.blockchainTransaction_get(tx.tx_hash, 1);
+        console.log(tx.tx_hash, rawTx);
 
-        totalVal += coinOpts.value;
+        const fullTx = TX.fromRaw(rawTx, 'hex');
+        const coin = Coin.fromTX(fullTx, tx.tx_pos, tx.height);
+        coins.push(coin);
+
+        totalVal += tx.value;
 
         if (totalVal >= target) {
             break;
         }
     }
+
+    await ecl.close();
 
     if (totalVal < target) {
         throw new Error('Insufficient funds available');

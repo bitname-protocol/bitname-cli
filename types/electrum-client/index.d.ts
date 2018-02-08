@@ -9,11 +9,20 @@ declare module 'electrum-client' {
         nonce: number,
     }
 
+    type utxo = {
+        tx_pos: number,
+        value: number,
+        tx_hash: string,
+        height: number
+    }
+
     class ElectrumClient {
         constructor(port: number, host: string, protocol: string, options?: any);
 
         public blockchainHeaders_subscribe(): Promise<header>;
         public blockchainEstimatefee(num: number): Promise<number>;
+        public blockchainAddress_listunspent(address: string): Promise<utxo[]>;
+        public blockchainTransaction_get(tx_hash: string, height?: number): Promise<string>;
 
         public connect(): Promise<void>;
         public close(): Promise<void>;

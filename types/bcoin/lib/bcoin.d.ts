@@ -79,6 +79,8 @@ declare module 'bcoin' {
         coinbase: boolean;
         hash: Hash;
         index: number;
+
+        public static fromTX(tx: tx, index: number, height: number): coin;
     }
 
     type NakedScript = {
