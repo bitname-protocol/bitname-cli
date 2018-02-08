@@ -99,6 +99,10 @@ $ bitname revoke tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn
 
 Fill in your own registration's txid, and bam, you've got half your money back.
 
+## I'm a developer, can I use this in my app?
+
+Sure thing! Read our handy-dandy [API docs](https://bitname-protocol.github.io/bitname-cli).
+
 ## Tell me more!
 
 Glad you asked! For a more technical summary, check out the [protocol specification](./paper/paper.adoc).
