@@ -18,3 +18,4 @@ deploy:
   local-dir: "docs"
   on:
     node: "node"
+    branch: "docs-deploy"
