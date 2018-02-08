@@ -1,0 +1,263 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>bitname</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">bitname</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> bitname</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 align="center">
+					<br />
+					<img src="graphics/logo.png" alt="bitname" width="512" />
+					<br />
+				</h1>
+				<p align="center"><b>Associate public keys with names on the Bitcoin blockchain</b></p>
+				<p align="center">
+					<a href="https://gitter.im/bitname-cli/Lobby">
+						<img src="https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=for-the-badge" alt="Chat on Gitter" />
+					</a>
+					<a href="https://travis-ci.org/bitname-protocol/bitname-cli">
+						<img src="https://img.shields.io/travis/bitname-protocol/bitname-cli/master.svg?style=for-the-badge" alt="Travis" />
+					</a>
+					<a href="https://codecov.io/gh/bitname-protocol/bitname-cli">
+						<img src="https://img.shields.io/codecov/c/github/bitname-protocol/bitname-cli/master.svg?style=for-the-badge" alt="Codecov" />
+					</a>
+					<a href="https://waffle.io/bitname-protocol/bitname-cli">
+						<img src="https://img.shields.io/github/issues/bitname-protocol/bitname-cli.svg?style=for-the-badge" alt="Issues" />
+					</a>
+					<a href="https://www.gnu.org/licenses/lgpl.html">
+						<img src="https://img.shields.io/github/license/bitname-protocol/bitname-cli.svg?style=for-the-badge" alt="License" />
+					</a>
+				</p>
+				<h2 id="what-is-this-">What is this?</h2>
+				<p>Besides being a store of value, Bitcoin is also useful as a distributed database. By embedding certain data in this database, it becomes possible to associate public keys and human-readable names. These pairs are registered for a set length of time, after which they must be renewed or become available to others.</p>
+				<p>This is a proof-of-concept CLI tool to create and parse this data.</p>
+				<h2 id="installation">Installation</h2>
+				<pre><code class="lang-bash">git <span class="hljs-built_in">clone</span> https://github.com/bitname-protocol/bitname-cli.git
+<span class="hljs-built_in">cd</span> bitname-cli
+</code></pre>
+				<h3 id="yarn">yarn</h3>
+				<pre><code class="lang-bash">$ yarn
+$ yarn build
+$ yarn global add <span class="hljs-variable">$PWD</span>
+</code></pre>
+				<h3 id="npm">npm</h3>
+				<pre><code class="lang-bash">$ npm install
+$ npm run build
+$ npm install -g .
+</code></pre>
+				<h2 id="usage">Usage</h2>
+				<p>As of now, the package is unstable. As a result, everything shown below will be done on the testnet.</p>
+				<p>First, generate a new private key.</p>
+				<pre><code class="lang-bash">$ bitname key-gen -o mykey.wif --testnet
+</code></pre>
+				<p>You need to fund the address displayed. The easiest way to get tBTC is a faucet, such as:</p>
+				<ul>
+					<li><a href="https://testnet.coinfaucet.eu/en/">https://testnet.coinfaucet.eu/en/</a></li>
+					<li><a href="https://testnet.manu.backend.hamburg/faucet">https://testnet.manu.backend.hamburg/faucet</a></li>
+					<li><a href="http://tpfaucet.appspot.com/">http://tpfaucet.appspot.com/</a></li>
+				</ul>
+				<p>Once you have some coins, you can start your registration process!</p>
+				<p>First, pick a service to use. Here, we will use a service with the public key</p>
+				<pre><code>tp<span class="hljs-number">1</span>qqdssqgmu<span class="hljs-number">777</span>ddts<span class="hljs-symbol">n2</span>rv<span class="hljs-number">4</span>uuwljy<span class="hljs-number">999</span>dkz<span class="hljs-number">3</span>zr<span class="hljs-number">8</span><span class="hljs-symbol">n2</span>fwakw<span class="hljs-number">7</span>xf<span class="hljs-number">4</span>e<span class="hljs-number">5</span>d<span class="hljs-number">5</span>j<span class="hljs-name">g58</span>ykm<span class="hljs-symbol">n</span>
+</code></pre><p>This key is equivalent to the testnet address <code>n4QtQVZF85XXB3rPTkb4B5c8THrp8uMiMb</code>.</p>
+				<p>Now, let&#39;s register a name! We&#39;re going to register the name &#39;bitname&#39; for 60 blocks, or roughly ten hours. And we want to push this transaction to the testnet network.</p>
+				<pre><code class="lang-bash">$ bitname register tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn bitname 60 -w mykey.wif --push
+</code></pre>
+				<p>This will print the transaction id of your registration. You can use this to track your registration&#39;s progress on a <a href="https://www.blocktrail.com/tBTC">block explorer</a>. Once it&#39;s been confirmed, we can see the names currently registered with the service.</p>
+				<pre><code class="lang-bash">$ bitname all-names tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn
+</code></pre>
+				<p>This will output a list of all the names on this service, including yours! Nice!</p>
+				<p>But wait, what if you don&#39;t like or need that name anymore? Well, you can revoke it. The way registration works, half of your funds are instantly sent to the service, but the other half aren&#39;t valid until it expires. Before that, you can reclaim that half.</p>
+				<pre><code class="lang-bash">$ bitname revoke tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn &lt;txid&gt; -w mykey.wif --push
+</code></pre>
+				<p>Fill in your own registration&#39;s txid, and bam, you&#39;ve got half your money back.</p>
+				<h2 id="i-m-a-developer-can-i-use-this-in-my-app-">I&#39;m a developer, can I use this in my app?</h2>
+				<p>Sure thing! Read our handy-dandy <a href="https://bitname-protocol.github.io/bitname-cli">API docs</a>.</p>
+				<h2 id="tell-me-more-">Tell me more!</h2>
+				<p>Glad you asked! For a more technical summary, check out the <a href="./paper/paper.adoc">protocol specification</a>.</p>
+				<h2 id="future-plans">Future plans</h2>
+				<ul>
+					<li>SegWit support to remove transaction malleability</li>
+					<li>A switch to the open Electrum protocol instead of relying on a proprietary, rate-limited API</li>
+					<li>Fixing a potential DoS attack vector (see the spec for a better description)</li>
+				</ul>
+				<h2 id="contributing">Contributing</h2>
+				<p>Please see the <a href="CODE_OF_CONDUCT.md">code of conduct</a> and <a href="CONTRIBUTING.md">contributor guidelines</a>.</p>
+				<h2 id="disclosure-policy">Disclosure Policy</h2>
+				<p>Please do not contact any contributors privately to disclose a bug. Make an issue so that this is immediately brought to light.</p>
+				<h2 id="technologies-used">Technologies Used</h2>
+				<ul>
+					<li>Typescript</li>
+					<li>bcoin for Bitcoin functionality</li>
+					<li>BlockCypher&#39;s excellent REST API</li>
+					<li>jest for testing</li>
+					<li>chalk for pretty colors</li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_customset_.html">"<wbr>Custom<wbr>Set"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_txlist_.html">"TXList"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_chain_.html">"chain"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_errors_.html">"errors"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_net_.html">"net"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_netutils_.html">"net<wbr>Utils"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_txs_.html">"txs"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_utils_.html">"utils"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_verify_.html">"verify"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
