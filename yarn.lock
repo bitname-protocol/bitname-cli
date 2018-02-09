@@ -911,9 +911,9 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
 
-"electrum-client@https://github.com/colatkinson/node-electrum-client.git#scripthash":
-  version "0.0.5"
-  resolved "https://github.com/colatkinson/node-electrum-client.git#8ed71b1e492c1f41a2307d001a873d206f327262"
+electrum-client@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/electrum-client/-/electrum-client-0.0.6.tgz#f6ad1285a2b2dc25a820ca3eab7c704e350dfcdb"
 
 elliptic@6.4.0, elliptic@^6.2.3:
   version "6.4.0"
