@@ -10,17 +10,17 @@
     <a href="https://gitter.im/bitname-cli/Lobby">
         <img src="https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=for-the-badge" alt="Chat on Gitter" />
     </a>
-    <a href="https://travis-ci.org/colatkinson/bitname-cli">
-        <img src="https://img.shields.io/travis/colatkinson/bitname-cli/master.svg?style=for-the-badge" alt="Travis" />
+    <a href="https://travis-ci.org/bitname-protocol/bitname-cli">
+        <img src="https://img.shields.io/travis/bitname-protocol/bitname-cli/master.svg?style=for-the-badge" alt="Travis" />
     </a>
-    <a href="https://codecov.io/gh/colatkinson/bitname-cli">
-        <img src="https://img.shields.io/codecov/c/github/colatkinson/bitname-cli/master.svg?style=for-the-badge" alt="Codecov" />
+    <a href="https://codecov.io/gh/bitname-protocol/bitname-cli">
+        <img src="https://img.shields.io/codecov/c/github/bitname-protocol/bitname-cli/master.svg?style=for-the-badge" alt="Codecov" />
     </a>
-    <a href="https://waffle.io/colatkinson/bitname-cli">
-        <img src="https://img.shields.io/github/issues/colatkinson/bitname-cli.svg?style=for-the-badge" alt="Issues" />
+    <a href="https://waffle.io/bitname-protocol/bitname-cli">
+        <img src="https://img.shields.io/github/issues/bitname-protocol/bitname-cli.svg?style=for-the-badge" alt="Issues" />
     </a>
     <a href="https://www.gnu.org/licenses/lgpl.html">
-        <img src="https://img.shields.io/github/license/colatkinson/bitname-cli.svg?style=for-the-badge" alt="License" />
+        <img src="https://img.shields.io/github/license/bitname-protocol/bitname-cli.svg?style=for-the-badge" alt="License" />
     </a>
 </p>
 
@@ -33,7 +33,7 @@ This is a proof-of-concept CLI tool to create and parse this data.
 ## Installation
 
 ```bash
-git clone https://github.com/colatkinson/bitname-cli.git
+git clone https://github.com/bitname-protocol/bitname-cli.git
 cd bitname-cli
 ```
 
