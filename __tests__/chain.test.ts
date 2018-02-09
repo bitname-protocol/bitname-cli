@@ -16,18 +16,18 @@ import { genCommitTx, genLockTx, genUnlockTx } from '../lib/txs';
 
 describe('chain state', () => {
     it('finds the one current name', async () => {
-        const servicePubKey = Buffer.from('0320263f7b82e3885d89be9ef997b3d0fe80c5799ac6656884a49f3ec184746d93', 'hex');
-        const userPubKey = Buffer.from('03c7ea37388348c29a52cbc02fc29bc85d7962c1eb4f72fe57d44b5cbe619b34c1', 'hex');
+        const servicePubKey = Buffer.from('02875b39c2d0afb1596b807b40d8faa4fe8ff4142034453c5791775970a8ea8a69', 'hex');
+        const userPubKey = Buffer.from('03dab567879b8aed0cc4971cf6a9a4f891a61e5e49184bc7c5fbe5c0334a40313d', 'hex');
 
         const addr = Address.fromPubkeyhash(crypto.hash160(servicePubKey));
         const txList = await getAllTX(addr, 'testnet');
 
-        const info = extractInfo(txList, servicePubKey, 1260170);
+        const info = extractInfo(txList, servicePubKey, 8);
 
         const expectedInfo = {
             colin: {
-                txid: 'a066cf6ddeded4f7185d264466f5401e3bff96efaafa0b404c33fe2874d828f1',
-                expires: 1260172,
+                txid: '5601e1013d2f528aee1dd548e84ee657c7fbfae25c5b85e8e8bae8c25dbf0411',
+                expires: 66080,
                 pubKey: userPubKey,
             },
         };

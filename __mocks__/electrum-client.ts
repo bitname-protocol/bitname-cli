@@ -9,10 +9,17 @@ interface IUtxo {
     height: number;
 }
 
+interface IHistory {
+    height: number;
+    tx_hash: string;
+}
+
 // tslint:disable-next-line:no-var-requires
-const unspentTxs: {[hash: string]: string} = require('./unspent_txs.json');
+const unspentTxs: {[hash: string]: string} = require('./txs.json');
 // tslint:disable-next-line:no-var-requires
 const unspentShort: {[addr: string]: IUtxo[]} = require('./unspent.json');
+// tslint:disable-next-line:no-var-requires
+const history: {[addr: string]: IHistory[]} = require('./history.json');
 
 const broadcast = jest.fn().mockImplementation(async (rawtx: string) => {
     try {
@@ -74,6 +81,15 @@ class ElectrumClient {
 
         return unspentShort[address];
     }
+
+    public async blockchainAddress_getHistory(address: string): Promise<IHistory[]> {
+        if (!(address in history)) {
+            return [];
+        }
+
+        return history[address];
+    }
+
     public async blockchainTransaction_get(txHash: string, height?: number): Promise<string> {
         if (!(txHash in unspentTxs)) {
             throw {
