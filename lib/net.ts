@@ -49,6 +49,11 @@ async function getFeesSatoshiPerKB(network: string): Promise<number> {
     return feeRateSat;
 }
 
+/**
+ * Get the current block height of the specified network
+ * @param network The network for which to check the height
+ * @returns The current block height
+ */
 async function getBlockHeight(network: string): Promise<number> {
     const [server, port] = selectServer(network);
 
@@ -65,6 +70,13 @@ async function getBlockHeight(network: string): Promise<number> {
     return data.block_height;
 }
 
+/**
+ * Given a target value, generate a list of Coins that provide sufficient funding for this
+ * @param addr The controlling address to check
+ * @param target The target value to reach
+ * @param network The network on which the transaction will occur
+ * @returns A list of Coins with total value greater than or equal to target
+ */
 async function fundTx(addr: Address, target: number, network: string): Promise<Coin[]> {
     const coins: Coin[] = [];
 
