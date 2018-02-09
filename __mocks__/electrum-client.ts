@@ -52,7 +52,11 @@ class ElectrumClient {
     }
     public async blockchainTransaction_get(txHash: string, height?: number): Promise<string> {
         if (!(txHash in unspentTxs)) {
-            throw new Error('Unknown transaction');
+            throw {
+                // tslint:disable-next-line:max-line-length
+                message: 'daemon error: {\'code\': -5, \'message\': \'No such mempool or blockchain transaction. Use gettransaction for wallet transactions.\'}',
+                code: -1,
+            };
         }
 
         return unspentTxs[txHash];

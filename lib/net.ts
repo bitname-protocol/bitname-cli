@@ -104,7 +104,7 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
 
     for (const tx of txs) {
         // Now get the full tx for each utxo
-        const rawTx  = await ecl.blockchainTransaction_get(tx.tx_hash, 1);
+        const rawTx  = await ecl.blockchainTransaction_get(tx.tx_hash);
         const fullTx = TX.fromRaw(rawTx, 'hex');
 
         // Create a Coin referencing the given output number
@@ -144,12 +144,28 @@ async function getAllTX(addr: Address, network: string): Promise<TXList> {
     return new TXList(txs, outputsSpent, heights);
 }
 
+/**
+ * Get a full tx by its txid
+ * @param txid The little-endian txid for which to search
+ * @param network The network on which the tx took place
+ * @returns A TX object for this tx
+ * @throws If the txid is not found
+ */
 async function getTX(txid: string, network: string): Promise<TX> {
-    const txData = await fetchTX(txid, network);
+    const [server, port] = selectServer(network);
 
-    const hex = txData.hex;
+    const ecl = new ElectrumClient(port, server, 'tls');
+    await ecl.connect();
 
-    return TX.fromRaw(Buffer.from(hex, 'hex'));
+    // Must use protocol >= 1.1
+    await ecl.server_version('3.0.5', '1.1');
+
+    const rawTx  = await ecl.blockchainTransaction_get(txid);
+    const fullTx = TX.fromRaw(rawTx, 'hex');
+
+    await ecl.close();
+
+    return fullTx;
 }
 
 async function postTX(tx: TX, network: string): Promise<void> {
