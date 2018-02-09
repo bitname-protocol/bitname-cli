@@ -13,8 +13,6 @@ import TXList from './TXList';
 
 const revHex = util.revHex;
 
-import { fetchUnspentTX, fetchAllTX, fetchMetadata, fetchTX, fetchPostTX } from './netUtils';
-
 function selectServer(network: string): [string, number] {
     if (network === 'testnet') {
         return ['testnet.qtornado.com', 51002];

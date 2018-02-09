@@ -1,7 +1,3 @@
-jest.mock('../lib/netUtils');
-
-import { fetchUnspentTX, fetchAllTX } from '../lib/netUtils';
-
 import { fundTx, getAllTX, getFeesSatoshiPerKB, getBlockHeight, getTX, postTX } from '../lib/net';
 
 import ElectrumClient = require('electrum-client');

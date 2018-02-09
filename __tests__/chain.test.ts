@@ -1,6 +1,3 @@
-jest.mock('../lib/netUtils');
-import { fetchUnspentTX, fetchAllTX } from '../lib/netUtils';
-
 import {
     address as Address,
     keyring as KeyRing,
