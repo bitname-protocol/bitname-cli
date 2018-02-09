@@ -24,6 +24,7 @@ declare module 'electrum-client' {
         public blockchainAddress_listunspent(address: string): Promise<utxo[]>;
         public blockchainTransaction_get(tx_hash: string, height?: number): Promise<string>;
         public blockchainTransaction_broadcast(rawtx: string): Promise<string>;
+        public blockchainAddress_getHistory(address: string): Promise<{height: number, tx_hash: string}[]>;
 
         public connect(): Promise<void>;
         public close(): Promise<void>;

@@ -129,17 +129,57 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
 }
 
 async function getAllTX(addr: Address, network: string): Promise<TXList> {
-    const txData = await fetchAllTX(addr, network);
+    const [server, port] = selectServer(network);
 
-    const confirmedOnly = txData.filter((data) => data.block_height > 0);
+    const ecl = new ElectrumClient(port, server, 'tls');
+    await ecl.connect();
 
-    const txs: TX[] = confirmedOnly.map((tx) => TX.fromRaw(Buffer.from(tx.hex, 'hex')));
+    // Must use protocol >= 1.1
+    await ecl.server_version('3.0.5', '1.1');
 
-    const outputsSpent: boolean[][] = confirmedOnly.map((tx) => {
-        return tx.outputs.map((out: object) => out.hasOwnProperty('spent_by'));
-    });
+    const origTxs = await ecl.blockchainAddress_getHistory(addr.toBase58(network));
 
-    const heights: number[] = confirmedOnly.map((tx) => tx.block_height);
+    const confirmedOnly = origTxs.filter((data) => data.height > 0);
+
+    const txs: TX[] = await Promise.all(confirmedOnly.map(async (tx) => {
+        const rawTx  = await ecl.blockchainTransaction_get(tx.tx_hash);
+        const fullTx = TX.fromRaw(rawTx, 'hex');
+
+        return fullTx;
+    }));
+
+    const unspents: {[addr: string]: {[txidOutput: string]: boolean}} = {};
+
+    // Iterate over all txs
+    const outputsSpent: boolean[][] = await Promise.all(txs.map(async (tx) => {
+        // Iterate over each output
+        return await Promise.all(tx.outputs.map(async (out, ind) => {
+            const outAddrObj = out.getAddress();
+            if (outAddrObj === null) {
+                return false;
+            }
+
+            const outAddr = outAddrObj.toBase58(network);
+
+            // If the utxos for this address aren't yet known, fetch and add them
+            if (!(outAddr in unspents)) {
+                // Due to async nature of await, must add this or there is a race condition
+                unspents[outAddr] = {};
+                const remoteUtxos = await ecl.blockchainAddress_listunspent(outAddr);
+
+                unspents[outAddr] = remoteUtxos.reduce((acc, cur) => {
+                    acc[cur.tx_hash + ':' + cur.tx_pos] = true;
+                    return acc;
+                }, {} as {[txidOutput: string]: boolean});
+            }
+
+            return !((tx.txid() + ':' + ind) in unspents[outAddr]);
+        }));
+    }));
+
+    const heights = confirmedOnly.map((tx) => tx.height);
+
+    await ecl.close();
 
     return new TXList(txs, outputsSpent, heights);
 }
