@@ -160,7 +160,7 @@ async function getTX(txid: string, network: string): Promise<TX> {
     // Must use protocol >= 1.1
     await ecl.server_version('3.0.5', '1.1');
 
-    const rawTx  = await ecl.blockchainTransaction_get(txid);
+    const rawTx = await ecl.blockchainTransaction_get(txid);
     const fullTx = TX.fromRaw(rawTx, 'hex');
 
     await ecl.close();
@@ -168,8 +168,28 @@ async function getTX(txid: string, network: string): Promise<TX> {
     return fullTx;
 }
 
+/**
+ * Publish a signed tx to the network
+ * @param tx The raw transaction to publish
+ * @param network The network to which to publish
+ * @throws If publishing encountered an error
+ */
 async function postTX(tx: TX, network: string): Promise<void> {
-    await fetchPostTX(tx.toRaw().toString('hex'), network);
+    const [server, port] = selectServer(network);
+
+    const ecl = new ElectrumClient(port, server, 'tls');
+    await ecl.connect();
+
+    // Must use protocol >= 1.1
+    await ecl.server_version('3.0.5', '1.1');
+
+    const rawTx = tx.toRaw().toString('hex');
+
+    try {
+        await ecl.blockchainTransaction_broadcast(rawTx);
+    } finally {
+        await ecl.close();
+    }
 }
 
 export {

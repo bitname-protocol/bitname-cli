@@ -190,6 +190,7 @@ declare module 'bcoin' {
         toRaw(): Buffer;
 
         hash(enc?: string): Hash;
+        txid(): Hash;
 
         inputs: input[];
         outputs: output[];

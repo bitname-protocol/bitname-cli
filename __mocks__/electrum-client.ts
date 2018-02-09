@@ -1,3 +1,7 @@
+import {
+    tx as TX,
+} from 'bcoin';
+
 interface IUtxo {
     tx_pos: number;
     value: number;
@@ -10,7 +14,27 @@ const unspentTxs: {[hash: string]: string} = require('./unspent_txs.json');
 // tslint:disable-next-line:no-var-requires
 const unspentShort: {[addr: string]: IUtxo[]} = require('./unspent.json');
 
+const broadcast = jest.fn().mockImplementation(async (rawtx: string) => {
+    try {
+        const tx = TX.fromRaw(rawtx, 'hex');
+
+        if (tx.txid() === 'd21633ba23f70118185227be58a63527675641ad37967e2aa461559f577aec43') {
+            throw new Error('blank tx');
+        }
+
+        return tx.txid();
+    } catch (e) {
+        throw {
+            message: 'the transaction was rejected by network rules.\n\nTX decode failed\n[69]',
+            code: -1,
+        };
+    }
+});
+
 class ElectrumClient {
+    // tslint:disable-next-line:variable-name
+    public blockchainTransaction_broadcast = broadcast;
+
     constructor(port: number, host: string, protocol: string, options?: any) {
         return;
     }
