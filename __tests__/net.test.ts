@@ -2,7 +2,7 @@ jest.mock('../lib/netUtils');
 
 import { fetchUnspentTX, fetchAllTX } from '../lib/netUtils';
 
-import { fundTx, getAllTX, getFeesSatoshiPerKB, getBlockHeight } from '../lib/net';
+import { fundTx, getAllTX, getFeesSatoshiPerKB, getBlockHeight, getTX } from '../lib/net';
 
 jest.mock('electrum-client');
 
@@ -50,6 +50,19 @@ describe('network data', () => {
         const addrStr = '14qyvufyTr9j52SPaXN1iY18vE8nyXi37b';
         const addr = Address.fromBase58(addrStr);
         expect(fundTx(addr, 2024152, 'main')).rejects.toThrow(`No unspent txs found for ${addrStr}`);
+    });
+
+    it('gets a valid txid', async () => {
+        const txid = 'bae2969230ac7104db17a2de96d4dd5c069acd9db49b40540cb24ff70c61e875';
+        const fullTx = await getTX(txid, 'testnet');
+
+        expect(fullTx.toRaw()).toMatchSnapshot();
+    });
+
+    it('throws if an unknown txid is found', async () => {
+        const txid = '1111111111111111111111111111111111111111111111111111111111111111';
+
+        expect(getTX(txid, 'testnet')).rejects.toThrow();
     });
 
     it('generates a tx list from network data', async () => {
