@@ -126,6 +126,12 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
     return coins;
 }
 
+/**
+ * Get all transactions with a given address as an input or output
+ * @param addr The address to query
+ * @param network The network about which to get information
+ * @returns A TXList containing all of these transactions
+ */
 async function getAllTX(addr: Address, network: string): Promise<TXList> {
     const [server, port] = selectServer(network);
 
