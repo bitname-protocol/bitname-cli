@@ -13,15 +13,55 @@ import TXList from './TXList';
 
 const revHex = util.revHex;
 
+interface IServerList {
+    [url: string]: {
+        t?: string;
+        s?: string;
+        pruning?: string;
+        version?: string;
+    };
+}
+
+// tslint:disable-next-line:no-var-requires
+const servers: IServerList = require('../data/servers.json');
+// tslint:disable-next-line:no-var-requires
+const testServers: IServerList = require('../data/servers_testnet.json');
+
 function selectServer(network: string): [string, number] {
+    // Choose whether testnet or mainnet
+    let list: IServerList;
     if (network === 'testnet') {
-        return ['testnet.qtornado.com', 51002];
+        list = testServers;
     } else if (network === 'main') {
-        return ['bitcoins.sk', 50002];
+        list = servers;
     } else {
         throw new Error(`Unknown network '${network}'`);
     }
+
+    let ret: [string, number] | null = null;
+
+    const keys = Object.keys(list);
+
+    // Only select servers that have a tls interface
+    while (ret === null) {
+        // Choose a random server
+        const randKey = keys[Math.floor(keys.length * Math.random())];
+
+        const randServer = list[randKey];
+
+        if (typeof(randServer.s) === 'undefined') {
+            continue;
+        }
+
+        ret = [randKey, Number.parseInt(randServer.s)];
+    }
+
+    return ret;
 }
+
+// TODO: Define a unified function for connecting to a server
+//       That way, it can attempt a fixed number of times
+//       And exclude already-attempted servers
 
 /**
  * Get the estimated fee to have a transaction confirmed in 2 blocks in sat/kb
