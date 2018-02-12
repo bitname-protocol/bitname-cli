@@ -100,7 +100,6 @@ async function commit(argv: yargs.Arguments) {
                 await postTX(commitTx, net);
                 console.log(txidStr);
             } catch (err) {
-                console.log(err);
                 return errorCantPush();
             }
         } else {

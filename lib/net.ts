@@ -27,27 +27,37 @@ const servers: IServerList = require('../data/servers.json');
 // tslint:disable-next-line:no-var-requires
 const testServers: IServerList = require('../data/servers_testnet.json');
 
-function selectServer(network: string): [string, number] {
-    // Choose whether testnet or mainnet
-    let list: IServerList;
+/**
+ * Return an appropriate list of default servers for a given network
+ * @param network The current network
+ * @returns A list of electrum servers
+ */
+function getServerList(network: string): IServerList {
     if (network === 'testnet') {
-        list = testServers;
+        return JSON.parse(JSON.stringify(testServers));
     } else if (network === 'main') {
-        list = servers;
+        return JSON.parse(JSON.stringify(servers));
     } else {
         throw new Error(`Unknown network '${network}'`);
     }
+}
 
+/**
+ * Select a server at random from a given list of servers
+ * @param serverList The list of servers to select from
+ * @returns A tuple of the server's url and ssl port number
+ */
+function selectRandomServer(serverList: IServerList): [string, number] {
     let ret: [string, number] | null = null;
 
-    const keys = Object.keys(list);
+    const keys = Object.keys(serverList);
 
     // Only select servers that have a tls interface
     while (ret === null) {
         // Choose a random server
         const randKey = keys[Math.floor(keys.length * Math.random())];
 
-        const randServer = list[randKey];
+        const randServer = serverList[randKey];
 
         if (typeof(randServer.s) === 'undefined') {
             continue;
@@ -59,9 +69,34 @@ function selectServer(network: string): [string, number] {
     return ret;
 }
 
-// TODO: Define a unified function for connecting to a server
-//       That way, it can attempt a fixed number of times
-//       And exclude already-attempted servers
+/**
+ * Randomly select a server and attempt to connect to it
+ * @param network The current network
+ * @returns A connected server
+ */
+async function serverConnect(network: string): Promise<ElectrumClient> {
+    const serverList = getServerList(network);
+
+    for (let i = 0; i < 5; ++i) {
+        const [url, port] = selectRandomServer(serverList);
+
+        try {
+            const ecl = new ElectrumClient(port, url, 'tls');
+            await ecl.connect();
+
+            // Must use protocol >= 1.1
+            await ecl.server_version('3.0.5', '1.1');
+
+            return ecl;
+        } catch (e) {
+            delete serverList[url];
+        }
+    }
+
+    throw new Error('Could not connect to a server');
+}
+
+// TODO: Define a class that manages server connections
 
 /**
  * Get the estimated fee to have a transaction confirmed in 2 blocks in sat/kb
@@ -69,15 +104,14 @@ function selectServer(network: string): [string, number] {
  * @returns The estimated fee in sat/kb
  */
 async function getFeesSatoshiPerKB(network: string): Promise<number> {
-    const [server, port] = selectServer(network);
-
-    const ecl = new ElectrumClient(port, server, 'tls');
-    await ecl.connect();
-
-    // Must use protocol >= 1.1
-    await ecl.server_version('3.0.5', '1.1');
+    const ecl = await serverConnect(network);
 
     const feeRate = await ecl.blockchainEstimatefee(2);
+
+    if (feeRate < 0) {
+        await ecl.close();
+        throw new Error('Bad fee rate');
+    }
 
     // Electrum returns BTC/kb, and we want sat/kb
     const feeRateSat = Amount.fromBTC(feeRate).toSatoshis(true) as number;
@@ -93,13 +127,7 @@ async function getFeesSatoshiPerKB(network: string): Promise<number> {
  * @returns The current block height
  */
 async function getBlockHeight(network: string): Promise<number> {
-    const [server, port] = selectServer(network);
-
-    const ecl = new ElectrumClient(port, server, 'tls');
-    await ecl.connect();
-
-    // Must use protocol >= 1.1
-    await ecl.server_version('3.0.5', '1.1');
+    const ecl = await serverConnect(network);
 
     const data = await ecl.blockchainHeaders_subscribe();
 
@@ -118,13 +146,7 @@ async function getBlockHeight(network: string): Promise<number> {
 async function fundTx(addr: Address, target: number, network: string): Promise<Coin[]> {
     const coins: Coin[] = [];
 
-    const [server, port] = selectServer(network);
-
-    const ecl = new ElectrumClient(port, server, 'tls');
-    await ecl.connect();
-
-    // Must use protocol >= 1.1
-    await ecl.server_version('3.0.5', '1.1');
+    const ecl = await serverConnect(network);
 
     const txs = await ecl.blockchainAddress_listunspent(addr.toBase58(network));
 
@@ -173,13 +195,7 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
  * @returns A TXList containing all of these transactions
  */
 async function getAllTX(addr: Address, network: string): Promise<TXList> {
-    const [server, port] = selectServer(network);
-
-    const ecl = new ElectrumClient(port, server, 'tls');
-    await ecl.connect();
-
-    // Must use protocol >= 1.1
-    await ecl.server_version('3.0.5', '1.1');
+    const ecl = await serverConnect(network);
 
     const origTxs = await ecl.blockchainAddress_getHistory(addr.toBase58(network));
 
@@ -236,13 +252,7 @@ async function getAllTX(addr: Address, network: string): Promise<TXList> {
  * @throws If the txid is not found
  */
 async function getTX(txid: string, network: string): Promise<TX> {
-    const [server, port] = selectServer(network);
-
-    const ecl = new ElectrumClient(port, server, 'tls');
-    await ecl.connect();
-
-    // Must use protocol >= 1.1
-    await ecl.server_version('3.0.5', '1.1');
+    const ecl = await serverConnect(network);
 
     const rawTx = await ecl.blockchainTransaction_get(txid);
     const fullTx = TX.fromRaw(rawTx, 'hex');
@@ -259,13 +269,7 @@ async function getTX(txid: string, network: string): Promise<TX> {
  * @throws If publishing encountered an error
  */
 async function postTX(tx: TX, network: string): Promise<void> {
-    const [server, port] = selectServer(network);
-
-    const ecl = new ElectrumClient(port, server, 'tls');
-    await ecl.connect();
-
-    // Must use protocol >= 1.1
-    await ecl.server_version('3.0.5', '1.1');
+    const ecl = await serverConnect(network);
 
     const rawTx = tx.toRaw().toString('hex');
 
