@@ -80,15 +80,23 @@ async function serverConnect(network: string): Promise<ElectrumClient> {
     for (let i = 0; i < 5; ++i) {
         const [url, port] = selectRandomServer(serverList);
 
+        const ecl = new ElectrumClient(port, url, 'tls');
+
         try {
-            const ecl = new ElectrumClient(port, url, 'tls');
             await ecl.connect();
 
             // Must use protocol >= 1.1
             await ecl.server_version('3.0.5', '1.1');
 
+            // Must support fee estimation
+            const feeRate = await ecl.blockchainEstimatefee(2);
+            if (feeRate < 0) {
+                throw new Error('Server does not support fee estimation');
+            }
+
             return ecl;
         } catch (e) {
+            await ecl.close();
             delete serverList[url];
         }
     }
