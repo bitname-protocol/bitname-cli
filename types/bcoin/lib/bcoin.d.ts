@@ -113,6 +113,7 @@ declare module 'bcoin' {
         static fromRaw(data: Buffer | string, enc?: string): script;
         static fromMultisig(m: number, n: number, keys: Buffer[]): script;
         hash160(data?: string): Hash;
+        public sha256(enc?: string): Hash;
 
         pushSym(sym: string): script;
         pushData(data: Buffer): script;

@@ -153,6 +153,12 @@ async function getBlockHeight(network: string): Promise<number> {
     return data.block_height;
 }
 
+function addrToScriptHash(addr: Address): string {
+    const script = Script.fromAddress(addr);
+    const origHash = script.sha256('hex') as string;
+    return revHex(origHash);
+}
+
 /**
  * Given a target value, generate a list of Coins that provide sufficient funding for this
  * @param addr The controlling address to check
@@ -165,7 +171,8 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
 
     const ecl = await serverConnect(network);
 
-    const txs = await ecl.blockchainAddress_listunspent(addr.toBase58(network));
+    const hash = addrToScriptHash(addr);
+    const txs = await ecl.blockchainScripthash_listunspent(addrToScriptHash(addr));
 
     if (txs.length === 0) {
         await ecl.close();
