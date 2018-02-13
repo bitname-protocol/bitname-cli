@@ -2,8 +2,6 @@ import { fundTx, getAllTX, getFeesSatoshiPerKB, getBlockHeight, getTX, postTX } 
 
 import ElectrumClient = require('electrum-client');
 
-jest.mock('electrum-client');
-
 import { address as Address, tx as TX } from 'bcoin';
 
 describe('network data', () => {
