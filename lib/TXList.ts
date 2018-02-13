@@ -4,6 +4,8 @@ import {
 } from 'bcoin';
 
 export default class TXList {
+
+
     private readonly txs: {
         readonly [key: string]: TX;
     };
@@ -52,6 +54,11 @@ export default class TXList {
         this.txids = tmpTxids;
     }
 
+
+    /**
+        Returns the transation matching the specified transaction ID.
+        @param txid is the bitcoin transaction ID
+    */
     public getTX(txid: string): TX {
         if (!this.txs.hasOwnProperty(txid)) {
             throw new Error(`Unknown txid '${txid}'`);
@@ -60,6 +67,11 @@ export default class TXList {
         return this.txs[txid];
     }
 
+    /**
+        Returns whether the specified output of the specified transaction has been spent.
+        @param txid is the bitcoin transaction ID.
+        @param output is the specified output we wish to monitor. 
+    */
     public getOutputSpent(txid: string, output: number): boolean {
         if (!this.spent.hasOwnProperty(txid)) {
             throw new Error(`Unknown txid '${txid}'`);
@@ -74,6 +86,10 @@ export default class TXList {
         return txSpent[output];
     }
 
+    /**
+        Returns the height of the transaction within the blockchain.
+        @param txid is the bitcoin transaction ID
+    */
     public getHeight(txid: string): number {
         if (!this.heights.hasOwnProperty(txid)) {
             throw new Error(`Unknown txid '${txid}'`);
@@ -82,6 +98,9 @@ export default class TXList {
         return this.heights[txid];
     }
 
+    /**
+        Returns the list of transactions  
+    */
     public getTxids(): ReadonlyArray<string> {
         return this.txids;
     }
