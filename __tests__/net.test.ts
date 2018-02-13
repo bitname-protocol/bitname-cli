@@ -41,13 +41,13 @@ describe('network data', () => {
 
     it('errors if there are insufficient funds for a tx', async () => {
         const addr = Address.fromBase58('muYWRM71cj5LH1aJ16FLFP2PHn2SHs3FpA');
-        expect(fundTx(addr, 2024152, 'testnet')).rejects.toThrow('Insufficient funds available');
+        await expect(fundTx(addr, 2024152, 'testnet')).rejects.toThrow('Insufficient funds available');
     });
 
     it('errors if there are no funds for a tx', async () => {
         const addrStr = '14qyvufyTr9j52SPaXN1iY18vE8nyXi37b';
         const addr = Address.fromBase58(addrStr);
-        expect(fundTx(addr, 2024152, 'main')).rejects.toThrow(`No unspent txs found for ${addrStr}`);
+        await expect(fundTx(addr, 2024152, 'main')).rejects.toThrow(`No unspent txs found for ${addrStr}`);
     });
 
     it('gets a valid txid', async () => {
@@ -60,7 +60,7 @@ describe('network data', () => {
     it('throws if an unknown txid is found', async () => {
         const txid = '1111111111111111111111111111111111111111111111111111111111111111';
 
-        expect(getTX(txid, 'testnet')).rejects.toThrow();
+        await expect(getTX(txid, 'testnet')).rejects.toThrow();
     });
 
     it('publishes a valid transaction', async () => {
@@ -79,7 +79,7 @@ describe('network data', () => {
     it('errors on an invalid transaction', async () => {
         const blankTx = new TX();
 
-        expect(postTX(blankTx, 'testnet')).rejects.toThrow();
+        await expect(postTX(blankTx, 'testnet')).rejects.toThrow();
     });
 
     it('generates a tx list from network data', async () => {

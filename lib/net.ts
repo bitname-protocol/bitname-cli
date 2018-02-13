@@ -42,31 +42,33 @@ function getServerList(network: string): IServerList {
     }
 }
 
+function shuffle(a: any[]) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
 /**
  * Select a server at random from a given list of servers
  * @param serverList The list of servers to select from
  * @returns A tuple of the server's url and ssl port number
  */
 function selectRandomServer(serverList: IServerList): [string, number] {
-    let ret: [string, number] | null = null;
+    const keys = shuffle(Object.keys(serverList));
 
-    const keys = Object.keys(serverList);
-
-    // Only select servers that have a tls interface
-    while (ret === null) {
-        // Choose a random server
-        const randKey = keys[Math.floor(keys.length * Math.random())];
-
+    for (const randKey of keys) {
         const randServer = serverList[randKey];
 
         if (typeof(randServer.s) === 'undefined') {
             continue;
         }
 
-        ret = [randKey, Number.parseInt(randServer.s)];
+        return [randKey, Number.parseInt(randServer.s)];
     }
 
-    return ret;
+    throw new Error('No valid servers');
 }
 
 /**
