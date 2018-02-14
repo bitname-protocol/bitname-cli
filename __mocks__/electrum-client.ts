@@ -1,5 +1,8 @@
 import {
     tx as TX,
+    address as Address,
+    script as Script,
+    util,
 } from 'bcoin';
 
 interface IUtxo {
@@ -38,6 +41,13 @@ const broadcast = jest.fn().mockImplementation(async (rawtx: string) => {
     }
 });
 
+function addrStrToScriptHash(addrStr: string): string {
+    const addr = Address.fromBase58(addrStr);
+    const script = Script.fromAddress(addr);
+    const origHash = script.sha256('hex') as string;
+    return util.revHex(origHash);
+}
+
 class ElectrumClient {
     // tslint:disable-next-line:variable-name
     public blockchainTransaction_broadcast = broadcast;
@@ -74,20 +84,30 @@ class ElectrumClient {
         };
     }
 
-    public async blockchainAddress_listunspent(address: string): Promise<IUtxo[]> {
-        if (!(address in unspentShort)) {
+    public async blockchainScripthash_listunspent(scripthash: string): Promise<IUtxo[]> {
+        if (!(scripthash in unspentShort)) {
             return [];
         }
 
-        return unspentShort[address];
+        return unspentShort[scripthash];
+    }
+
+    public async blockchainAddress_listunspent(address: string): Promise<IUtxo[]> {
+        const scripthash = addrStrToScriptHash(address);
+        return await this.blockchainScripthash_listunspent(scripthash);
+    }
+
+    public async blockchainScripthash_getHistory(scripthash: string): Promise<IHistory[]> {
+        if (!(scripthash in history)) {
+            return [];
+        }
+
+        return history[scripthash];
     }
 
     public async blockchainAddress_getHistory(address: string): Promise<IHistory[]> {
-        if (!(address in history)) {
-            return [];
-        }
-
-        return history[address];
+        const scripthash = addrStrToScriptHash(address);
+        return await this.blockchainScripthash_getHistory(scripthash);
     }
 
     public async blockchainTransaction_get(txHash: string, height?: number): Promise<string> {
