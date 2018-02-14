@@ -171,8 +171,8 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
 
     const ecl = await serverConnect(network);
 
-    const hash = addrToScriptHash(addr);
-    const txs = await ecl.blockchainScripthash_listunspent(addrToScriptHash(addr));
+    const scripthash = addrToScriptHash(addr);
+    const txs = await ecl.blockchainScripthash_listunspent(scripthash);
 
     if (txs.length === 0) {
         await ecl.close();
@@ -221,7 +221,8 @@ async function fundTx(addr: Address, target: number, network: string): Promise<C
 async function getAllTX(addr: Address, network: string): Promise<TXList> {
     const ecl = await serverConnect(network);
 
-    const origTxs = await ecl.blockchainAddress_getHistory(addr.toBase58(network));
+    const scripthash = addrToScriptHash(addr);
+    const origTxs = await ecl.blockchainScripthash_getHistory(scripthash);
 
     const confirmedOnly = origTxs.filter((data) => data.height > 0);
 
@@ -249,7 +250,9 @@ async function getAllTX(addr: Address, network: string): Promise<TXList> {
             if (!(outAddr in unspents)) {
                 // Due to async nature of await, must add this or there is a race condition
                 unspents[outAddr] = {};
-                const remoteUtxos = await ecl.blockchainAddress_listunspent(outAddr);
+
+                const outAddrScripthash = addrToScriptHash(outAddrObj);
+                const remoteUtxos = await ecl.blockchainScripthash_listunspent(outAddrScripthash);
 
                 unspents[outAddr] = remoteUtxos.reduce((acc, cur) => {
                     acc[cur.tx_hash + ':' + cur.tx_pos] = true;
