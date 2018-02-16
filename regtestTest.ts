@@ -16,6 +16,9 @@ const addr = ring.getAddress().toBase58('testnet');
 const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
 const serviceRing = KeyRing.fromSecret(serviceWif);
 const servicePubKey = serviceRing.getPublicKey();
+// console.log(serviceRing.getAddress().toBase58('testnet'));
+console.log(ring.getPublicKey().toString('hex'));
+console.log(servicePubKey.toString('hex'));
 
 child_process.exec(`bitcoin-cli -regtest listunspent 0 9999999 "[\\"${addr}\\"]"`, (err, stdout, stderr) => {
     if (err) {
