@@ -360,7 +360,7 @@ function main() {
                 })
                 .positional('locktime', {
                     type: 'number',
-                    describe: 'how many blocks (up to 65535) to hold the name for',
+                    describe: 'the block height (up to 499999999) until which the name should be valid',
                 })
                 .option('wif', {
                     alias: 'w',
@@ -390,7 +390,7 @@ function main() {
                 })
                 .positional('locktime', {
                     type: 'number',
-                    describe: 'how many blocks (up to 65535) to hold the name for',
+                    describe: 'the block height (up to 499999999) until which the name should be valid',
                 })
                 .option('wif', {
                     alias: 'w',
