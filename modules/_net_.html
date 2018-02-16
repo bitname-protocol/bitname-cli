@@ -69,20 +69,33 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section tsd-is-not-exported">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_net_.iserverlist.html" class="tsd-kind-icon">IServer<wbr>List</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-not-exported">
 							<h3>Variables</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#revhex" class="tsd-kind-icon">rev<wbr>Hex</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#servers" class="tsd-kind-icon">servers</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#testservers" class="tsd-kind-icon">test<wbr>Servers</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-not-exported">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#addrtoscripthash" class="tsd-kind-icon">addr<wbr>ToScript<wbr>Hash</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#fundtx" class="tsd-kind-icon">fund<wbr>Tx</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#getalltx" class="tsd-kind-icon">get<wbr>AllTX</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#getblockheight" class="tsd-kind-icon">get<wbr>Block<wbr>Height</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#getfeessatoshiperkb" class="tsd-kind-icon">get<wbr>Fees<wbr>Satoshi<wbr>PerKB</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#getserverlist" class="tsd-kind-icon">get<wbr>Server<wbr>List</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#gettx" class="tsd-kind-icon">getTX</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#posttx" class="tsd-kind-icon">postTX</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#selectrandomserver" class="tsd-kind-icon">select<wbr>Random<wbr>Server</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#serverconnect" class="tsd-kind-icon">server<wbr>Connect</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_net_.html#shuffle" class="tsd-kind-icon">shuffle</a></li>
 							</ul>
 						</section>
 					</div>
@@ -96,13 +109,56 @@
 					<div class="tsd-signature tsd-kind-icon">rev<wbr>Hex<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> =&nbsp;util.revHex</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/428d874/lib/net.ts#L12">net.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L14">net.ts:14</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="servers" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> servers</h3>
+					<div class="tsd-signature tsd-kind-icon">servers<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_net_.iserverlist.html" class="tsd-signature-type">IServerList</a><span class="tsd-signature-symbol"> =&nbsp;require(&#x27;../data/servers.json&#x27;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L26">net.ts:26</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="testservers" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> test<wbr>Servers</h3>
+					<div class="tsd-signature tsd-kind-icon">test<wbr>Servers<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_net_.iserverlist.html" class="tsd-signature-type">IServerList</a><span class="tsd-signature-symbol"> =&nbsp;require(&#x27;../data/servers_testnet.json&#x27;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L28">net.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
 				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="addrtoscripthash" class="tsd-anchor"></a>
+					<h3>addr<wbr>ToScript<wbr>Hash</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">addr<wbr>ToScript<wbr>Hash<span class="tsd-signature-symbol">(</span>addr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Address</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L156">net.ts:156</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>addr: <span class="tsd-signature-type">Address</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
 					<a name="fundtx" class="tsd-anchor"></a>
 					<h3>fund<wbr>Tx</h3>
@@ -113,22 +169,37 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/428d874/lib/net.ts#L28">net.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L169">net.ts:169</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Given a target value, generate a list of Coins that provide sufficient funding for this</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>addr: <span class="tsd-signature-type">Address</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The controlling address to check</p>
+									</div>
 								</li>
 								<li>
 									<h5>target: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The target value to reach</p>
+									</div>
 								</li>
 								<li>
 									<h5>network: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The network on which the transaction will occur</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Coin</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A list of Coins with total value greater than or equal to target</p>
 						</li>
 					</ul>
 				</section>
@@ -142,19 +213,31 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/428d874/lib/net.ts#L80">net.ts:80</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L221">net.ts:221</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get all transactions with a given address as an input or output</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>addr: <span class="tsd-signature-type">Address</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The address to query</p>
+									</div>
 								</li>
 								<li>
 									<h5>network: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The network about which to get information</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../classes/_txlist_.txlist.html" class="tsd-signature-type">TXList</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A TXList containing all of these transactions</p>
 						</li>
 					</ul>
 				</section>
@@ -162,22 +245,31 @@
 					<a name="getblockheight" class="tsd-anchor"></a>
 					<h3>get<wbr>Block<wbr>Height</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Block<wbr>Height<span class="tsd-signature-symbol">(</span>network<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Block<wbr>Height<span class="tsd-signature-symbol">(</span>network<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/428d874/lib/net.ts#L22">net.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L146">net.ts:146</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get the current block height of the specified network</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>network: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The network for which to check the height</p>
+									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>The current block height</p>
 						</li>
 					</ul>
 				</section>
@@ -191,16 +283,57 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/428d874/lib/net.ts#L16">net.ts:16</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L123">net.ts:123</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get the estimated fee to have a transaction confirmed in 2 blocks in sat/kb</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>network: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The network from which to get info. Currently either &#39;main&#39; or &#39;testnet&#39;</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>The estimated fee in sat/kb</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="getserverlist" class="tsd-anchor"></a>
+					<h3>get<wbr>Server<wbr>List</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Server<wbr>List<span class="tsd-signature-symbol">(</span>network<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_net_.iserverlist.html" class="tsd-signature-type">IServerList</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L35">net.ts:35</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Return an appropriate list of default servers for a given network</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>network: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The current network</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_net_.iserverlist.html" class="tsd-signature-type">IServerList</a></h4>
+							<p>A list of electrum servers</p>
 						</li>
 					</ul>
 				</section>
@@ -214,19 +347,36 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/428d874/lib/net.ts#L96">net.ts:96</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L281">net.ts:281</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get a full tx by its txid</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>If the txid is not found</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>txid: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The little-endian txid for which to search</p>
+									</div>
 								</li>
 								<li>
 									<h5>network: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The network on which the tx took place</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">TX</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A TX object for this tx</p>
 						</li>
 					</ul>
 				</section>
@@ -240,19 +390,132 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/428d874/lib/net.ts#L104">net.ts:104</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L298">net.ts:298</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Publish a signed tx to the network</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p>If publishing encountered an error</p>
+									</dd>
+								</dl>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>tx: <span class="tsd-signature-type">TX</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The raw transaction to publish</p>
+									</div>
 								</li>
 								<li>
 									<h5>network: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The network to which to publish</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="selectrandomserver" class="tsd-anchor"></a>
+					<h3>select<wbr>Random<wbr>Server</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">select<wbr>Random<wbr>Server<span class="tsd-signature-symbol">(</span>serverList<span class="tsd-signature-symbol">: </span><a href="../interfaces/_net_.iserverlist.html" class="tsd-signature-type">IServerList</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L65">net.ts:65</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Select a server at random from a given list of servers</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>serverList: <a href="../interfaces/_net_.iserverlist.html" class="tsd-signature-type">IServerList</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The list of servers to select from</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span></h4>
+							<p>A tuple of the server&#39;s url and ssl port number</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="serverconnect" class="tsd-anchor"></a>
+					<h3>server<wbr>Connect</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">server<wbr>Connect<span class="tsd-signature-symbol">(</span>network<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ElectrumClient</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L86">net.ts:86</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Randomly select a server and attempt to connect to it</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>network: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The current network</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ElectrumClient</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A connected server</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="shuffle" class="tsd-anchor"></a>
+					<h3>shuffle</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">shuffle<span class="tsd-signature-symbol">(</span>a<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/net.ts#L52">net.ts:52</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>In-place shuffle an array</p>
+								</div>
+								<p>From <a href="https://stackoverflow.com/a/6274381/721868">https://stackoverflow.com/a/6274381/721868</a></p>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>a: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The array to shuffle</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h4>
+							<p>The shuffled array</p>
 						</li>
 					</ul>
 				</section>
@@ -280,9 +543,6 @@
 						<a href="_net_.html">"net"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_netutils_.html">"net<wbr>Utils"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
 						<a href="_txs_.html">"txs"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
@@ -295,8 +555,20 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../interfaces/_net_.iserverlist.html" class="tsd-kind-icon">IServer<wbr>List</a>
+					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="_net_.html#revhex" class="tsd-kind-icon">rev<wbr>Hex</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_net_.html#servers" class="tsd-kind-icon">servers</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_net_.html#testservers" class="tsd-kind-icon">test<wbr>Servers</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_net_.html#addrtoscripthash" class="tsd-kind-icon">addr<wbr>ToScript<wbr>Hash</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="_net_.html#fundtx" class="tsd-kind-icon">fund<wbr>Tx</a>
@@ -311,10 +583,22 @@
 						<a href="_net_.html#getfeessatoshiperkb" class="tsd-kind-icon">get<wbr>Fees<wbr>Satoshi<wbr>PerKB</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_net_.html#getserverlist" class="tsd-kind-icon">get<wbr>Server<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="_net_.html#gettx" class="tsd-kind-icon">getTX</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
 						<a href="_net_.html#posttx" class="tsd-kind-icon">postTX</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_net_.html#selectrandomserver" class="tsd-kind-icon">select<wbr>Random<wbr>Server</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_net_.html#serverconnect" class="tsd-kind-icon">server<wbr>Connect</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_net_.html#shuffle" class="tsd-kind-icon">shuffle</a>
 					</li>
 				</ul>
 			</nav>
