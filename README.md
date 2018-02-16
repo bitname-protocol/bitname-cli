@@ -77,13 +77,25 @@ First, pick a service to use. Here, we will use a service with the public key
 
 This key is equivalent to the testnet address `n4QtQVZF85XXB3rPTkb4B5c8THrp8uMiMb`.
 
-Now, let's register a name! We're going to register the name 'bitname' for 60 blocks, or roughly ten hours. And we want to push this transaction to the testnet network.
+Now, let's register a name! We're going to register the name 'bitname' until block 1283165. First, we have to "commit" to the name.
 
 ```bash
-$ bitname register tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn bitname 60 -w mykey.wif --push
+$ bitname register tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn bitname 1283165 -w mykey.wif --push
 ```
 
-This will print the transaction id of your registration. You can use this to track your registration's progress on a [block explorer](https://www.blocktrail.com/tBTC). Once it's been confirmed, we can see the names currently registered with the service.
+The output of this command will be a 64-character hexadecimal string, like `8435f7d681828dd51077cf4d66b9300994b786cf8e647324f73ac31fde8bfe2c`. You can check its status on a block explorer, like [Blocktrail](https://www.blocktrail.com/tBTC). Here's the [example transaction](https://www.blocktrail.com/tBTC/tx/8435f7d681828dd51077cf4d66b9300994b786cf8e647324f73ac31fde8bfe2c).
+
+Commitment is a process by which you call "dibs" on a name, and then wait 6 blocks (~1 hour) to finalize the registration. This makes the system much more secure. Note that on testnet, the time between blocks varies a great deal, so be prepared.
+
+Once an hour has passed, we can publically register our name!
+
+```bash
+$ bitname register tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn 8435f7d681828dd51077cf4d66b9300994b786cf8e647324f73ac31fde8bfe2c bitname 1283165 -w mykey.wif --push
+```
+
+Note that the service pubkey, name, and time must match exactly. Replace the txid above with the one the commitment command output.
+
+This will print the transaction id of your registration. Once it's been confirmed, we can see the names currently registered with the service.
 
 ```bash
 $ bitname all-names tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn
