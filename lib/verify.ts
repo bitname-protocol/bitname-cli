@@ -1,5 +1,5 @@
 import {
-        tx as TX,
+    tx as TX,
     output as Output,
     address as Address,
     crypto,
@@ -13,8 +13,8 @@ import {
 } from './txs';
 
 /**
-*Returns a Boolean value that indicates if URI has and only has alphanumeric leteral and  '_',  '-', '.' '~'
-*@param {string} str The URI String
+* Returns a Boolean value that indicates if URI has and only has alphanumeric leteral and  '_',  '-', '.' '~'
+* @param str The URI String
 */
 function isURISafe(str: string): boolean {
     const re = /^[a-zA-Z0-9_\-\.\~]*$/;
@@ -22,8 +22,8 @@ function isURISafe(str: string): boolean {
 }
 
 /**
-*Returns a Boolean value indicates if transaction output is in the correct format of Opcode OP_RETURN.
-*@param {Output} output Transaction output
+* Returns a Boolean value indicates if transaction output is in the correct format of Opcode OP_RETURN.
+* @param output Transaction output
 */
 function isValidOP_RETURN(output: Output): boolean {
     // Check that output 0 is an OP_RETURN
@@ -45,12 +45,12 @@ function isValidOP_RETURN(output: Output): boolean {
 }
 
 /**
-*Returns a Boolean value indicates that whether or not the commit transaction is valid
-*@param {TX} tx The commit transaction that needs to be verified.
-*@param {Buffer} userPubKey User's public key
-*@param {Buffer} servicePubKey Service provider's public key
-*@param {string} name A name of at most 64 characters composed of URL-safe characters
-*@param {number} locktime An absolute lock time, in blockheight
+* Returns a Boolean value indicates that whether or not the commit transaction is valid
+* @param tx The commit transaction that needs to be verified.
+* @param userPubKey User's public key
+* @param servicePubKey Service provider's public key
+* @param name A name of at most 64 characters composed of URL-safe characters
+* @param locktime An absolute lock time, in blockheight
 */
 function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name: string, locktime: number): boolean {
     if (tx.outputs.length < 3) {
@@ -92,10 +92,10 @@ function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name:
 }
 
 /**
-*Returns a Boolean value indicates that whether or not the lock transaction is valid
-*@param {TX} tx The lock transaction
-*@param {TX} commitTX The corresponding commit transaction.
-*@param {Buffer} servicePubKey service provider's public key
+* Returns a Boolean value indicates that whether or not the lock transaction is valid
+* @param tx The lock transaction
+* @param commitTX The corresponding commit transaction.
+* @param servicePubKey service provider's public key
 */
 function verifyLockTX(tx: TX, commitTX: TX, servicePubKey: Buffer): boolean {
     if (tx.outputs.length < 2) {
