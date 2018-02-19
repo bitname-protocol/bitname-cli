@@ -92,13 +92,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/verify.ts#L15">verify.ts:15</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/724befb/lib/verify.ts#L19">verify.ts:19</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Boolean value that indicates if URI has and only has alphanumeric leteral and  &#39;_&#39;,  &#39;-&#39;, &#39;.&#39; &#39;~&#39;</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>str: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The URI String</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -115,13 +123,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/verify.ts#L20">verify.ts:20</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/724befb/lib/verify.ts#L28">verify.ts:28</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Boolean value indicates if transaction output is in the correct format of Opcode OP_RETURN.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>output: <span class="tsd-signature-type">Output</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Transaction output</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -138,25 +154,45 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/verify.ts#L39">verify.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/724befb/lib/verify.ts#L55">verify.ts:55</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Boolean value indicates that whether or not the commit transaction is valid</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>tx: <span class="tsd-signature-type">TX</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The commit transaction that needs to be verified.</p>
+									</div>
 								</li>
 								<li>
 									<h5>userPubKey: <span class="tsd-signature-type">Buffer</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>User&#39;s public key</p>
+									</div>
 								</li>
 								<li>
 									<h5>servicePubKey: <span class="tsd-signature-type">Buffer</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Service provider&#39;s public key</p>
+									</div>
 								</li>
 								<li>
 									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A name of at most 64 characters composed of URL-safe characters</p>
+									</div>
 								</li>
 								<li>
 									<h5>locktime: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An absolute lock time, in blockheight</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
@@ -173,19 +209,33 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/3b24903/lib/verify.ts#L78">verify.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/724befb/lib/verify.ts#L100">verify.ts:100</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Boolean value indicates that whether or not the lock transaction is valid</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>tx: <span class="tsd-signature-type">TX</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The lock transaction</p>
+									</div>
 								</li>
 								<li>
 									<h5>commitTX: <span class="tsd-signature-type">TX</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The corresponding commit transaction.</p>
+									</div>
 								</li>
 								<li>
 									<h5>servicePubKey: <span class="tsd-signature-type">Buffer</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>service provider&#39;s public key</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
