@@ -80,7 +80,7 @@ This key is equivalent to the testnet address `n4QtQVZF85XXB3rPTkb4B5c8THrp8uMiM
 Now, let's register a name! We're going to register the name 'bitname' until block 1283165. First, we have to "commit" to the name.
 
 ```bash
-$ bitname register tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn bitname 1283165 -w mykey.wif --push
+$ bitname commit tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn bitname 1283165 -w mykey.wif --push
 ```
 
 The output of this command will be a 64-character hexadecimal string, like `8435f7d681828dd51077cf4d66b9300994b786cf8e647324f73ac31fde8bfe2c`. You can check its status on a block explorer, like [Blocktrail](https://www.blocktrail.com/tBTC). Here's the [example transaction](https://www.blocktrail.com/tBTC/tx/8435f7d681828dd51077cf4d66b9300994b786cf8e647324f73ac31fde8bfe2c).
