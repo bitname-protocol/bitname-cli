@@ -7,30 +7,21 @@ const mock = {
     server_version: jest.fn(),
 };
 
-import ElectrumClient = require('electrum-client');
-
-// This is some jankiness to make sure that the jest functions exist
-declare module 'electrum-client' {
-    // tslint:disable-next-line:no-shadowed-variable interface-name
-    interface ElectrumClient {
-        mockReturnValue(value: number): any;
-        mockReturnValueOnce(value: number): any;
-    }
-}
-
 jest.mock('electrum-client', () => {
     return jest.fn().mockImplementation(() => mock);
 });
 
+import ElectrumClient = require('electrum-client');
+
 describe('network functions with bad fees', () => {
     beforeEach(() => {
         // Clear all instances and calls to constructor and all methods
-        ElectrumClient.mockClear();
+        jest.clearAllMocks();
     });
 
     it('throws on -1 as fee', async () => {
         // Tests the situation where all the servers can not estimate fees
-        const estFeeFn = (new ElectrumClient()).blockchainEstimatefee;
+        const estFeeFn = (new ElectrumClient(0, '', '')).blockchainEstimatefee as jest.Mock<{}>;
         estFeeFn.mockReturnValue(Promise.resolve(-1));
 
         await expect(getFeesSatoshiPerKB('testnet')).rejects.toThrow('Could not connect to a server');
@@ -38,7 +29,7 @@ describe('network functions with bad fees', () => {
 
     it('throws on valid initial fee and then -1 on check', async () => {
         // Tests the situattion where a server is temporarily unable to estimate fees
-        const estFeeFn = (new ElectrumClient()).blockchainEstimatefee;
+        const estFeeFn = (new ElectrumClient(0, '', '')).blockchainEstimatefee as jest.Mock<{}>;
         estFeeFn.mockReturnValueOnce(Promise.resolve(1)).mockReturnValueOnce(Promise.resolve(-1));
 
         await expect(getFeesSatoshiPerKB('testnet')).rejects.toThrow('Bad fee rate');
