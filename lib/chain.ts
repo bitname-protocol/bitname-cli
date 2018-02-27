@@ -24,14 +24,12 @@ interface INameInfo {
 }
 
 /**
- * Function will find all lock transaction in txlist given and return all 
- * transactions not expired
- * @param TXList a list of all transactions with address of public key specified
- * by user 
+ * Function will find a lock transaction in txs
+ * @param txid a list of all transactions with a given address as an input
  * or output
- * @param Buffer the services public key stored in a buffer
- * @param number the current height of the blockchain (number of blocks)
- * @return map of all IReadonlyNameInfo returns a name, txid, pubkey and the block that the 
+ * @param servicePubKey the services public key stored in a buffer
+ * @param curHeight the current height of the blockchain (number of blocks)
+ * @return IReadonlyNameInfo returns a name, txid, pubkey and the block that the 
  * name name expires in
  */
 function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IReadonlyNameInfo {
@@ -42,6 +40,7 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
         const lockTx = txs.getTX(txid);
 
         // reference to the lockTx 1st inputs previos output reference
+        // (does each transaction in the list only have one input?) 
         const prevHash = util.revHex(lockTx.inputs[0].prevout.hash as string);
 
 
@@ -82,8 +81,6 @@ function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IRe
 
         const name = getLockTxName(lockTx) as string;
 
-        // if there are two transactions with the same name that on the same 
-        // block they are both ignored
         if (map.hasOwnProperty(name) && txs.getHeight(map[name].txid) === height) {
             map[name].invalid = true;
             continue;
