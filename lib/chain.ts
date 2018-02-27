@@ -25,7 +25,8 @@ interface INameInfo {
 
 /**
  * Function will find a lock transaction in txs
- * @param TXList a list of transactions
+ * @param TXList a list of all transactions with a given address as an input
+ * or output
  * @param Buffer the services public key stored in a buffer
  * @param number the current height of the blockchain (number of blocks)
  * @return IReadonlyNameInfo returns a name, txid, pubkey and the block that the 
