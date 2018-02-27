@@ -9,7 +9,7 @@ import {
     crypto,
     util,
 } from 'bcoin';
-import { genLockTx, genUnlockTx, genCommitTx } from './lib/txs';
+import { genLockTx, genUnlockTx, genCommitTx, getLockTxPubKey } from './lib/txs';
 import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from './lib/net';
 import { extractInfo } from './lib/chain';
 
@@ -179,22 +179,17 @@ async function revoke(argv: yargs.Arguments) {
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
 
-    // console.log(argv);
-
     let lockTX: TX;
     try {
         lockTX = await getTX(argv.txid, net);
     } catch (err) {
-        // console.log(err);
         return errorUnfoundTx();
     }
 
     let commitTX: TX;
     try {
-        console.log(lockTX.inputs[0].prevout.hash.toString());
         commitTX = await getTX(util.revHex(lockTX.inputs[0].prevout.hash) as string, net);
     } catch (err) {
-        console.log(err);
         return errorUnfoundTx();
     }
 
@@ -242,12 +237,17 @@ async function serviceSpend(argv: yargs.Arguments) {
 
     let commitTX: TX;
     try {
-        commitTX = await getTX(lockTX.inputs[0].prevout.hash as string, net);
+        commitTX = await getTX(util.revHex(lockTX.inputs[0].prevout.hash as string), net);
     } catch (err) {
         return errorUnfoundTx();
     }
 
     if (!verifyLockTX(lockTX, commitTX, servicePubKey)) {
+        return errorInvalidLock();
+    }
+
+    const userPubKey = getLockTxPubKey(lockTX);
+    if (userPubKey === null) {
         return errorInvalidLock();
     }
 
@@ -258,7 +258,7 @@ async function serviceSpend(argv: yargs.Arguments) {
         return errorNoFees();
     }
 
-    const unlockTx = genUnlockTx(lockTX, commitTX, feeRate, true, ring, servicePubKey);
+    const unlockTx = genUnlockTx(lockTX, commitTX, feeRate, true, ring, userPubKey);
     const txidStr = chalk`{green ${util.revHex(unlockTx.hash('hex')) as string}}`;
 
     if (argv.push) {
@@ -360,7 +360,7 @@ function main() {
                 })
                 .positional('locktime', {
                     type: 'number',
-                    describe: 'how many blocks (up to 65535) to hold the name for',
+                    describe: 'the block height (up to 499999999) until which the name should be valid',
                 })
                 .option('wif', {
                     alias: 'w',
@@ -390,7 +390,7 @@ function main() {
                 })
                 .positional('locktime', {
                     type: 'number',
-                    describe: 'how many blocks (up to 65535) to hold the name for',
+                    describe: 'the block height (up to 499999999) until which the name should be valid',
                 })
                 .option('wif', {
                     alias: 'w',
