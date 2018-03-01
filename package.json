@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "main": "dist/bitname.umd.js",
   "module": "dist/bitname.es5.js",
+  "types": "dist/index.d.ts",
   "author": "Colin Atkinson",
   "description": "Associate public keys with names on the Bitcoin blockchain",
   "keywords": [

@@ -158,7 +158,7 @@ function serializeCommitData(nonce: Buffer, locktime: number, name: string): Buf
     return outBuf;
 }
 
-interface ICommitData {
+export interface ICommitData {
     nonce: Buffer;
     locktime: number;
     name: string;

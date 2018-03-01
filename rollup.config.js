@@ -30,8 +30,6 @@ export default {
         // https://github.com/rollup/rollup-plugin-node-resolve#usage
         resolve({
             module: true,
-            jsnext: true,
-            main: true,
         }),
         // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
         // commonjs({
