@@ -22,10 +22,8 @@ interface IServerList {
     };
 }
 
-// tslint:disable-next-line:no-var-requires
-const servers: IServerList = require('../data/servers.json');
-// tslint:disable-next-line:no-var-requires
-const testServers: IServerList = require('../data/servers_testnet.json');
+import * as servers from '../data/servers.json';
+import * as testServers from '../data/servers_testnet.json';
 
 /**
  * Return an appropriate list of default servers for a given network
