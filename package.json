@@ -1,7 +1,8 @@
 {
   "name": "bitname-cli",
   "version": "0.0.2",
-  "main": "index.js",
+  "main": "dist/bitname.umd.js",
+  "module": "dist/bitname.es5.js",
   "author": "Colin Atkinson",
   "description": "Associate public keys with names on the Bitcoin blockchain",
   "keywords": [
@@ -23,6 +24,12 @@
     "@types/node-fetch": "^1.6.7",
     "@types/yargs": "^10.0.0",
     "jest": "^22.0.4",
+    "rollup": "^0.56.3",
+    "rollup-plugin-commonjs": "^8.3.0",
+    "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-node-resolve": "^3.0.3",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-typescript2": "^0.11.1",
     "ts-jest": "^22.0.0",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",

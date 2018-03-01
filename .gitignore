@@ -1,5 +1,6 @@
 *.wif
 .vscode/
+.rpt2_cache/
 
 paper.html
 paper.pdf

@@ -7,7 +7,7 @@ import {
     amount as Amount,
 } from 'bcoin';
 
-import ElectrumClient = require('electrum-client');
+import ElectrumClient from 'electrum-client';
 
 import TXList from './TXList';
 
@@ -22,8 +22,8 @@ interface IServerList {
     };
 }
 
-import * as servers from '../data/servers.json';
-import * as testServers from '../data/servers_testnet.json';
+import servers from '../data/servers.json';
+import testServers from '../data/servers_testnet.json';
 
 /**
  * Return an appropriate list of default servers for a given network

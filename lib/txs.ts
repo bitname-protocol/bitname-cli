@@ -1,5 +1,3 @@
-// import { I64 } from 'n64';
-
 import {
     script as Script,
     address as Address,
@@ -11,7 +9,7 @@ import {
     crypto,
 } from 'bcoin';
 
-import randomBytes = require('randombytes');
+import randomBytes from 'randombytes';
 
 import {
     BadUserPublicKeyError,
