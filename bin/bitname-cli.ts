@@ -7,14 +7,14 @@ import {
     crypto,
     util,
 } from 'bcoin';
-import { genLockTx, genUnlockTx, genCommitTx, getLockTxPubKey } from './lib/txs';
-import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from './lib/net';
-import { extractInfo } from './lib/chain';
+import { genLockTx, genUnlockTx, genCommitTx, getLockTxPubKey } from '../lib/txs';
+import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from '../lib/net';
+import { extractInfo } from '../lib/chain';
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { verifyLockTX } from './lib/verify';
-import { bech32Encode, bech32Decode } from './lib/utils';
+import { verifyLockTX } from '../lib/verify';
+import { bech32Encode, bech32Decode } from '../lib/utils';
 
 import chalk from 'chalk';
 

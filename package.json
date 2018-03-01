@@ -69,6 +69,6 @@
     "mapCoverage": true
   },
   "bin": {
-    "bitname": "dist/bitname.umd.js"
+    "bitname": "dist/bin/bitname-cli.cjs.js"
   }
 }
