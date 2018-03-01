@@ -47,8 +47,8 @@
   },
   "scripts": {
     "start:dev": "ts-node index.ts",
-    "build": "tsc -p tsconfig.build.json",
-    "start": "npm run build && node dist/index.js",
+    "build": "rollup -c",
+    "start": "npm run build && node dist/bitname.umd.js",
     "test": "jest",
     "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/__mocks__/**\" --name bitname ./lib"
   },
@@ -68,6 +68,6 @@
     "mapCoverage": true
   },
   "bin": {
-    "bitname": "dist/index.js"
+    "bitname": "dist/bitname.umd.js"
   }
 }
