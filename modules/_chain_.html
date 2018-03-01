@@ -96,9 +96,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/726f5c0/lib/chain.ts#L26">chain.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/a2ea5b8/lib/chain.ts#L35">chain.ts:35</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Function will find a lock transaction in txs</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -106,12 +111,20 @@
 								</li>
 								<li>
 									<h5>servicePubKey: <span class="tsd-signature-type">Buffer</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the services public key stored in a buffer</p>
+									</div>
 								</li>
 								<li>
 									<h5>curHeight: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the current height of the blockchain (number of blocks)</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_chain_.ireadonlynameinfo.html" class="tsd-signature-type">IReadonlyNameInfo</a></h4>
+							<p>IReadonlyNameInfo returns a name, txid, pubkey and the block that the
+							name name expires in</p>
 						</li>
 					</ul>
 				</section>
