@@ -39,7 +39,9 @@ export default {
         // }),
         commonjs(),
         // Compile TypeScript files
-        typescript(),
+        typescript({
+            tsconfig: './tsconfig.build.json'
+        }),
         json({
             preferConst: true
         }),
