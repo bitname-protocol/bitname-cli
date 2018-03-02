@@ -34,7 +34,7 @@
     "ts-jest": "^22.0.0",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
-    "typedoc": "^0.10.0",
+    "@colatkinson/typedoc": "^0.10.0",
     "typescript": "^2.6.2"
   },
   "dependencies": {
