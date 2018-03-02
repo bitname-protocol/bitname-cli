@@ -65,8 +65,7 @@
       "jsx",
       "json",
       "node"
-    ],
-    "mapCoverage": true
+    ]
   },
   "bin": {
     "bitname": "dist/bin/bitname-cli.cjs.js"
