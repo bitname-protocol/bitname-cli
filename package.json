@@ -51,7 +51,7 @@
     "build": "rollup -c",
     "start": "npm run build && node dist/bitname.umd.js",
     "test": "jest",
-    "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/__mocks__/**\" --name bitname ./lib"
+    "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/+(__mocks__|__tests__|.git|node_modules)/**\" --name bitname ."
   },
   "jest": {
     "transform": {
