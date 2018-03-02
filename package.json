@@ -32,6 +32,7 @@
     "rollup-plugin-node-resolve": "^3.0.3",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.11.1",
+    "source-map-support": "^0.5.3",
     "ts-jest": "^22.0.0",
     "tslint": "^5.8.0",
     "typescript": "^2.6.2"
@@ -47,7 +48,8 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "start": "npm run build && node dist/bitname.umd.js",
+    "start": "npm run build && node dist/bin/bitname-cli.cjs.js",
+    "start:dev": "npm run build && node -r source-map-support/register dist/bin/bitname-cli.cjs.js",
     "test": "jest",
     "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/+(__mocks__|__tests__|.git|node_modules)/**\" --name bitname ."
   },

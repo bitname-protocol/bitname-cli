@@ -13,7 +13,8 @@ export default [
             {
                 file: pkg.bin.bitname,
                 format: 'cjs',
-                banner: '#!/usr/bin/env node'
+                banner: '#!/usr/bin/env node',
+                sourcemap: true,
             },
         ],
         external: [...Object.keys(pkg.dependencies), 'fs', 'path', '..'],
