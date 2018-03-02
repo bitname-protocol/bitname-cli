@@ -7,6 +7,7 @@ import json from 'rollup-plugin-json'
 const pkg = require('./package.json')
 
 export default [
+    // Build node binary script
     {
         input: 'bin/bitname-cli.ts',
         output: [
@@ -43,6 +44,7 @@ export default [
             sourceMaps(),
         ],
     },
+    // Build UMD and ES6 lib bundles
     {
         input: `index.ts`,
         output: [
@@ -51,7 +53,6 @@ export default [
                 name: 'bitname',
                 format: 'umd',
                 sourcemap: true,
-                banner: '#!/usr/bin/env node'
             },
             {
                 file: pkg.module,
