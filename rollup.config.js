@@ -18,7 +18,7 @@ export default [
                 sourcemap: true,
             },
         ],
-        external: [...Object.keys(pkg.dependencies), 'fs', 'path', '..'],
+        external: [...Object.keys(pkg.dependencies), 'fs', 'path'],
         plugins: [
             // Allow node_modules resolution, so you can use 'external' to control
             // which external modules to include in the bundle
@@ -27,11 +27,6 @@ export default [
                 module: true,
             }),
             // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
-            // commonjs({
-            //     namedExports: {
-            //         bcoin: [ 'keyring', 'util', 'address', 'tx', 'coin', 'crypto', 'script', 'mtx', 'output', 'amount', 'utils' ],
-            //     }
-            // }),
             commonjs(),
             // Compile TypeScript files
             typescript({
@@ -51,7 +46,7 @@ export default [
             {
                 file: pkg.main,
                 name: 'bitname',
-                format: 'umd',
+                format: 'cjs',
                 sourcemap: true,
             },
             {
@@ -70,11 +65,6 @@ export default [
                 module: true,
             }),
             // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
-            // commonjs({
-            //     namedExports: {
-            //         bcoin: [ 'keyring', 'util', 'address', 'tx', 'coin', 'crypto', 'script', 'mtx', 'output', 'amount', 'utils' ],
-            //     }
-            // }),
             commonjs(),
             // Compile TypeScript files
             typescript({
