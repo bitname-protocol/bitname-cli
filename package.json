@@ -21,6 +21,7 @@
     "@types/jest": "^21.1.9",
     "@types/node-fetch": "^1.6.7",
     "@types/yargs": "^10.0.0",
+    "husky": "^0.14.3",
     "jest": "^22.0.4",
     "ts-jest": "^22.0.0",
     "ts-node": "^3.3.0",
@@ -42,7 +43,8 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "npm run build && node dist/index.js",
     "test": "jest",
-    "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/__mocks__/**\" --name bitname ./lib"
+    "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/__mocks__/**\" --name bitname ./lib",
+    "lint": "tslint --project tsconfig.json"
   },
   "jest": {
     "transform": {
