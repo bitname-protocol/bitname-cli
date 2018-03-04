@@ -6,7 +6,7 @@ import {
     util,
 } from 'bcoin';
 
-interface IReadonlyNameInfo {
+export interface IReadonlyNameInfo {
     readonly [name: string]: {
         readonly txid: string;
         readonly pubKey: Buffer;
@@ -29,24 +29,23 @@ interface INameInfo {
  * or output
  * @param servicePubKey the services public key stored in a buffer
  * @param curHeight the current height of the blockchain (number of blocks)
- * @return IReadonlyNameInfo returns a name, txid, pubkey and the block that the 
+ * @return IReadonlyNameInfo returns a name, txid, pubkey and the block that the
  * name name expires in
  */
 function extractInfo(txs: TXList, servicePubKey: Buffer, curHeight: number): IReadonlyNameInfo {
     const map: INameInfo = {};
 
     for (const txid of ([...txs.getTxids()].reverse() as ReadonlyArray<string>)) {
-        //a transaction in txs list
+        // a transaction in txs list
         const lockTx = txs.getTX(txid);
 
         // reference to the lockTx 1st inputs previos output reference
-        // (does each transaction in the list only have one input?) 
+        // (does each transaction in the list only have one input?)
         const prevHash = util.revHex(lockTx.inputs[0].prevout.hash as string);
-
 
         let ctx: TX;
         try {
-            // check if the lockTx previous transaction is also in TXlist 
+            // check if the lockTx previous transaction is also in TXlist
             ctx = txs.getTX(prevHash);
         } catch (e) {
             continue;
