@@ -9,17 +9,18 @@ import {
 import TXList from '../lib/TXList';
 
 describe('TXList class', () => {
+    const txDataPath = path.resolve(__dirname, 'data');
+
+    const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
+    const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
+    const randTx = TX.fromRaw(randTxData, 'hex');
+
+    const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
+    const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
+    const lockTx = TX.fromRaw(lockTxData, 'hex');
+
     it('correctly stores txids', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
@@ -35,16 +36,7 @@ describe('TXList class', () => {
     });
 
     it('correctly stores txs by txid', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
@@ -62,16 +54,7 @@ describe('TXList class', () => {
     });
 
     it('correctly stores output spent info', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
@@ -91,16 +74,7 @@ describe('TXList class', () => {
     });
 
     it('correctly stores height info', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, true, false];
 
         const heights = [1, 2];
@@ -120,17 +94,7 @@ describe('TXList class', () => {
     });
 
     it('throws on bad spent length', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
-        const lockTxSpent = [false, false, false, true, false];
 
         expect(() => {
             return new TXList([randTx, lockTx], [randTxSpent], [1, 1]);
@@ -138,16 +102,7 @@ describe('TXList class', () => {
     });
 
     it('throws on bad heights length', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, true, false];
 
         expect(() => {
@@ -156,16 +111,7 @@ describe('TXList class', () => {
     });
 
     it('throws on bad output length', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, false, false, true, false, true];
 
         const hash = util.revHex(lockTx.hash('hex')) as string;
@@ -176,16 +122,7 @@ describe('TXList class', () => {
     });
 
     it('throws on bad txid in TX lookup', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
@@ -196,16 +133,7 @@ describe('TXList class', () => {
     });
 
     it('throws on bad txid in spend lookup', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
@@ -216,16 +144,7 @@ describe('TXList class', () => {
     });
 
     it('throws on bad output in spend lookup', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
@@ -238,16 +157,7 @@ describe('TXList class', () => {
     });
 
     it('throws on bad txid in height lookup', () => {
-        const txDataPath = path.resolve(__dirname, 'data');
-
-        const randTxPath = path.resolve(txDataPath, '04accc0d.tx');
-        const randTxData = fs.readFileSync(randTxPath, 'utf8').trim();
-        const randTx = TX.fromRaw(randTxData, 'hex');
         const randTxSpent = [true];
-
-        const lockTxPath = path.resolve(txDataPath, 'valid_lock_tx.tx');
-        const lockTxData = fs.readFileSync(lockTxPath, 'utf8').trim();
-        const lockTx = TX.fromRaw(lockTxData, 'hex');
         const lockTxSpent = [false, true, false];
 
         const list = new TXList([randTx, lockTx], [randTxSpent, lockTxSpent], [1, 1]);
