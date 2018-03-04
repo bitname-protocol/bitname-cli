@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;CustomSet&quot; | bitname</title>
+	<title>&quot;regtestTest&quot; | bitname</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_customset_.html">&quot;CustomSet&quot;</a>
+					<a href="_regtesttest_.html">&quot;regtestTest&quot;</a>
 				</li>
 			</ul>
-			<h1>External module &quot;CustomSet&quot;</h1>
+			<h1>External module &quot;regtestTest&quot;</h1>
 		</div>
 	</div>
 </header>
@@ -68,19 +68,81 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section ">
-							<h3>Classes</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-parent-kind-external-module"><a href="../classes/_customset_.customset.html" class="tsd-kind-icon">Custom<wbr>Set</a></li>
-							</ul>
-						</section>
 						<section class="tsd-index-section tsd-is-not-exported">
-							<h3>Interfaces</h3>
+							<h3>Variables</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_customset_.isetdict.html" class="tsd-kind-icon">ISet<wbr>Dict</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_regtesttest_.html#addr" class="tsd-kind-icon">addr</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_regtesttest_.html#ring" class="tsd-kind-icon">ring</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_regtesttest_.html#servicepubkey" class="tsd-kind-icon">service<wbr>Pub<wbr>Key</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_regtesttest_.html#servicering" class="tsd-kind-icon">service<wbr>Ring</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_regtesttest_.html#servicewif" class="tsd-kind-icon">service<wbr>Wif</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported"><a href="_regtesttest_.html#wif" class="tsd-kind-icon">wif</a></li>
 							</ul>
 						</section>
 					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="addr" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> addr</h3>
+					<div class="tsd-signature tsd-kind-icon">addr<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;ring.getAddress().toBase58(&#x27;testnet&#x27;)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/8629df3/regtestTest.ts#L14">regtestTest.ts:14</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="ring" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> ring</h3>
+					<div class="tsd-signature tsd-kind-icon">ring<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">keyring</span><span class="tsd-signature-symbol"> =&nbsp;KeyRing.fromSecret(wif)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/8629df3/regtestTest.ts#L13">regtestTest.ts:13</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="servicepubkey" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> service<wbr>Pub<wbr>Key</h3>
+					<div class="tsd-signature tsd-kind-icon">service<wbr>Pub<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol"> =&nbsp;serviceRing.getPublicKey()</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/8629df3/regtestTest.ts#L18">regtestTest.ts:18</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="servicering" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> service<wbr>Ring</h3>
+					<div class="tsd-signature tsd-kind-icon">service<wbr>Ring<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">keyring</span><span class="tsd-signature-symbol"> =&nbsp;KeyRing.fromSecret(serviceWif)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/8629df3/regtestTest.ts#L17">regtestTest.ts:17</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="servicewif" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> service<wbr>Wif</h3>
+					<div class="tsd-signature tsd-kind-icon">service<wbr>Wif<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/8629df3/regtestTest.ts#L16">regtestTest.ts:16</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="wif" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> wif</h3>
+					<div class="tsd-signature tsd-kind-icon">wif<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/8629df3/regtestTest.ts#L12">regtestTest.ts:12</a></li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 		</div>
@@ -90,39 +152,60 @@
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_bin_bitname_cli_.html">"bin/bitname-<wbr>cli"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_index_.html">"index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_customset_.html">"lib/<wbr>Custom<wbr>Set"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_txlist_.html">"lib/TXList"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_chain_.html">"lib/chain"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_errors_.html">"lib/errors"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_net_.html">"lib/net"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_txs_.html">"lib/txs"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_utils_.html">"lib/utils"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_verify_.html">"lib/verify"</a>
+					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_customset_.html">"<wbr>Custom<wbr>Set"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_txlist_.html">"TXList"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_chain_.html">"chain"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_errors_.html">"errors"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_net_.html">"net"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_txs_.html">"txs"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_utils_.html">"utils"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_verify_.html">"verify"</a>
+						<a href="_regtesttest_.html">"regtest<wbr>Test"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class tsd-parent-kind-external-module">
-						<a href="../classes/_customset_.customset.html" class="tsd-kind-icon">Custom<wbr>Set</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_regtesttest_.html#addr" class="tsd-kind-icon">addr</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../interfaces/_customset_.isetdict.html" class="tsd-kind-icon">ISet<wbr>Dict</a>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_regtesttest_.html#ring" class="tsd-kind-icon">ring</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_regtesttest_.html#servicepubkey" class="tsd-kind-icon">service<wbr>Pub<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_regtesttest_.html#servicering" class="tsd-kind-icon">service<wbr>Ring</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_regtesttest_.html#servicewif" class="tsd-kind-icon">service<wbr>Wif</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_regtesttest_.html#wif" class="tsd-kind-icon">wif</a>
 					</li>
 				</ul>
 			</nav>

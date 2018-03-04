@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;utils&quot; | bitname</title>
+	<title>&quot;lib/verify&quot; | bitname</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_utils_.html">&quot;utils&quot;</a>
+					<a href="_lib_verify_.html">&quot;lib/verify&quot;</a>
 				</li>
 			</ul>
-			<h1>External module &quot;utils&quot;</h1>
+			<h1>External module &quot;lib/verify&quot;</h1>
 		</div>
 	</div>
 </header>
@@ -69,85 +69,176 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section tsd-is-not-exported">
-							<h3>Type aliases</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-not-exported"><a href="_utils_.html#netstr" class="tsd-kind-icon">net<wbr>Str</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section tsd-is-not-exported">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_utils_.html#bech32decode" class="tsd-kind-icon">bech32<wbr>Decode</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_utils_.html#bech32encode" class="tsd-kind-icon">bech32<wbr>Encode</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_lib_verify_.html#isurisafe" class="tsd-kind-icon">isURISafe</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_lib_verify_.html#isvalidop_return" class="tsd-kind-icon">is<wbr>ValidOP_<wbr>RETURN</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_lib_verify_.html#verifycommittx" class="tsd-kind-icon">verify<wbr>CommitTX</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_lib_verify_.html#verifylocktx" class="tsd-kind-icon">verify<wbr>LockTX</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
-				<h2>Type aliases</h2>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-not-exported">
-					<a name="netstr" class="tsd-anchor"></a>
-					<h3>net<wbr>Str</h3>
-					<div class="tsd-signature tsd-kind-icon">net<wbr>Str<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"testnet"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"main"</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/a2ea5b8/lib/utils.ts#L5">utils.ts:5</a></li>
-						</ul>
-					</aside>
-				</section>
-			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
 				<h2>Functions</h2>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-					<a name="bech32decode" class="tsd-anchor"></a>
-					<h3>bech32<wbr>Decode</h3>
+					<a name="isurisafe" class="tsd-anchor"></a>
+					<h3>isURISafe</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">bech32<wbr>Decode<span class="tsd-signature-symbol">(</span>data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+						<li class="tsd-signature tsd-kind-icon">isURISafe<span class="tsd-signature-symbol">(</span>str<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/a2ea5b8/lib/utils.ts#L19">utils.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/8629df3/lib/verify.ts#L19">lib/verify.ts:19</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Boolean value that indicates if URI has and only has alphanumeric leteral and  &#39;_&#39;,  &#39;-&#39;, &#39;.&#39; &#39;~&#39;</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>data: <span class="tsd-signature-type">string</span></h5>
+									<h5>str: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The URI String</p>
+									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">object</span>
-								<span class="tsd-signature-symbol"> | </span>
-								<span class="tsd-signature-type">null</span>
-							</h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-					<a name="bech32encode" class="tsd-anchor"></a>
-					<h3>bech32<wbr>Encode</h3>
+					<a name="isvalidop_return" class="tsd-anchor"></a>
+					<h3>is<wbr>ValidOP_<wbr>RETURN</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">bech32<wbr>Encode<span class="tsd-signature-symbol">(</span>pubKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span>, network<span class="tsd-signature-symbol">: </span><a href="_utils_.html#netstr" class="tsd-signature-type">netStr</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">is<wbr>ValidOP_<wbr>RETURN<span class="tsd-signature-symbol">(</span>output<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Output</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/a2ea5b8/lib/utils.ts#L7">utils.ts:7</a></li>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/8629df3/lib/verify.ts#L28">lib/verify.ts:28</a></li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Boolean value indicates if transaction output is in the correct format of Opcode OP_RETURN.</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>pubKey: <span class="tsd-signature-type">Buffer</span></h5>
-								</li>
-								<li>
-									<h5>network: <a href="_utils_.html#netstr" class="tsd-signature-type">netStr</a></h5>
+									<h5>output: <span class="tsd-signature-type">Output</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Transaction output</p>
+									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="verifycommittx" class="tsd-anchor"></a>
+					<h3>verify<wbr>CommitTX</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">verify<wbr>CommitTX<span class="tsd-signature-symbol">(</span>tx<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TX</span>, userPubKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span>, servicePubKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, locktime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/8629df3/lib/verify.ts#L55">lib/verify.ts:55</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Boolean value indicates that whether or not the commit transaction is valid</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tx: <span class="tsd-signature-type">TX</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The commit transaction that needs to be verified.</p>
+									</div>
+								</li>
+								<li>
+									<h5>userPubKey: <span class="tsd-signature-type">Buffer</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>User&#39;s public key</p>
+									</div>
+								</li>
+								<li>
+									<h5>servicePubKey: <span class="tsd-signature-type">Buffer</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Service provider&#39;s public key</p>
+									</div>
+								</li>
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>A name of at most 64 characters composed of URL-safe characters</p>
+									</div>
+								</li>
+								<li>
+									<h5>locktime: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An absolute lock time, in blockheight</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+					<a name="verifylocktx" class="tsd-anchor"></a>
+					<h3>verify<wbr>LockTX</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<li class="tsd-signature tsd-kind-icon">verify<wbr>LockTX<span class="tsd-signature-symbol">(</span>tx<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TX</span>, commitTX<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TX</span>, servicePubKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/8629df3/lib/verify.ts#L100">lib/verify.ts:100</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Boolean value indicates that whether or not the lock transaction is valid</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tx: <span class="tsd-signature-type">TX</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The lock transaction</p>
+									</div>
+								</li>
+								<li>
+									<h5>commitTX: <span class="tsd-signature-type">TX</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The corresponding commit transaction.</p>
+									</div>
+								</li>
+								<li>
+									<h5>servicePubKey: <span class="tsd-signature-type">Buffer</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>service provider&#39;s public key</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -160,41 +251,53 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_customset_.html">"<wbr>Custom<wbr>Set"</a>
+						<a href="_bin_bitname_cli_.html">"bin/bitname-<wbr>cli"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_txlist_.html">"TXList"</a>
+						<a href="_index_.html">"index"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_chain_.html">"chain"</a>
+						<a href="_lib_customset_.html">"lib/<wbr>Custom<wbr>Set"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_errors_.html">"errors"</a>
+						<a href="_lib_txlist_.html">"lib/TXList"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_net_.html">"net"</a>
+						<a href="_lib_chain_.html">"lib/chain"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_txs_.html">"txs"</a>
+						<a href="_lib_errors_.html">"lib/errors"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_net_.html">"lib/net"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_txs_.html">"lib/txs"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="_lib_utils_.html">"lib/utils"</a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_utils_.html">"utils"</a>
+						<a href="_lib_verify_.html">"lib/verify"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_verify_.html">"verify"</a>
+						<a href="_regtesttest_.html">"regtest<wbr>Test"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-type-alias tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="_utils_.html#netstr" class="tsd-kind-icon">net<wbr>Str</a>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_lib_verify_.html#isurisafe" class="tsd-kind-icon">isURISafe</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="_utils_.html#bech32decode" class="tsd-kind-icon">bech32<wbr>Decode</a>
+						<a href="_lib_verify_.html#isvalidop_return" class="tsd-kind-icon">is<wbr>ValidOP_<wbr>RETURN</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="_utils_.html#bech32encode" class="tsd-kind-icon">bech32<wbr>Encode</a>
+						<a href="_lib_verify_.html#verifycommittx" class="tsd-kind-icon">verify<wbr>CommitTX</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_lib_verify_.html#verifylocktx" class="tsd-kind-icon">verify<wbr>LockTX</a>
 					</li>
 				</ul>
 			</nav>

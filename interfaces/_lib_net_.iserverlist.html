@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;chain&quot; | bitname</title>
+	<title>IServerList | bitname</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,80 +54,44 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="_chain_.html">&quot;chain&quot;</a>
+					<a href="../modules/_lib_net_.html">&quot;lib/net&quot;</a>
+				</li>
+				<li>
+					<a href="_lib_net_.iserverlist.html">IServerList</a>
 				</li>
 			</ul>
-			<h1>External module &quot;chain&quot;</h1>
+			<h1>Interface IServerList</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel-group tsd-index-group">
-				<h2>Index</h2>
-				<section class="tsd-panel tsd-index-panel">
-					<div class="tsd-index-content">
-						<section class="tsd-index-section tsd-is-not-exported">
-							<h3>Interfaces</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_chain_.inameinfo.html" class="tsd-kind-icon">IName<wbr>Info</a></li>
-								<li class="tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported"><a href="../interfaces/_chain_.ireadonlynameinfo.html" class="tsd-kind-icon">IReadonly<wbr>Name<wbr>Info</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section tsd-is-not-exported">
-							<h3>Functions</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported"><a href="_chain_.html#extractinfo" class="tsd-kind-icon">extract<wbr>Info</a></li>
-							</ul>
-						</section>
-					</div>
-				</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">IServerList</span>
+					</li>
+				</ul>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
-				<h2>Functions</h2>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-					<a name="extractinfo" class="tsd-anchor"></a>
-					<h3>extract<wbr>Info</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">extract<wbr>Info<span class="tsd-signature-symbol">(</span>txs<span class="tsd-signature-symbol">: </span><a href="../classes/_txlist_.txlist.html" class="tsd-signature-type">TXList</a>, servicePubKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Buffer</span>, curHeight<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_chain_.ireadonlynameinfo.html" class="tsd-signature-type">IReadonlyNameInfo</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/bitname-protocol/bitname-cli/blob/a2ea5b8/lib/chain.ts#L35">chain.ts:35</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Function will find a lock transaction in txs</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>txs: <a href="../classes/_txlist_.txlist.html" class="tsd-signature-type">TXList</a></h5>
-								</li>
-								<li>
-									<h5>servicePubKey: <span class="tsd-signature-type">Buffer</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the services public key stored in a buffer</p>
-									</div>
-								</li>
-								<li>
-									<h5>curHeight: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the current height of the blockchain (number of blocks)</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_chain_.ireadonlynameinfo.html" class="tsd-signature-type">IReadonlyNameInfo</a></h4>
-							<p>IReadonlyNameInfo returns a name, txid, pubkey and the block that the
-							name name expires in</p>
-						</li>
-					</ul>
-				</section>
+			<section class="tsd-panel tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+				<h3 class="tsd-before-signature">Indexable</h3>
+				<div class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">[</span>url: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">object</span></div>
+				<ul class="tsd-parameters">
+					<li class="tsd-parameter">
+						<h5><span class="tsd-flag ts-flagOptional">Optional</span> pruning<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+					</li>
+					<li class="tsd-parameter">
+						<h5><span class="tsd-flag ts-flagOptional">Optional</span> s<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+					</li>
+					<li class="tsd-parameter">
+						<h5><span class="tsd-flag ts-flagOptional">Optional</span> t<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+					</li>
+					<li class="tsd-parameter">
+						<h5><span class="tsd-flag ts-flagOptional">Optional</span> version<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+					</li>
+				</ul>
 			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -137,41 +101,84 @@
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_customset_.html">"<wbr>Custom<wbr>Set"</a>
+						<a href="../modules/_bin_bitname_cli_.html">"bin/bitname-<wbr>cli"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_txlist_.html">"TXList"</a>
+						<a href="../modules/_index_.html">"index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_lib_customset_.html">"lib/<wbr>Custom<wbr>Set"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_lib_txlist_.html">"lib/TXList"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_lib_chain_.html">"lib/chain"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="../modules/_lib_errors_.html">"lib/errors"</a>
 					</li>
 					<li class="current tsd-kind-external-module">
-						<a href="_chain_.html">"chain"</a>
+						<a href="../modules/_lib_net_.html">"lib/net"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_errors_.html">"errors"</a>
+						<a href="../modules/_lib_txs_.html">"lib/txs"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_net_.html">"net"</a>
+						<a href="../modules/_lib_utils_.html">"lib/utils"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_txs_.html">"txs"</a>
+						<a href="../modules/_lib_verify_.html">"lib/verify"</a>
 					</li>
 					<li class=" tsd-kind-external-module">
-						<a href="_utils_.html">"utils"</a>
-					</li>
-					<li class=" tsd-kind-external-module">
-						<a href="_verify_.html">"verify"</a>
+						<a href="../modules/_regtesttest_.html">"regtest<wbr>Test"</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../interfaces/_chain_.inameinfo.html" class="tsd-kind-icon">IName<wbr>Info</a>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="_lib_net_.iserverlist.html" class="tsd-kind-icon">IServer<wbr>List</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="../interfaces/_chain_.ireadonlynameinfo.html" class="tsd-kind-icon">IReadonly<wbr>Name<wbr>Info</a>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-variable tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#revhex" class="tsd-kind-icon">rev<wbr>Hex</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
-						<a href="_chain_.html#extractinfo" class="tsd-kind-icon">extract<wbr>Info</a>
+						<a href="../modules/_lib_net_.html#addrtoscripthash" class="tsd-kind-icon">addr<wbr>ToScript<wbr>Hash</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#fundtx" class="tsd-kind-icon">fund<wbr>Tx</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#getalltx" class="tsd-kind-icon">get<wbr>AllTX</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#getblockheight" class="tsd-kind-icon">get<wbr>Block<wbr>Height</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#getfeessatoshiperkb" class="tsd-kind-icon">get<wbr>Fees<wbr>Satoshi<wbr>PerKB</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#getserverlist" class="tsd-kind-icon">get<wbr>Server<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#gettx" class="tsd-kind-icon">getTX</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#posttx" class="tsd-kind-icon">postTX</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#selectrandomserver" class="tsd-kind-icon">select<wbr>Random<wbr>Server</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#serverconnect" class="tsd-kind-icon">server<wbr>Connect</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-external-module tsd-is-not-exported">
+						<a href="../modules/_lib_net_.html#shuffle" class="tsd-kind-icon">shuffle</a>
 					</li>
 				</ul>
 			</nav>
