@@ -1,6 +1,6 @@
 {
   "name": "bitname",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "dist/bitname.cjs.js",
   "module": "dist/bitname.es5.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "url": "https://github.com/colatkinson/bitname-cli.git"
   },
   "license": "LGPL-3.0-or-later",
-  "private": true,
+  "private": false,
   "devDependencies": {
     "@colatkinson/typedoc": "^0.10.0",
     "@types/jest": "^21.1.9",
