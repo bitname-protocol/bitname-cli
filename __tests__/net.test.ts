@@ -1,32 +1,83 @@
-jest.mock('../lib/netUtils');
-import { fetchUnspentTX, fetchAllTX } from '../lib/netUtils';
+import { fundTx, getAllTX, getFeesSatoshiPerKB, getBlockHeight, getTX, postTX } from '../lib/net';
 
-import { fundTx, getAllTX } from '../lib/net';
+import ElectrumClient from 'electrum-client';
 
-import { address as Address } from 'bcoin';
+import { address as Address, tx as TX } from 'bcoin';
 
 describe('network data', () => {
-    it('generates coins correctly', async () => {
-        const addr = Address.fromBase58('mk8cJh83q2JKBNguuzamfN1LZ9aECtnVJ7');
-        const coins = await fundTx(addr, 1, 'testnet');
+    it('gets the estimated fee', async () => {
+        const fee = await getFeesSatoshiPerKB('testnet');
+
+        expect(fee).toBe(100);
+    });
+
+    it('gets the current block height', async () => {
+        const height = await getBlockHeight('testnet');
+
+        expect(height).toBe(1280175);
+    });
+
+    it('correctly funds a transaction', async () => {
+        const addr = Address.fromBase58('mmGx9VsBsn1Mv3gERhXTAChASu8vqkeke6');
+        const coins = await fundTx(addr, 2024152, 'testnet');
 
         const expected = [
             {
                 version: 1,
-                height: -1,
-                value: 280463407,
-                script: '76a914329ecab2c7fc540c96295a507a367a46a0ee649488ac',
-                address: '15cf1e351zs4QGDJCRcPqSo1h9yXFsMY2A',
+                height: 1260163,
+                value: 115368335,
+                script: '76a9143f2acedfda87b9a111bdd4a0b0d8b04cb34e515488ac',
+                address: '16kzrSnD4ka78wCci8Z5LHUqauYDxLS8QD',
                 coinbase: false,
-                hash: 'd5dfe44619e5e2a806399309880944714fdbfe4524852be97287ef80eb844332',
-                index: 0,
+                hash: '3a03f98f6f5632c7cebc3d1a9eb3ac64c8bd23fb5b0fdeeba29c835a545642be',
+                index: 3,
             },
         ];
 
-        const expectedStr = JSON.stringify(expected);
-        const actualStr = JSON.stringify(coins);
+        expect(JSON.stringify(coins)).toBe(JSON.stringify(expected));
+    });
 
-        expect(actualStr).toBe(expectedStr);
+    it('errors if there are insufficient funds for a tx', async () => {
+        const addr = Address.fromBase58('muYWRM71cj5LH1aJ16FLFP2PHn2SHs3FpA');
+        await expect(fundTx(addr, 2024152, 'testnet')).rejects.toThrow('Insufficient funds available');
+    });
+
+    it('errors if there are no funds for a tx', async () => {
+        const addrStr = '14qyvufyTr9j52SPaXN1iY18vE8nyXi37b';
+        const addr = Address.fromBase58(addrStr);
+        await expect(fundTx(addr, 2024152, 'main')).rejects.toThrow(`No unspent txs found for ${addrStr}`);
+    });
+
+    it('gets a valid txid', async () => {
+        const txid = 'bae2969230ac7104db17a2de96d4dd5c069acd9db49b40540cb24ff70c61e875';
+        const fullTx = await getTX(txid, 'testnet');
+
+        expect(fullTx.toRaw()).toMatchSnapshot();
+    });
+
+    it('throws if an unknown txid is found', async () => {
+        const txid = '1111111111111111111111111111111111111111111111111111111111111111';
+
+        await expect(getTX(txid, 'testnet')).rejects.toThrow();
+    });
+
+    it('publishes a valid transaction', async () => {
+        // tslint:disable-next-line:max-line-length
+        const rawTx = '010000000136b3f495418e8e368a5171f359bfc08147ec80eae1115cd8ca3a3e6ac568ca57010000006b483045022100d73b4e20d7fb787b9b6a21904db5cd1a0e546ae93a034b3491eff1764759254e0220620913f62dc63ea8f43cc75615b78076e2bc378d96276321277f446b5b25706a012103c7ea37388348c29a52cbc02fc29bc85d7962c1eb4f72fe57d44b5cbe619b34c1ffffffff040000000000000000226a20c83a8f415ee1147b90ed364e36564ed0a467e81ddb7c2c429b2563cac50b4f9020a10700000000001976a91499dcfe8133d8db60cb98df44397f6f1a2cdb776688ac6c761e000000000017a91436c74d83ced4969b1d8f8ce742559dde1626659c878a640007000000001976a9143f2acedfda87b9a111bdd4a0b0d8b04cb34e515488ac00000000';
+
+        const fullTx = TX.fromRaw(rawTx, 'hex');
+
+        await postTX(fullTx, 'testnet');
+
+        const ex = new ElectrumClient(0, '', '');
+        expect(ex.blockchainTransaction_broadcast).toBeCalled();
+        expect(ex.blockchainTransaction_broadcast).toBeCalledWith(rawTx);
+    });
+
+    it('errors on an invalid transaction', async () => {
+        const blankTx = new TX();
+
+        await expect(postTX(blankTx, 'testnet')).rejects.toThrow();
     });
 
     it('generates a tx list from network data', async () => {

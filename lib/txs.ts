@@ -1,5 +1,3 @@
-import { I64 } from 'n64';
-
 import {
     script as Script,
     address as Address,
@@ -11,7 +9,7 @@ import {
     crypto,
 } from 'bcoin';
 
-import randomBytes = require('randombytes');
+import randomBytes from 'randombytes';
 
 import {
     BadUserPublicKeyError,
@@ -24,7 +22,7 @@ import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
 /**
  * Generate a redeem script, removing a name/key pair from the blockchain.
  * Validates `userPubkey` and `servicePubkey`.
- * 
+ *
  * @param userPubkey The user's public key.
  * @param servicePubkey The service's public key.
  * @param alocktime An absolute lock time, in blocks.
@@ -46,7 +44,7 @@ function genRedeemScript(userPubkey: Buffer, servicePubkey: Buffer, alocktime: n
 
     //
     // If spending as user, execute this branch
-    
+
     // Verify that 0 <= current block size - commit block size
     script.pushInt(0);
     script.pushSym('OP_CHECKSEQUENCEVERIFY');
@@ -146,7 +144,7 @@ function serializeCommitData(nonce: Buffer, locktime: number, name: string): Buf
     if (name.length > 64) {
         throw new Error('Name is too long');
     }
-    //
+
     // Create a new buffer. Write no
     const outBuf = new Buffer(32 + 4 + 1 + name.length);
     nonce.copy(outBuf);
@@ -157,11 +155,10 @@ function serializeCommitData(nonce: Buffer, locktime: number, name: string): Buf
 
     outBuf.write(name, 37, name.length, 'ascii');
 
-
     return outBuf;
 }
 
-interface ICommitData {
+export interface ICommitData {
     nonce: Buffer;
     locktime: number;
     name: string;
@@ -237,7 +234,7 @@ function genCommitTx(coins: Coin[],
     }
 
     // Generate a P2SH address from a redeem script, using a random nonce
-    const nonce = randomBytes(32); 
+    const nonce = randomBytes(32);
     const redeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name, locktime);
     const p2shAddr = genP2shAddr(redeemScript);
 
@@ -303,7 +300,7 @@ function genCommitTx(coins: Coin[],
  * Generate a lock transaction.
  * @param commitTX The corresponding commit transaction.
  * @param name The name to use.
- * @param upfrontFee The upfront fee in satoshis to use the service, as 
+ * @param upfrontFee The upfront fee in satoshis to use the service, as
  * determined by the service.
  * @param lockedFee Fee incentivizing registrar to provide service, as
  * determined by the service.
@@ -504,7 +501,7 @@ function genUnlockTx(lockTx: TX,
     if (locktime === null) {
         throw new Error('Could not extract locktime');
     }
-    
+
     const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
 
     const val = lockTx.outputs[1].value; // the P2SH output

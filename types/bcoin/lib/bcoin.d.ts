@@ -79,6 +79,8 @@ declare module 'bcoin' {
         coinbase: boolean;
         hash: Hash;
         index: number;
+
+        public static fromTX(tx: tx, index: number, height: number): coin;
     }
 
     type NakedScript = {
@@ -111,6 +113,7 @@ declare module 'bcoin' {
         static fromRaw(data: Buffer | string, enc?: string): script;
         static fromMultisig(m: number, n: number, keys: Buffer[]): script;
         hash160(data?: string): Hash;
+        public sha256(enc?: string): Hash;
 
         pushSym(sym: string): script;
         pushData(data: Buffer): script;
@@ -188,6 +191,7 @@ declare module 'bcoin' {
         toRaw(): Buffer;
 
         hash(enc?: string): Hash;
+        txid(): Hash;
 
         inputs: input[];
         outputs: output[];
