@@ -158,7 +158,7 @@ describe('transaction verification', () => {
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
-            // TODO ring.serviceRing = true;
+            // TODO serviceRing.witness = true;
             const servicePubKey = serviceRing.getPublicKey();
 
             // I shall begone to build a spiteful script
