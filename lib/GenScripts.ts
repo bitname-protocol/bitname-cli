@@ -101,3 +101,8 @@ function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string, 
     script.compile();
     return script;
 }
+
+export {
+    genRedeemScript,
+    genCommitRedeemScript,
+};
