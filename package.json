@@ -1,6 +1,6 @@
 {
   "name": "bitname",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "dist/bitname.cjs.js",
   "module": "dist/bitname.es5.js",
   "types": "dist/index.d.ts",
