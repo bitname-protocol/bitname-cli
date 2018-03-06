@@ -1,5 +1,3 @@
 declare module 'randombytes' {
-    function randomBytes(size: number): Buffer;
-
-    export = randomBytes;
+    export default function randomBytes(size: number): Buffer;
 }

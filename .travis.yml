@@ -10,6 +10,7 @@ script:
  - yarn lint
  - yarn build
  - yarn test --coverage
+ - yarn start key-gen
  - codecov
  - yarn build:docs
  - touch docs/.nojekyll

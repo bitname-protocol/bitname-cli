@@ -6,7 +6,7 @@ import {
     util,
 } from 'bcoin';
 
-interface IReadonlyNameInfo {
+export interface IReadonlyNameInfo {
     readonly [name: string]: {
         readonly txid: string;
         readonly pubKey: Buffer;

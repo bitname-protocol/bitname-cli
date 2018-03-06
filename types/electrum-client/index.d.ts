@@ -16,7 +16,7 @@ declare module 'electrum-client' {
         height: number
     }
 
-    class ElectrumClient {
+    export default class ElectrumClient {
         constructor(port: number, host: string, protocol: string, options?: any);
 
         public blockchainHeaders_subscribe(): Promise<header>;
@@ -33,6 +33,4 @@ declare module 'electrum-client' {
 
         public server_version(client_name: string, protocol_ver: string): Promise<[string, string]>;
     }
-
-    export = ElectrumClient;
 }
