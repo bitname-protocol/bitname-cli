@@ -113,6 +113,7 @@ function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string, 
     return script;
 }
 
+// TODO update to support P2WSH
 /**
  * Generate a P2SH address from a redeem script.
  * @param redeemScript The script to use.
@@ -236,7 +237,7 @@ function genCommitTx(coins: Coin[],
     // Generate a P2SH address from a redeem script, using a random nonce
     const nonce = randomBytes(32);
     const redeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name, locktime);
-    const p2shAddr = genP2shAddr(redeemScript);
+    const p2shAddr = genP2shAddr(redeemScript); // TODO update for P2WSH
 
     // Generate service address from service public key
     const servicePKH = crypto.hash160(servicePubKey);
@@ -273,7 +274,7 @@ function genCommitTx(coins: Coin[],
 
     // Add change output as 3
     lockTx.addOutput({
-        address: userRing.getAddress(),
+        address: userRing.getAddress(), // TODO userRing.getNestedAddress(),
         value: changeVal,
     });
 
@@ -341,7 +342,7 @@ function genLockTx(commitTX: TX,
 
     // Generate a P2SH address from redeem script
     const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
-    const p2shAddr = genP2shAddr(redeemScript);
+    const p2shAddr = genP2shAddr(redeemScript); // TODO update for P2WSH
 
     // Generate address from service public key
     const servicePKH = crypto.hash160(servicePubKey);
@@ -373,7 +374,7 @@ function genLockTx(commitTX: TX,
 
     // Add change output as 2
     lockTx.addOutput({
-        address: userRing.getAddress(),
+        address: userRing.getAddress(), // TODO userRing.getNestedAddress(),
         value: changeVal,
     });
 
@@ -520,7 +521,7 @@ function genUnlockTx(lockTx: TX,
     }
 
     unlockTx.addOutput({
-        address: ring.getAddress(),
+        address: ring.getAddress(), // TODO ring.getNestedAddress(),
         value: val,
     });
 

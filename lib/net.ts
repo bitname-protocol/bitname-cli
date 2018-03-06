@@ -237,7 +237,7 @@ async function getAllTX(addr: Address, network: string): Promise<TXList> {
     const outputsSpent: boolean[][] = await Promise.all(txs.map(async (tx) => {
         // Iterate over each output
         return await Promise.all(tx.outputs.map(async (out, ind) => {
-            const outAddrObj = out.getAddress();
+            const outAddrObj = out.getAddress(); // TODO out.getNestedAddress();
             if (outAddrObj === null) {
                 return false;
             }

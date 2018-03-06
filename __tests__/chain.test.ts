@@ -37,6 +37,7 @@ describe('chain state', () => {
         // const userPubKey = Buffer.from('036d6e6cf57a88d39fee39b88721dcd5afbb18e5d078888293eaf5eee2fbc4cd36', 'hex');
 
         const userRing = KeyRing.fromSecret('cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB');
+        // TODO userRing.witness = true;
         const userPubKey = userRing.getPublicKey();
 
         // const info = extractInfo(txList, servicePubKey, 1257485);
@@ -166,6 +167,7 @@ describe('chain state', () => {
         const servicePubKey = Buffer.from('03f000da94f60417c76832179fd82ebfc614f5df9e67ffbc1717542ec460e8054c', 'hex');
 
         const userRing = KeyRing.fromSecret('cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB');
+        // TODO userRing.witness = true;
         const userPubKey = userRing.getPublicKey();
 
         const commitFee = 10000;
@@ -300,6 +302,7 @@ describe('chain state', () => {
         const servicePubKey = Buffer.from('03f000da94f60417c76832179fd82ebfc614f5df9e67ffbc1717542ec460e8054c', 'hex');
 
         const userRing = KeyRing.fromSecret('cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB');
+        // TODO userRing.witness = true;
         const userPubKey = userRing.getPublicKey();
 
         const commitFee = 10000;
