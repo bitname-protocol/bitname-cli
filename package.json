@@ -1,6 +1,6 @@
 {
   "name": "bitname",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "dist/bitname.cjs.js",
   "module": "dist/bitname.es5.js",
   "types": "dist/index.d.ts",
@@ -51,7 +51,8 @@
     "start": "npm run build && node dist/bin/bitname-cli.cjs.js",
     "start:dev": "npm run build && node -r source-map-support/register dist/bin/bitname-cli.cjs.js",
     "test": "jest",
-    "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/+(__mocks__|__tests__|.git|node_modules)/**\" --name bitname ."
+    "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/+(__mocks__|__tests__|.git|node_modules)/**\" --name bitname .",
+    "prepublish": "npm run build"
   },
   "jest": {
     "transform": {
