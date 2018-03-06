@@ -466,13 +466,11 @@ function genUnlockTx(lockTx: TX,
 export {
     genLockTx,
     genUnlockTx,
-    genRedeemScript,
     genP2shAddr,
     getLockTxName,
     getLockTxTime,
     getLockTxPubKey,
     genCommitTx,
-    genCommitRedeemScript,
     serializeCommitData,
     deserializeCommitData,
 };
