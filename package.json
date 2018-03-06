@@ -53,7 +53,8 @@
     "start:dev": "npm run build && node -r source-map-support/register dist/bin/bitname-cli.cjs.js",
     "test": "jest",
     "lint": "tslint --project tsconfig.json",
-    "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/+(__mocks__|__tests__|.git|node_modules)/**\" --name bitname ."
+    "build:docs": "typedoc --out ./docs --excludeExternals --externalPattern \"**/node_modules/**\" --ignoreCompilerErrors --exclude \"**/+(__mocks__|__tests__|.git|node_modules)/**\" --name bitname .",
+    "precommit": "npm run lint"
   },
   "jest": {
     "transform": {
