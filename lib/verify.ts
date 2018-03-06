@@ -71,7 +71,8 @@ function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name:
     // Check that output 1 is sent to the service's address
     const servicePKH = crypto.hash160(servicePubKey);
     const serviceAddr = Address.fromPubkeyhash(servicePKH);
-    if (tx.outputs[1].getAddress().toBase58('testnet') !== serviceAddr.toBase58('testnet')) {
+    // TODO tx.outputs[1].getNestedAddress().toBase58('testnet')
+    if (tx.outputs[1].getAddress().toBase58('testnet') !== serviceAddr.toBase58('testnet')) { 
         return false;
     }
 
@@ -131,6 +132,7 @@ function verifyLockTX(tx: TX, commitTX: TX, servicePubKey: Buffer): boolean {
     // Check that output 0 is sent to the service's address
     const servicePKH = crypto.hash160(servicePubKey);
     const serviceAddr = Address.fromPubkeyhash(servicePKH);
+    // TODO tx.outputs[0].getNestedAddress().toBase58('testnet')
     if (tx.outputs[0].getAddress().toBase58('testnet') !== serviceAddr.toBase58('testnet')) {
         return false;
     }
@@ -145,6 +147,7 @@ function verifyLockTX(tx: TX, commitTX: TX, servicePubKey: Buffer): boolean {
     const redeemScript = genRedeemScript(pubKey, servicePubKey, locktime);
     const scriptHash = crypto.hash160(redeemScript.toRaw());
     const p2shAddr = Address.fromScripthash(scriptHash);
+    // TODO tx.outputs[1].getNestedAddress().toBase58('testnet')
     if (tx.outputs[1].getAddress().toBase58('testnet') !== p2shAddr.toBase58('testnet')) {
         return false;
     }

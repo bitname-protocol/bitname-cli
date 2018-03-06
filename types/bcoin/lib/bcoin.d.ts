@@ -221,8 +221,10 @@ declare module 'bcoin' {
 
     class keyring {
         public network: string;
+        // TODO public witness: boolean;
         static fromOptions(options: KeyRingOpts | hd, network: string): keyring;
 
+        // TODO getNestedAddress(): address;
         getAddress(): address;
         toSecret(network?: string): Base58String;
         getPrivateKey(enc?: string): Buffer;

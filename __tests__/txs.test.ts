@@ -147,6 +147,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         const testCoin = {
             version: 1,
@@ -177,6 +178,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         const testCoin = {
             version: 1,
@@ -207,6 +209,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         const testCoin = {
             version: 1,
@@ -237,6 +240,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         const testCoin = {
             version: 1,
@@ -268,7 +272,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
-
+        // TODO userRing.witness = true;
         const testCoin = {
             version: 1,
             height: -1,
@@ -298,6 +302,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         const testCoin = {
             version: 1,
@@ -328,6 +333,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         const ctxDataPath = path.resolve(__dirname, 'data', '04accc0d.tx');
         const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();
@@ -350,9 +356,15 @@ describe('tx generation', () => {
 
         const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
         const ring = KeyRing.fromSecret(wif);
+<<<<<<< c84bc196bfe886d3f53cd57ceb1f8416d69fde47
+=======
+        // TODO ring.witness = true;
+        const addr = ring.getAddress().toBase58('testnet');
+>>>>>>> add todo comments for segwit migration
 
         const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
         const serviceRing = KeyRing.fromSecret(serviceWif);
+        // TODO serviceRing.witness = true;
         const servicePubKey = serviceRing.getPublicKey();
 
         const tx = genUnlockTx(lockTX, ctx, 1, false, ring, servicePubKey);
@@ -372,10 +384,16 @@ describe('tx generation', () => {
 
         const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
         const ring = KeyRing.fromSecret(wif);
+        // TODO ring.witness = true;
         const userPubKey = ring.getPublicKey();
-
+        
         const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
         const serviceRing = KeyRing.fromSecret(serviceWif);
+<<<<<<< c84bc196bfe886d3f53cd57ceb1f8416d69fde47
+=======
+        // TODO serviceRing.witness = true;
+        const servicePubKey = serviceRing.getPublicKey();
+>>>>>>> add todo comments for segwit migration
 
         const tx = genUnlockTx(lockTX, ctx, 1, true, serviceRing, userPubKey);
 
@@ -387,6 +405,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         const testCoin = {
             version: 1,
@@ -417,6 +436,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         const testCoin = {
             version: 1,
@@ -447,6 +467,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         const testCoin = {
             version: 1,
@@ -484,6 +505,7 @@ describe('tx generation', () => {
 
         const wif = 'cUTaW9nuwpwfuZLkgY98qnfdbzokta2BKxnQ43HyGf7jLEwe1Big';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         const serviceKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
 
@@ -504,6 +526,7 @@ describe('tx generation', () => {
 
         const wif = 'cUTaW9nuwpwfuZLkgY98qnfdbzokta2BKxnQ43HyGf7jLEwe1Big';
         const serviceRing = KeyRing.fromSecret(wif);
+        // TODO serviceRing.witness = true;
 
         const userKey = Buffer.from('030589ee559348bd6a7325994f9c8eff12bd5d73cc683142bd0dd1a17abc99b0dc', 'hex');
 
@@ -524,6 +547,7 @@ describe('tx generation', () => {
 
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
+        // TODO userRing.witness = true;
 
         expect(() => {
             genUnlockTx(lockTX, ctx, 1, false, userRing, userRing.getPublicKey());

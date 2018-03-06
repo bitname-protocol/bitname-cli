@@ -86,8 +86,17 @@ describe('transaction verification', () => {
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
 
+<<<<<<< c84bc196bfe886d3f53cd57ceb1f8416d69fde47
+=======
+            const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
+            const ring = KeyRing.fromSecret(wif);
+            // TODO ring.witness = true;
+            const userPubKey = ring.getPublicKey();
+
+>>>>>>> add todo comments for segwit migration
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
+            // TODO serviceRing.witness = true;
             const servicePubKey = serviceRing.getPublicKey();
 
             const name = '000102030405060708090a0b0c0d0e0f1012131415161718191a1b1c1d1e1f20';
@@ -141,10 +150,12 @@ describe('transaction verification', () => {
 
             const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
             const ring = KeyRing.fromSecret(wif);
+            // TODO ring.witness = true;
             const userPubKey = ring.getPublicKey();
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
+            // TODO ring.serviceRing = true;
             const servicePubKey = serviceRing.getPublicKey();
 
             // I shall begone to build a spiteful script
@@ -274,12 +285,14 @@ describe('transaction verification', () => {
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
+            // TODO serviceRing.witness = true;
             const servicePubKey = serviceRing.getPublicKey();
 
             const oldVal = mtx.outputs[1].value;
 
             // This new output will also be a P2SH, so we're sure it's not just checking for that
             // const newOutput = Output.fromScript(newScript.getAddress(), oldVal);
+            // TODO support for P2WSH
             const addr = Address.fromBase58('muwhLTVYGD7xHpAP2Dx4aCjKThorymmV4w');
             const newOutput = Output.fromScript(addr, oldVal);
 
@@ -301,6 +314,7 @@ describe('transaction verification', () => {
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
+            // TODO serviceRing.witness = true;
             const servicePubKey = serviceRing.getPublicKey();
 
             const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
@@ -311,6 +325,7 @@ describe('transaction verification', () => {
             const oldVal = mtx.outputs[1].value;
 
             // This new output will also be a P2SH, so we're sure it's not just checking for that
+            // TODO newScript.getNestedAddress()
             const newOutput = Output.fromScript(newScript.getAddress() as Address, oldVal);
 
             mtx.outputs[1] = newOutput;
@@ -323,9 +338,15 @@ describe('transaction verification', () => {
         it('verifies generated locking txs', () => {
             const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
             const ring = KeyRing.fromSecret(wif);
+<<<<<<< c84bc196bfe886d3f53cd57ceb1f8416d69fde47
+=======
+            // TODO ring.witness = true;
+            const userPubKey = ring.getPublicKey();
+>>>>>>> add todo comments for segwit migration
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
+            // TODO serviceRing.witness = true;
             const servicePubKey = serviceRing.getPublicKey();
 
             const txDataPath = path.resolve(__dirname, 'data', 'valid_commit_tx.tx');
@@ -354,10 +375,12 @@ describe('transaction verification', () => {
 
             const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
             const ring = KeyRing.fromSecret(wif);
+            // TODO ring.witness = true;
             const userPubKey = ring.getPublicKey();
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
+            // TODO serviceRing.witness = true;
             const servicePubKey = serviceRing.getPublicKey();
 
             expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toEqual(true);
@@ -480,10 +503,12 @@ describe('transaction verification', () => {
 
             const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
             const ring = KeyRing.fromSecret(wif);
+            // TODO ring.witness = true;
             const userPubKey = ring.getPublicKey();
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
+            // TODO serviceRing.witness = true;
             const servicePubKey = serviceRing.getPublicKey();
 
             const oldVal = ctx.outputs[2].value;
@@ -503,10 +528,12 @@ describe('transaction verification', () => {
 
             const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
             const ring = KeyRing.fromSecret(wif);
+            // TODO ring.witness = true;
             const userPubKey = ring.getPublicKey();
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
+            // TODO serviceRing.witness = true;
             const servicePubKey = serviceRing.getPublicKey();
 
             const otherKey = Buffer.from('02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc', 'hex');
@@ -517,6 +544,7 @@ describe('transaction verification', () => {
             const oldVal = ctx.outputs[2].value;
 
             // This new output will also be a P2SH, so we're sure it's not just checking for that
+            // TODO newScript.getNestedAddress()
             const newOutput = Output.fromScript(newScript.getAddress() as Address, oldVal);
 
             ctx.outputs[2] = newOutput;
@@ -527,6 +555,7 @@ describe('transaction verification', () => {
         it('verifies generated commitment txs', () => {
             const wif = 'cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB';
             const ring = KeyRing.fromSecret(wif);
+            // TODO ring.witness = true;
 
             const servicePubKeyHex = '02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc';
             const servicePubKey = Buffer.from(servicePubKeyHex, 'hex');
