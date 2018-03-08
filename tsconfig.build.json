@@ -6,6 +6,7 @@
         "**/__mocks__/*.ts"
     ],
     "compilerOptions": {
-        "outDir": "./dist"
+        "outDir": "./dist",
+        "declaration": true
     }
 }

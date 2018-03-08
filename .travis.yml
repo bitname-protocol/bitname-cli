@@ -8,6 +8,8 @@ install:
  - yarn global add codecov
 script:
  - yarn test --coverage
+ - yarn build
+ - yarn start key-gen
  - codecov
  - yarn build:docs
  - touch docs/.nojekyll

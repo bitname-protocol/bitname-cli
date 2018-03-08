@@ -7,11 +7,20 @@ const mock = {
     server_version: jest.fn(),
 };
 
+// This is some jankiness to make sure that the jest functions exist
+declare module 'electrum-client' {
+    // tslint:disable-next-line:no-shadowed-variable interface-name
+    interface ElectrumClient {
+        mockReturnValue(value: number): any;
+        mockReturnValueOnce(value: number): any;
+    }
+}
+
 jest.mock('electrum-client', () => {
     return jest.fn().mockImplementation(() => mock);
 });
 
-import ElectrumClient = require('electrum-client');
+import ElectrumClient from 'electrum-client';
 
 describe('network functions with bad fees', () => {
     beforeEach(() => {
