@@ -324,11 +324,16 @@ describe('transaction verification', () => {
 
             // Generate a script of any other kind
             const newScript = Script.fromMultisig(1, 2, [servicePubKey, otherKey]);
+            //TODO: then pass the multisig script to the ring?
+            //TODO: serviceRing.script = newScript;
 
             const oldVal = mtx.outputs[1].value;
 
             // This new output will also be a P2SH, so we're sure it's not just checking for that
             // TODO newScript.getNestedAddress()
+            // TODO ^getNestedAddress is only define in key ring?
+            // TODO shouldn't it be  changing below to serviceRing.getAddress();
+            // const newOutput = Output.fromScript(serviceRing.getAddress() as Address, oldVal);?
             const newOutput = Output.fromScript(newScript.getAddress() as Address, oldVal);
 
             mtx.outputs[1] = newOutput;
