@@ -1,15 +1,18 @@
 import { verifyLockTX, verifyCommitTX } from '../lib/verify';
 import {
-    genRedeemScript,
     genP2shAddr,
-    genLockTx,
     getLockTxName,
     getLockTxPubKey,
     getLockTxTime,
-    genCommitTx,
     serializeCommitData,
     deserializeCommitData,
 } from '../lib/txs';
+import{
+    genRedeemScript,
+    genCommitRedeemScript, 
+} from '../lib/tx-generate';
+import genCommitTx from '../lib/tx-commit';
+import genLockTx from '../lib/tx-lock';
 import {
     keyring as KeyRing,
     coin as Coin,
