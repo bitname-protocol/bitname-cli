@@ -1,3 +1,11 @@
+import{
+    coin as Coin,
+    keyring as KeyRing,
+    crypto,
+} from 'bcoin';
+
+
+
 /**
  * Generate a commit transaction.
  * @param coins Array of coins to fund the transaction.
@@ -94,4 +102,8 @@ function genCommitTx(coins: Coin[],
     }
 
     return lockTx.toTX();
+
 }
+export {
+    genCommitTx
+};
