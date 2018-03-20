@@ -8,14 +8,28 @@ import {
 } from 'bcoin';
 
 import {
-    genRedeemScript,
-    genLockTx,
-    genUnlockTx,
-    genCommitTx,
-    genCommitRedeemScript,
     serializeCommitData,
     deserializeCommitData,
 } from '../lib/txs';
+
+import {
+    genUnlockTx,
+} from '../lib/tx-unlock';
+
+import {
+    genLockTx,
+} from '../lib/tx-lock';
+
+import {
+    genCommitTx,
+} from '../lib/tx-commit';
+
+
+import {
+    genRedeemScript,
+    genCommitRedeemScript,
+} from '../lib/tx-generate';
+
 import {
     BadUserPublicKeyError,
     BadServicePublicKeyError,
