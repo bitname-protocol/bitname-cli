@@ -8,6 +8,10 @@ import {
     BadServicePublicKeyError,
 } from './errors';
 
+import {
+    serializeCommitData,
+} from './txs';
+
 /**
  * Generate a redeem script, removing a name/key pair from the blockchain.
  * Validates `userPubkey` and `servicePubkey`.
