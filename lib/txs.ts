@@ -16,7 +16,7 @@ import randomBytes = require('randombytes');
 import {
     genRedeemScript,
     genCommitRedeemScript,
-} from GenScripts;
+} from './tx-generate';
 
 import {
     BadUserPublicKeyError,
