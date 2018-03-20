@@ -9,7 +9,9 @@ import { fundTx, getAllTX } from '../lib/net';
 import { extractInfo } from '../lib/chain';
 
 import TXList from '../lib/TXList';
-import { genCommitTx, genLockTx, genUnlockTx } from '../lib/txs';
+import genCommitTx  from '../lib/tx-commit.ts';
+import genLockTx from '../lib/tx-lock.ts'
+import genUnlockTx from '../lib/tx-unlock.ts'
 
 describe('chain state', () => {
     it('finds the one current name', async () => {
