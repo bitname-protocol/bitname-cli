@@ -1,3 +1,15 @@
+import{
+    tx as TX,
+    keyring as KeyRing,
+    crypto
+} from 'bcoin';
+
+import{
+    genRedeemScript,
+    genCommitRedeemScript, 
+} from './tx-generate';
+
+
 /**
  * Generate an unlock transaction.
  * @param lockTx The corresponding lock transaction.
@@ -81,15 +93,6 @@ function genUnlockTx(lockTx: TX,
 }
 
 export {
-    genLockTx,
+    
     genUnlockTx,
-    genRedeemScript,
-    genP2shAddr,
-    getLockTxName,
-    getLockTxTime,
-    getLockTxPubKey,
-    genCommitTx,
-    genCommitRedeemScript,
-    serializeCommitData,
-    deserializeCommitData,
 };
