@@ -56,7 +56,7 @@ async function commit(argv: yargs.Arguments) {
 
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
-
+    //TODO: ring.witness = true;
     const addr = ring.getAddress();
 
     let feeRate: number;
@@ -120,6 +120,7 @@ async function register(argv: yargs.Arguments) {
 
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
+    //TODO: ring.witness = true;
 
     let feeRate: number;
     try {
@@ -176,6 +177,7 @@ async function revoke(argv: yargs.Arguments) {
 
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
+    //TODO: ring.witness = true;
 
     let lockTX: TX;
     try {
@@ -223,6 +225,7 @@ async function serviceSpend(argv: yargs.Arguments) {
 
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
+    //TODO: ring.witness = true;
 
     const servicePubKey = ring.getPublicKey();
 
@@ -327,6 +330,7 @@ function keyInfo(argv: yargs.Arguments) {
     }
 
     const ring = KeyRing.fromSecret(data.trim());
+    //TODO: ring.witness = true;
     const net = ring.network.toString();
     if (net !== 'testnet' && net !== 'main') {
         return error(`Unknown network ${net}`);
