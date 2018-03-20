@@ -4,6 +4,9 @@ import{
     crypto,
 } from 'bcoin';
 
+import{
+    genCommitRedeemScript, 
+} from './tx-generate';
 
 
 /**
