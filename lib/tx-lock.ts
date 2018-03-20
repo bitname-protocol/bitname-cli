@@ -1,3 +1,14 @@
+import{
+    genRedeemScript,
+    genCommitRedeemScript, 
+} from './tx-generate';
+
+import{
+    tx as TX,
+    keyring as KeyRing,
+    crypto
+} from 'bcoin';
+
 /**
  * Generate a lock transaction.
  * @param commitTX The corresponding commit transaction.
@@ -106,3 +117,6 @@ function genLockTx(commitTX: TX,
 
     return lockTx.toTX();
 }
+export{
+    genLockTx
+};
