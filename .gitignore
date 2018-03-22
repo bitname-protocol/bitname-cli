@@ -71,3 +71,6 @@ typings/
 # dotenv environment variables file
 .env
 
+# package-lock bc its specific to npm
+package-lock.json
+
