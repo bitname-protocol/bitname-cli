@@ -4,7 +4,7 @@ import {
     coin as Coin,
     crypto,
 } from 'bcoin';
-import { fundTx, getAllTX } from '../lib/net';
+import { getAllTX } from '../lib/net';
 
 import { extractInfo } from '../lib/chain';
 
@@ -300,7 +300,6 @@ describe('chain state', () => {
         const servicePubKey = Buffer.from('03f000da94f60417c76832179fd82ebfc614f5df9e67ffbc1717542ec460e8054c', 'hex');
 
         const userRing = KeyRing.fromSecret('cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB');
-        const userPubKey = userRing.getPublicKey();
 
         const commitFee = 10000;
         const registerFee = 10000;

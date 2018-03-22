@@ -1,5 +1,4 @@
 jest.mock('electrum-client');
-import ElectrumClient from 'electrum-client';
 
 describe('network functions with bad server lists', () => {
     beforeEach(() => {
