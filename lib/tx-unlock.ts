@@ -13,6 +13,8 @@ import{
     genCommitRedeemScript, 
 } from './tx-generate';
 
+import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
+
 
 /**
  * Generate an unlock transaction.
