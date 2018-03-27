@@ -1,7 +1,12 @@
 import{
+    script as Script,
+    address as Address,
+    output as Output,
+    mtx as MTX,
+    coin as Coin,
     tx as TX,
     keyring as KeyRing,
-    crypto
+    crypto,
 } from 'bcoin';
 
 import{
@@ -15,6 +20,11 @@ import{
 
 import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
 
+import {
+    BadUserPublicKeyError,
+    BadServicePublicKeyError,
+    BadLockTransactionError,
+} from './errors';
 
 /**
  * Generate an unlock transaction.

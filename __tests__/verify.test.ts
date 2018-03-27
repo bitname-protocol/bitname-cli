@@ -11,8 +11,8 @@ import{
     genRedeemScript,
     genCommitRedeemScript, 
 } from '../lib/tx-generate';
-import genCommitTx from '../lib/tx-commit';
-import genLockTx from '../lib/tx-lock';
+import { genCommitTx } from '../lib/tx-commit';
+import { genLockTx } from '../lib/tx-lock';
 import {
     keyring as KeyRing,
     coin as Coin,

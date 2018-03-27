@@ -8,7 +8,7 @@ import { fundTx, getAllTX } from '../lib/net';
 
 import { extractInfo } from '../lib/chain';
 
-import { TXList } from '../lib/TXList';
+import  TXList  from '../lib/TXList';
 import { genCommitTx }  from '../lib/tx-commit.ts';
 import { genLockTx } from '../lib/tx-lock.ts';
 import { genUnlockTx } from '../lib/tx-unlock.ts';
