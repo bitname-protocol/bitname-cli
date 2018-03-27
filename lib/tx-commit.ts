@@ -13,6 +13,9 @@ import{
 } from './txs.ts';
 
 import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
+
+import randomBytes = require('randombytes');
+
 /**
  * Generate a commit transaction.
  * @param coins Array of coins to fund the transaction.
