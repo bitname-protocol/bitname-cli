@@ -12,7 +12,7 @@ import{
     genP2shAddr,
 } from './txs.ts';
 
-
+import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
 /**
  * Generate a commit transaction.
  * @param coins Array of coins to fund the transaction.
