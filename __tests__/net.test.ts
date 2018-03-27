@@ -17,6 +17,16 @@ describe('network data', () => {
         expect(height).toBe(1280175);
     });
 
+    it('selects a regtest server', async () => {
+        const height = await getBlockHeight('regtest');
+
+        expect(height).toBe(1280175);
+    });
+
+    it('errors on an invalid network', async () => {
+        await expect(getBlockHeight('litecoin')).rejects.toThrow('Unknown network \'litecoin\'');
+    });
+
     it('correctly funds a transaction', async () => {
         const addr = Address.fromBase58('mmGx9VsBsn1Mv3gERhXTAChASu8vqkeke6');
         const coins = await fundTx(addr, 2024152, 'testnet');
