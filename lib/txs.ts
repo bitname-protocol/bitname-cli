@@ -7,6 +7,7 @@ import {
     tx as TX,
     keyring as KeyRing,
     crypto,
+    Witness
 } from 'bcoin';
 
 import randomBytes from 'randombytes';
@@ -123,6 +124,13 @@ function genP2shAddr(redeemScript: Script): Address {
     const p2shAddr = Address.fromScript(outputScript);
 
     return p2shAddr;
+}
+
+function genP2WshAddr(redeemScript: Script): Address {
+    const outputScript = Script.fromScripthash(redeemScript.sha256()); // P2WSH uses SHA256 not HASH160
+    const p2wshAddr = Address.fromScript(outputScript);
+
+    return p2wshAddr;
 }
 
 /**
@@ -297,6 +305,91 @@ function genCommitTx(coins: Coin[],
     return lockTx.toTX();
 }
 
+function genCommitTxW(coins: Coin[],
+                     name: string,
+                     locktime: number,
+                     commitFee: number,
+                     registerFee: number,
+                     escrowFee: number,
+                     feeRate: number,
+                     userRing: KeyRing,
+                     servicePubKey: Buffer): TX {
+    //
+    // Validate name and the service public key
+    if (name.length > 64) {
+        throw new Error('Name is too long');
+    }
+
+    if (!isURISafe(name)) {
+        throw new Error('Invalid character(s) in name');
+    }
+
+    if (!crypto.secp256k1.publicKeyVerify(servicePubKey)) {
+        throw new Error('Invalid service public key');
+    }
+
+    // Generate a P2WSH address from a redeem script, using a random nonce
+    const nonce = randomBytes(32);
+    const redeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name, locktime);
+    const p2WshAddr = genP2WshAddr(redeemScript);
+
+    // Generate service address from service public key
+    const serviceWPKH = crypto.hash160(servicePubKey); // I believe this is the correct hash fn
+    const serviceAddr = Address.fromPubkeyhash(serviceWPKH);
+
+    const lockTx = new MTX();
+
+    // Compute total value of coins
+    const total = coins.reduce((acc, cur) => acc + cur.value, 0);
+
+    for (const coin of coins) {
+        lockTx.addCoin(coin);
+    }
+
+    // Compute change amount
+    const changeVal = total - (commitFee + registerFee + escrowFee) - (4 * feeRate);
+
+    // Add nonce OP_RETURN as output 0
+    const pubkeyDataScript = Script.fromNulldata(nonce);
+    lockTx.addOutput(Output.fromScript(pubkeyDataScript, 0));
+
+    // Add service upfront fee as output 1
+    lockTx.addOutput({
+        address: serviceAddr,
+        value: commitFee,
+    });
+
+    // Add locked fee as output 2
+    lockTx.addOutput({
+        address: p2WshAddr,
+        value: registerFee + escrowFee + 4 * feeRate,
+    });
+
+    // Add change output as output 3
+    lockTx.addOutput({
+        address: userRing.getNestedAddress(),   // not sure if right
+        value: changeVal,
+    });
+
+    // Add coins as inputs
+    for (let i = 0; i < coins.length; ++i) {
+        const coin = coins[i];
+        lockTx.scriptInput(i, coin, userRing);
+    }
+
+    // Each signature is 72 bytes long
+    const virtSize = lockTx.getVirtualSize() + coins.length * 72;
+    lockTx.subtractIndex(3, Math.ceil(virtSize / 1000 * feeRate));
+
+    // Sign the coins
+    for (let i = 0; i < coins.length; ++i) {
+        const coin = coins[i];
+        lockTx.signInput(i, coin, userRing, Script.hashType.ALL);
+    }
+
+    return lockTx.toTX();
+}
+
 /**
  * Generate a lock transaction.
  * @param commitTX The corresponding commit transaction.
@@ -375,6 +468,115 @@ function genLockTx(commitTX: TX,
     // Add change output as 2
     lockTx.addOutput({
         address: userRing.getAddress(), // TODO userRing.getNestedAddress(),
+        value: changeVal,
+    });
+
+    const nonce = commitTX.outputs[0].script.code[1].data;
+
+    const hashData = serializeCommitData(nonce, locktime, name);
+
+    const commitRedeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name, locktime);
+
+    const unlockScript = new Script();
+    unlockScript.pushData(hashData);
+    unlockScript.pushData(commitRedeemScript.toRaw());
+    unlockScript.compile();
+
+    lockTx.inputs[0].script = unlockScript;
+
+    // Add constant for signature
+    const virtSize = lockTx.getVirtualSize() + 72;
+
+    // Calculate fee to be paid
+    const fee = Math.ceil(virtSize / 1000 * feeRate);
+    lockTx.subtractIndex(2, fee);
+
+    // Add signature
+    const sig = lockTx.signature(0, commitRedeemScript, total, userRing.getPrivateKey(), Script.hashType.ALL, 0);
+    unlockScript.insertData(0, sig);
+    unlockScript.compile();
+
+    return lockTx.toTX();
+}
+
+/**
+ * Generate a lock transaction.
+ * @param commitTX The corresponding witness commit transaction
+ * @param name The name to use.
+ * @param upfrontFee The upfront fee in satoshis to use the service, as
+ * determined by the service.
+ * @param lockedFee Fee incenvitizing registrar to provide service, as
+ * determined by the service.
+ * @param feeRate Fee rate in satoshi/KB.
+ * @param userRing The user key ring.
+ * @param servicePubKey Service public key.
+ * @param locktime Absolute lock time in blocks.
+ */
+function genLockTxW(commitTX: TX,
+                    name: string,
+                    upfrontFee: number,
+                    lockedFee: number,
+                    feeRate: number,
+                    userRing: KeyRing,
+                    servicePubKey: Buffer,
+                    locktime: number): TX {
+    //
+    // Input validation
+    if (locktime > 500000000) {
+    throw new Error('Locktime must be less than 500000000 blocks');
+    }
+
+    if (name.length > 64) {
+    throw new Error('Name is too long');
+    }
+
+    if (!isURISafe(name)) {
+    throw new Error('Invalid character(s) in name');
+    }
+
+    if (!crypto.secp256k1.publicKeyVerify(servicePubKey)) {
+    throw new Error('Invalid service public key');
+    }
+
+    if (!verifyCommitTX(commitTX, userRing.getPublicKey(), servicePubKey, name, locktime)) {
+    throw new Error('Invalid commitment tx');
+    }
+
+    // Generate a P2SH address from redeem script
+    const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
+    const p2wshAddr = genP2WshAddr(redeemScript); 
+
+    // Generate address from service public key
+    const serviceWPKH = crypto.sha256(servicePubKey); // P2PKH uses SHA256 not HASH160
+    const serviceAddr = Address.fromPubkeyhash(serviceWPKH); 
+
+    const lockTx = MTX.fromOptions({
+        version: 2,
+    });
+
+    lockTx.addTX(commitTX, 2);
+
+    lockTx.setSequence(0, 6);
+
+    const total = commitTX.outputs[2].value;
+
+    const changeVal = total - upfrontFee - lockedFee;
+
+    // Add upfront fee as output 0
+    lockTx.addOutput({
+        address: serviceAddr, // P2WPKH not P2PKH
+        value: upfrontFee,
+    });
+
+    // Add locked fee as output 1
+    lockTx.addOutput({
+        address: p2wshAddr, // P2WSH not P2SH
+        value: lockedFee,
+    });
+
+    // Add change output as 2
+    lockTx.addOutput({
+        address: userRing.getNestedAddress(), 
         value: changeVal,
     });
 
@@ -547,6 +749,94 @@ function genUnlockTx(lockTx: TX,
     unlockScript2.compile();
 
     unlockTx.inputs[0].script = unlockScript2;
+
+    return unlockTx.toTX();
+}
+
+/**
+ * Generate a witness unlock transaction.
+ * @param lockTx The corresponding witness lock transaction.
+ * @param commitTx The corresponding witness commit transaction.
+ * @param feeRate The fee rate in satoshi/KB
+ * @param service Whether to use the script as service.
+ * @param ring The service key ring if `service`, otherwise user key ring.
+ * @param otherPubKey The user key ring if `service`, otherwise service key ring.
+ */
+function genUnlockTxW(lockTx: TX,
+                      commitTx: TX,
+                      feeRate: number,
+                      service: boolean,
+                      ring: KeyRing,
+                      otherPubKey: Buffer): TX {
+    // Disambiguate ring public key and the other public key
+    const servicePubKey =  service ? ring.getPublicKey() : otherPubKey;
+    const userPubKey    = !service ? ring.getPublicKey() : otherPubKey;
+
+    //
+    // Input validation
+    if (!verifyLockTX(lockTx, commitTx, servicePubKey)) {
+        throw new BadLockTransactionError();
+    }
+
+    if (!crypto.secp256k1.publicKeyVerify(otherPubKey)) {
+        throw new Error('Invalid service public key');
+    }
+
+    const locktime = getLockTxTime(lockTx);
+    if (locktime === null) {
+        throw new Error('Could not extract locktime');
+    }
+
+    const redeemScript = genRedeemScript(userPubKey, servicePubKey, locktime);
+
+    const val = lockTx.outputs[1].value; // P2WSH output
+    const unlockTx = MTX.fromOptions({
+        version: 2,
+    });
+
+    unlockTx.addTX(lockTx, 1);
+
+    const boolVal = service ? 0 : 1;
+
+    if (service) {
+        unlockTx.setLocktime(locktime);
+    } else {
+        unlockTx.setSequence(0, 0);
+    }
+
+    unlockTx.addOutput({
+        address: ring.getNestedAddress(),
+        value: val,
+    });
+
+    // Generate new script: <sig> <isUser> <redeemScript>
+    const unlockScript = new Script();
+    unlockScript.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
+    unlockScript.pushInt(boolVal);
+    unlockScript.pushData(redeemScript.toRaw());
+    unlockScript.compile();
+
+    // put it on the witness, not scriptSig. This should be scrutinized heavily and is really a guess. TODO
+    unlockTx.inputs[0].witness = Witness.fromOptions({
+        redeem: unlockScript,
+    });
+
+    // Compute a fee by multiplying the size by the rate, then account for it
+    const virtSize = unlockTx.getVirtualSize();
+    const fee = Math.ceil(virtSize / 1000 * feeRate);
+    unlockTx.subtractFee(fee);
+
+    // Remake script with the new signature
+    const unlockScript2 = new Script();
+    unlockScript2.pushData(unlockTx.signature(0, redeemScript, val, ring.getPrivateKey(), Script.hashType.ALL, 0));
+    unlockScript2.pushInt(boolVal);
+    unlockScript2.pushData(redeemScript.toRaw());
+    unlockScript2.compile();
+
+    // Also TODO
+    unlockTx.inputs[0].witness = Witness.fromOptions({
+        redeem: unlockScript2,
+    });
 
     return unlockTx.toTX();
 }
