@@ -8,6 +8,10 @@ import{
     genCommitRedeemScript, 
 } from './tx-generate';
 
+import{
+    genP2shAddr,
+} from './txs.ts';
+
 
 /**
  * Generate a commit transaction.

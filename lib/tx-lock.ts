@@ -3,6 +3,11 @@ import{
     genCommitRedeemScript, 
 } from './tx-generate';
 
+import {
+    genP2shAddr,
+    serializeCommitData,    
+} from './txs.ts';
+
 import{
     tx as TX,
     keyring as KeyRing,

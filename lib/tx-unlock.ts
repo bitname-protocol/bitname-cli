@@ -5,6 +5,10 @@ import{
 } from 'bcoin';
 
 import{
+    getLockTxTime,
+} from './txs.ts';
+
+import{
     genRedeemScript,
     genCommitRedeemScript, 
 } from './tx-generate';
