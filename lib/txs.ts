@@ -29,7 +29,7 @@ import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
 /**
  * Generate a P2SH address from a redeem script.
  * @param redeemScript The script to use.
- */register
+ */
 function genP2shAddr(redeemScript: Script): Address {
     const outputScript = Script.fromScripthash(redeemScript.hash160());
     const p2shAddr = Address.fromScript(outputScript);
