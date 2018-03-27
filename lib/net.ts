@@ -35,6 +35,12 @@ function getServerList(network: string): IServerList {
         return JSON.parse(JSON.stringify(testServers));
     } else if (network === 'main') {
         return JSON.parse(JSON.stringify(servers));
+    } else if (network === 'regtest') {
+        return {
+            localhost: {
+                s: '50002',
+            },
+        };
     } else {
         throw new Error(`Unknown network '${network}'`);
     }
