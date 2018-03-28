@@ -111,6 +111,10 @@ $ bitname revoke tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn
 
 Fill in your own registration's txid, and bam, you've got half your money back.
 
+## Testnet is annoying. Can I use regtest instead?
+
+You betcha! Check out the [regtest guide](./REGTEST_GUIDE.md) for how to get started.
+
 ## I'm a developer, can I use this in my app?
 
 Sure thing! Read our handy-dandy [API docs](https://docs.bitname.xyz/).
