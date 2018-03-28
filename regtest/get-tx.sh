@@ -1,2 +1,2 @@
 #!/usr/bin/sh
-./bitcoin-cli.sh gettransaction $@
+./bitcoin-cli.sh getrawtransaction $@
