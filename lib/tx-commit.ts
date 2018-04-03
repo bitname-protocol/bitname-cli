@@ -1,4 +1,4 @@
-import{
+import {
     script as Script,
     address as Address,
     output as Output,
@@ -9,17 +9,17 @@ import{
     crypto,
 } from 'bcoin';
 
-import{
-    genCommitRedeemScript, 
+import {
+    genCommitRedeemScript,
 } from './tx-generate';
 
-import{
+import {
     genP2shAddr,
-} from './txs.ts';
+} from './txs';
 
 import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
 
-import randomBytes = require('randombytes');
+import randomBytes from 'randombytes';
 
 /**
  * Generate a commit transaction.
@@ -120,5 +120,5 @@ function genCommitTx(coins: Coin[],
 
 }
 export {
-    genCommitTx
+    genCommitTx,
 };

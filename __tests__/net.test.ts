@@ -1,6 +1,6 @@
 import { fundTx, getAllTX, getFeesSatoshiPerKB, getBlockHeight, getTX, postTX } from '../lib/net';
 
-import ElectrumClient = require('electrum-client');
+import ElectrumClient from 'electrum-client';
 
 import { address as Address, tx as TX } from 'bcoin';
 

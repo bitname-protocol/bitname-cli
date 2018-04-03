@@ -5,11 +5,10 @@ import {
     getLockTxPubKey,
     getLockTxTime,
     serializeCommitData,
-    deserializeCommitData,
 } from '../lib/txs';
-import{
+import {
     genRedeemScript,
-    genCommitRedeemScript, 
+    genCommitRedeemScript,
 } from '../lib/tx-generate';
 import { genCommitTx } from '../lib/tx-commit';
 import { genLockTx } from '../lib/tx-lock';
@@ -94,10 +93,6 @@ describe('transaction verification', () => {
             const txDataPath = path.resolve(__dirname, 'data', 'valid_lock_tx.tx');
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
-
-            const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
-            const ring = KeyRing.fromSecret(wif);
-            const userPubKey = ring.getPublicKey();
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
@@ -336,7 +331,6 @@ describe('transaction verification', () => {
         it('verifies generated locking txs', () => {
             const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
             const ring = KeyRing.fromSecret(wif);
-            const userPubKey = ring.getPublicKey();
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
@@ -534,8 +528,6 @@ describe('transaction verification', () => {
             const newOutput = Output.fromScript(newScript.getAddress() as Address, oldVal);
 
             ctx.outputs[2] = newOutput;
-
-            const tx = ctx.toTX();
 
             expect(verifyCommitTX(ctx, userPubKey, servicePubKey, 'colin', 66072)).toEqual(false);
         });

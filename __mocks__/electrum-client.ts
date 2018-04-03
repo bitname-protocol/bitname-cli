@@ -123,4 +123,4 @@ class ElectrumClient {
     }
 }
 
-export = ElectrumClient;
+export default ElectrumClient;

@@ -1,5 +1,3 @@
-// import { I64 } from 'n64';
-
 import {
     script as Script,
     address as Address,
@@ -11,7 +9,7 @@ import {
     crypto,
 } from 'bcoin';
 
-import randomBytes = require('randombytes');
+import randomBytes from 'randombytes';
 
 import {
     genRedeemScript,
@@ -71,7 +69,7 @@ function serializeCommitData(nonce: Buffer, locktime: number, name: string): Buf
     return outBuf;
 }
 
-interface ICommitData {
+export interface ICommitData {
     nonce: Buffer;
     locktime: number;
     name: string;
@@ -110,8 +108,6 @@ function deserializeCommitData(data: Buffer): ICommitData {
         name,
     };
 }
-
-
 
 /**
  * Extract metadata from a script (i.e. the nonce, locktime, and name).
@@ -174,9 +170,6 @@ function getLockTxPubKey(lockTx: TX): Buffer | null {
     const pubKey: Buffer = encumberScript.code[6].data;
 
     return pubKey;
-}
-
-
 }
 
 export {
