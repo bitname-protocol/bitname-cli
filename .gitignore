@@ -1,5 +1,6 @@
 *.wif
 .vscode/
+.rpt2_cache/
 
 paper.html
 paper.pdf
@@ -45,6 +46,7 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+package-lock.json
 
 # Typescript v1 declaration files
 typings/
@@ -68,3 +70,4 @@ typings/
 .env
 
 package-lock.json
+

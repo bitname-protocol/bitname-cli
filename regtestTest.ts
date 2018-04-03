@@ -1,10 +1,10 @@
+/* tslint:disable:no-console */
 import child_process = require('child_process');
 import {
     keyring as KeyRing,
     script as Script,
     coin as Coin,
     amount as Amount,
-    Amount as RawAmount,
     util,
 } from 'bcoin';
 import { genCommitTx, genLockTx, genUnlockTx } from './lib/txs';

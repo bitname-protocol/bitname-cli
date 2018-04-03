@@ -2,7 +2,7 @@ import {
     utils,
 } from 'bcoin';
 
-type netStr = 'testnet' | 'main';
+export type netStr = 'testnet' | 'main';
 
 function bech32Encode(pubKey: Buffer, network: netStr): string {
     let hrp: string;
