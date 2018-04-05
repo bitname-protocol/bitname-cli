@@ -7,7 +7,8 @@ import {
     crypto,
     util,
 } from 'bcoin';
-import { genLockTx, genUnlockTx, genCommitTx, getLockTxPubKey } from '../lib/txs';
+import { genUnlockTx, genCommitTx, getLockTxPubKey } from '../lib/txs';
+import { genLockTx } from '../lib/tx-lock.ts
 import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from '../lib/net';
 import { extractInfo } from '../lib/chain';
 
@@ -68,7 +69,6 @@ async function commit(argv: yargs.Arguments) {
 
     // const upfrontFee =  500000;
     // const delayFee   = 1500000;
-
     const commitFee = 500000;
     const registerFee = 500000;
     const escrowFee = 1000000;
