@@ -56,7 +56,10 @@ async function commit(argv: yargs.Arguments) {
 
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
-    //TODO: ring.witness = true;
+
+    if (argv.witness) {
+        ring.witness = true;
+    }
     const addr = ring.getAddress();
 
     let feeRate: number;
@@ -90,7 +93,8 @@ async function commit(argv: yargs.Arguments) {
                                      escrowFee,
                                      feeRate,
                                      ring,
-                                     servicePubKey);
+                                     servicePubKey,
+                                     argv.witness);
         const txidStr = chalk`{green ${util.revHex(commitTx.hash('hex')) as string}}`;
 
         if (argv.push) {
@@ -120,7 +124,10 @@ async function register(argv: yargs.Arguments) {
 
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
-    //TODO: ring.witness = true;
+
+    if (argv.witness) {
+        ring.witness = true;
+    }
 
     let feeRate: number;
     try {
@@ -147,7 +154,8 @@ async function register(argv: yargs.Arguments) {
                                  feeRate,
                                  ring,
                                  servicePubKey,
-                                 argv.locktime);
+                                 argv.locktime,
+                                 argv.witness);
         const txidStr = chalk`{green ${util.revHex(lockTx.hash('hex')) as string}}`;
 
         if (argv.push) {
@@ -177,7 +185,10 @@ async function revoke(argv: yargs.Arguments) {
 
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
-    //TODO: ring.witness = true;
+
+    if (argv.witness) {
+        ring.witness = true;
+    }
 
     let lockTX: TX;
     try {
@@ -204,7 +215,7 @@ async function revoke(argv: yargs.Arguments) {
         return errorNoFees();
     }
 
-    const unlockTx = genUnlockTx(lockTX, commitTX, feeRate, false, ring, servicePubKey);
+    const unlockTx = genUnlockTx(lockTX, commitTX, feeRate, false, ring, servicePubKey, argv.witness);
     const txidStr = chalk`{green ${util.revHex(unlockTx.hash('hex')) as string}}`;
 
     if (argv.push) {
@@ -225,7 +236,10 @@ async function serviceSpend(argv: yargs.Arguments) {
 
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
-    //TODO: ring.witness = true;
+
+    if (argv.witness) {
+        ring.witness = true;
+    }
 
     const servicePubKey = ring.getPublicKey();
 
@@ -259,7 +273,7 @@ async function serviceSpend(argv: yargs.Arguments) {
         return errorNoFees();
     }
 
-    const unlockTx = genUnlockTx(lockTX, commitTX, feeRate, true, ring, userPubKey);
+    const unlockTx = genUnlockTx(lockTX, commitTX, feeRate, true, ring, userPubKey, argv.witness);
     const txidStr = chalk`{green ${util.revHex(unlockTx.hash('hex')) as string}}`;
 
     if (argv.push) {
@@ -373,6 +387,10 @@ function main() {
                 .option('push', {
                     type: 'boolean',
                     describe: 'whether to push this transaction to the network',
+                })
+                .option('witness', {
+                    type: 'boolean',
+                    describe: 'whether to generate witness transaction',
                 });
         }, commit)
         .command('register <servicePubKey> <txid> <name> <locktime>',
@@ -403,6 +421,10 @@ function main() {
                 .option('push', {
                     type: 'boolean',
                     describe: 'whether to push this transaction to the network',
+                })                
+                .option('witness', {
+                    type: 'boolean',
+                    describe: 'whether to generate witness transaction',
                 });
         }, register)
         .command('revoke <servicePubKey> <txid>', 'revoke a name', (yargsObj) => {
@@ -424,6 +446,10 @@ function main() {
                 .option('push', {
                     type: 'boolean',
                     describe: 'whether to push this transaction to the network',
+                })
+                .option('witness', {
+                    type: 'boolean',
+                    describe: 'whether to generate witness transaction',
                 });
         }, revoke)
         .command('service-spend <txid>', 'spend locked fee sent to a service you control', (yargsObj) => {
@@ -445,6 +471,10 @@ function main() {
                 .option('push', {
                     type: 'boolean',
                     describe: 'whether to push this transaction to the network',
+                })
+                .option('witness', {
+                    type: 'boolean',
+                    describe: 'whether to generate witness transaction',
                 });
         }, serviceSpend)
         .command('all-names <servicePubKey>', 'get all current names registered with a service', (yargsObj) => {
