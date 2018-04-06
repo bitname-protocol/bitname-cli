@@ -52,7 +52,12 @@ function isValidOP_RETURN(output: Output): boolean {
  * @param name A name of at most 64 characters composed of URL-safe characters
  * @param locktime An absolute lock time, in blockheight
  */
-function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name: string, locktime: number): boolean {
+function verifyCommitTX(tx: TX, 
+                        userPubKey: Buffer, 
+                        servicePubKey: Buffer,
+                        name: string, 
+                        locktime: number,
+                        witness: boolean = false): boolean {
     if (tx.outputs.length < 3) {
         return false;
     }
@@ -98,7 +103,10 @@ function verifyCommitTX(tx: TX, userPubKey: Buffer, servicePubKey: Buffer, name:
  * @param commitTX The corresponding commit transaction.
  * @param servicePubKey service provider's public key
  */
-function verifyLockTX(tx: TX, commitTX: TX, servicePubKey: Buffer): boolean {
+function verifyLockTX(tx: TX, 
+                      commitTX: TX, 
+                      servicePubKey: Buffer,
+                      witness: boolean = false): boolean {
     if (tx.outputs.length < 2) {
         return false;
     }

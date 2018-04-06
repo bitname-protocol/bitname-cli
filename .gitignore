@@ -71,6 +71,11 @@ typings/
 # dotenv environment variables file
 .env
 
+<<<<<<< 04283aa0ee96c8381458eb10d07d0e22d5f75fdb
 # package-lock bc its specific to npm
 package-lock.json
 
+=======
+# editor config 
+.vscode/
+>>>>>>> add support for witness in verify.ts, add --witness flag in cli
