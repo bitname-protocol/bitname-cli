@@ -45,7 +45,7 @@ Let's start mining! In regtest mode, block rewards must be allowed to "mature" f
 
 You should now see 101 hexadecimal strings printed to your console. That means it worked.
 
-Let's check our wallet balance by running `./get-balance.sh`. It should print out sum nonzero number.
+Let's check our wallet balance by running `./get-balance.sh`. It should print out some nonzero number.
 
 Say we want to test with the address `mmGx9VsBsn1Mv3gERhXTAChASu8vqkeke6`. But it has no funds. Fortunately, we can easily donate 10 RBTC to it.
 

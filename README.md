@@ -60,7 +60,7 @@ As of now, the package is unstable. As a result, everything shown below will be 
 First, generate a new private key.
 
 ```bash
-$ bitname key-gen -o mykey.wif --testnet
+$ bitname key-gen -o mykey.wif --network testnet
 ```
 
 You need to fund the address displayed. The easiest way to get tBTC is a faucet, such as:
