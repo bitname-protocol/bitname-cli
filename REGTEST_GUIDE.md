@@ -29,7 +29,7 @@ First things first, let's move into the `regtest` directory.
 cd regtest
 ```
 
-Now, let's start up the the Docker images.
+Now, let's start up the the Docker images. Note that if this doesn't work, you may want to retry it using `sudo`. This also applies to the shell scripts we're going to run later.
 
 ```bash
 docker-compose up
