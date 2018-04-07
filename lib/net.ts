@@ -35,6 +35,12 @@ function getServerList(network: string): IServerList {
         return JSON.parse(JSON.stringify(testServers));
     } else if (network === 'main') {
         return JSON.parse(JSON.stringify(servers));
+    } else if (network === 'regtest') {
+        return {
+            localhost: {
+                s: '50002',
+            },
+        };
     } else {
         throw new Error(`Unknown network '${network}'`);
     }
@@ -96,7 +102,7 @@ async function serverConnect(network: string): Promise<ElectrumClient> {
             await ecl.server_version('3.0.5', '1.1');
 
             // Must support fee estimation
-            const feeRate = await ecl.blockchainEstimatefee(2);
+            const feeRate = network === 'regtest' ? 10000 : await ecl.blockchainEstimatefee(2);
             if (feeRate < 0) {
                 throw new Error('Server does not support fee estimation');
             }
@@ -119,6 +125,10 @@ async function serverConnect(network: string): Promise<ElectrumClient> {
  * @returns The estimated fee in sat/kb
  */
 async function getFeesSatoshiPerKB(network: string): Promise<number> {
+    if (network === 'regtest') {
+        return 10000;
+    }
+
     const ecl = await serverConnect(network);
 
     const feeRate = await ecl.blockchainEstimatefee(2);
@@ -233,16 +243,17 @@ async function getAllTX(addr: Address, network: string): Promise<TXList> {
 
     const unspents: {[addr: string]: {[txidOutput: string]: boolean}} = {};
 
-    // Iterate over all txs
-    const outputsSpent: boolean[][] = await Promise.all(txs.map(async (tx) => {
-        // Iterate over each output
-        return await Promise.all(tx.outputs.map(async (out, ind) => {
+    const shimNet = network === 'regtest' ? 'testnet' : network;
+
+    // Construct the unspents dictionary
+    for (const tx of txs) {
+        for (const out of tx.outputs) {
             const outAddrObj = out.getAddress();
             if (outAddrObj === null) {
-                return false;
+                continue;
             }
 
-            const outAddr = outAddrObj.toBase58(network);
+            const outAddr = outAddrObj.toBase58(shimNet);
 
             // If the utxos for this address aren't yet known, fetch and add them
             if (!(outAddr in unspents)) {
@@ -257,10 +268,22 @@ async function getAllTX(addr: Address, network: string): Promise<TXList> {
                     return acc;
                 }, {} as {[txidOutput: string]: boolean});
             }
+        }
+    }
+
+    // Using the unspents dicitonary, check if each txo has been spent
+    const outputsSpent: boolean[][] = txs.map((tx) => {
+        return tx.outputs.map((out, ind) => {
+            const outAddrObj = out.getAddress();
+            if (outAddrObj === null) {
+                return false;
+            }
+
+            const outAddr = outAddrObj.toBase58(shimNet);
 
             return !((tx.txid() + ':' + ind) in unspents[outAddr]);
-        }));
-    }));
+        });
+    });
 
     const heights = confirmedOnly.map((tx) => tx.height);
 

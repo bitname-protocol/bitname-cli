@@ -60,7 +60,7 @@ As of now, the package is unstable. As a result, everything shown below will be 
 First, generate a new private key.
 
 ```bash
-$ bitname key-gen -o mykey.wif --testnet
+$ bitname key-gen -o mykey.wif --network testnet
 ```
 
 You need to fund the address displayed. The easiest way to get tBTC is a faucet, such as:
@@ -110,6 +110,10 @@ $ bitname revoke tp1qqdssqgmu777ddtsn2rv4uuwljy999dkz3zr8n2fwakw7xf4e5d5jg58ykmn
 ```
 
 Fill in your own registration's txid, and bam, you've got half your money back.
+
+## Testnet is annoying. Can I use regtest instead?
+
+You betcha! Check out the [regtest guide](./REGTEST_GUIDE.md) for how to get started.
 
 ## I'm a developer, can I use this in my app?
 
