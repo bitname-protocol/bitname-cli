@@ -3,6 +3,12 @@ language: node_js
 node_js:
   - "node"
   - "7"
+services:
+  - docker
+before_install:
+  - cd regtest
+  - docker-compose up -d
+  - cd ..
 install:
  - yarn
  - yarn global add codecov
@@ -11,6 +17,7 @@ script:
  - yarn build
  - yarn test --coverage
  - yarn start key-gen
+after_success:
  - codecov
  - yarn build:docs
  - touch docs/.nojekyll
