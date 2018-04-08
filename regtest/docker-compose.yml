@@ -10,11 +10,14 @@ services:
      - DAEMON_URL=user:password@bitcoind:12001
      - NET=regtest
     volumes:
-     - ./data/electrumx-data:/data
+     - electrumx-data:/data
   bitcoind:
     image: "kylemanna/bitcoind"
     ports:
      - "12001:12001"
     volumes:
-     - ./data/bitcoind-data:/bitcoin
+     - bitcoin-data:/bitcoin
      - ./bitcoin.conf:/bitcoin/.bitcoin/bitcoin.conf
+volumes:
+ bitcoin-data:
+ electrumx-data:
