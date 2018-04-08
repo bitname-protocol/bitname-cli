@@ -17,7 +17,6 @@ script:
  - yarn build
  - yarn test --coverage
  - yarn start key-gen
-after_success:
  - codecov
  - yarn build:docs
  - touch docs/.nojekyll
