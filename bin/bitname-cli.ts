@@ -1,14 +1,14 @@
+// tslint:disable:no-console
 import * as yargs from 'yargs';
 import {
     keyring as KeyRing,
-    coin as Coin,
     tx as TX,
     address as Address,
     crypto,
     util,
 } from 'bcoin';
-import { genLockTx, genUnlockTx, genCommitTx, getLockTxPubKey } from '../lib/txs';
-import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from '../lib/net';
+import { genLockTx, genUnlockTx, getLockTxPubKey } from '../lib/txs';
+import { getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from '../lib/net';
 import { extractInfo } from '../lib/chain';
 
 import * as fs from 'fs';
@@ -16,34 +16,9 @@ import * as path from 'path';
 import { verifyLockTX } from '../lib/verify';
 import { bech32Encode, bech32Decode } from '../lib/utils';
 
+import { errorBadHRP, error, errorNoFees, errorCantPush, errorUnfoundTx, errorInvalidLock } from './errors';
+import { onlineCommitTx } from './commit-tx-gen';
 import chalk from 'chalk';
-
-/* tslint:disable:no-console */
-function error(msg: string): never {
-    console.error(chalk`{red Error: ${msg}}`);
-    process.exit(1);
-    throw new Error('Somehow, exiting the process failed?');
-}
-
-function errorUnfoundTx(): never {
-    return error('Could not find the transaction. Check the txid or try again later.');
-}
-
-function errorBadHRP() {
-    return error('Invalid pubkey HRP');
-}
-
-function errorNoFees() {
-    return error('Could not fetch fee information. Try again later.');
-}
-
-function errorInvalidLock() {
-    return error('This is not a valid bitname registration tx');
-}
-
-function errorCantPush() {
-    return error('There was a problem publishing the tx. Try again later.');
-}
 
 async function commit(argv: yargs.Arguments) {
     const decoded = bech32Decode(argv.servicePubKey);
@@ -55,54 +30,23 @@ async function commit(argv: yargs.Arguments) {
     const servicePubKey = decoded.pubKey;
 
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
-    const ring = KeyRing.fromSecret(wifData.trim());
 
-    const addr = ring.getAddress();
+    const result = await onlineCommitTx(servicePubKey, net, wifData, argv.name, argv.locktime, argv.push);
 
-    let feeRate: number;
-    try {
-        feeRate = await getFeesSatoshiPerKB(net);
-    } catch (err) {
-        return errorNoFees();
-    }
+    const txidStr = chalk`{green ${util.revHex(result.hash('hex')) as string}}`;
 
-    const commitFee = 500000;
-    const registerFee = 500000;
-    const escrowFee = 1000000;
-
-    // Fund up to a 2 KB transaction
-    let coins: Coin[];
-    try {
-        coins = await fundTx(addr, commitFee + registerFee + escrowFee + 8 * feeRate, net);
-    } catch (err) {
-        return error('Could not fund the transaction');
-    }
-
-    try {
-        const commitTx = genCommitTx(coins,
-                                     argv.name,
-                                     argv.locktime,
-                                     commitFee,
-                                     registerFee,
-                                     escrowFee,
-                                     feeRate,
-                                     ring,
-                                     servicePubKey);
-        const txidStr = chalk`{green ${util.revHex(commitTx.hash('hex')) as string}}`;
-
-        if (argv.push) {
-            try {
-                await postTX(commitTx, net);
-                console.log(txidStr);
-            } catch (err) {
-                return errorCantPush();
-            }
-        } else {
+    if (argv.push) {
+        try {
+            // tslint:disable-next-line:no-console
             console.log(txidStr);
-            console.log(commitTx.toRaw().toString('hex'));
+        } catch (err) {
+            return errorCantPush();
         }
-    } catch (err) {
-        return error('Could not generate transaction: ' + err.message);
+    } else {
+        // tslint:disable-next-line:no-console
+        console.log(txidStr);
+        // tslint:disable-next-line:no-console
+        console.log(result.toRaw().toString('hex'));
     }
 }
 
@@ -151,6 +95,7 @@ async function register(argv: yargs.Arguments) {
                 await postTX(lockTx, net);
                 console.log(txidStr);
             } catch (err) {
+                console.log(err);
                 return errorCantPush();
             }
         } else {
@@ -158,6 +103,7 @@ async function register(argv: yargs.Arguments) {
             console.log(lockTx.toRaw().toString('hex'));
         }
     } catch (err) {
+        // console.log(err);
         return error('Could not generate transaction: ' + err.message);
     }
 }

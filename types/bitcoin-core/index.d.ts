@@ -12,5 +12,7 @@ declare module 'bitcoin-core' {
         generate(blocks: number): string[];
 
         getBlockCount(): number;
+
+        sendToAddress(addr: string, amount: number): string;
     }
 }

@@ -1,4 +1,12 @@
 import Client from 'bitcoin-core';
+import {
+    keyring as KeyRing,
+} from 'bcoin';
+
+import { genLockTx, genUnlockTx, genCommitTx, getLockTxPubKey } from '../lib/txs';
+import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from '../lib/net';
+
+import { onlineCommitTx } from '../bin/commit-tx-gen';
 
 describe('Network integration testing', async () => {
     const client = new Client({
@@ -10,8 +18,12 @@ describe('Network integration testing', async () => {
         network: 'regtest',
     });
 
-    // const userWif = 'cSfYjfhSotRuhYx7n8ttCFdbHRZiMxwdmBPyJb2BZBous96sbSkh';
-    // const serviceWif = 'cMb11yoKHey8fp26zXV1vbeGCmw62nXJ8SVQJ6Uk2vdK6mEQyhNX';
+    const userWif = 'cSfYjfhSotRuhYx7n8ttCFdbHRZiMxwdmBPyJb2BZBous96sbSkh';
+    const userRing = KeyRing.fromSecret(userWif);
+    const userAddr = userRing.getAddress();
+    const serviceWif = 'cMb11yoKHey8fp26zXV1vbeGCmw62nXJ8SVQJ6Uk2vdK6mEQyhNX';
+    const serviceRing = KeyRing.fromSecret(serviceWif);
+    const servicePubKey = serviceRing.getPublicKey();
 
     beforeAll(async () => {
         const curBlocks = await client.getBlockCount();
@@ -20,9 +32,13 @@ describe('Network integration testing', async () => {
         } else {
             await client.generate(1);
         }
+
+        await client.sendToAddress(userAddr.toBase58('testnet'), 10);
     });
 
     it('Publishes a commit tx', async () => {
-        await client.getBlockCount();
+        const curBlocks = await client.getBlockCount();
+
+        await onlineCommitTx(servicePubKey, 'regtest', userWif, 'test1', curBlocks + 20, true);
     });
 });
