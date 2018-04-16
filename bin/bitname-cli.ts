@@ -69,6 +69,7 @@ async function commit(argv: yargs.Arguments) {
 
     // const upfrontFee =  500000;
     // const delayFee   = 1500000;
+
     const commitFee = 500000;
     const registerFee = 500000;
     const escrowFee = 1000000;
@@ -219,7 +220,7 @@ async function revoke(argv: yargs.Arguments) {
 }
 
 async function serviceSpend(argv: yargs.Arguments) {
-    const net = argv.testnet ? 'testnet' : 'main';
+    const net = argv.network;
 
     const wifData = fs.readFileSync(path.resolve(argv.wif), 'utf8');
     const ring = KeyRing.fromSecret(wifData.trim());
@@ -297,7 +298,7 @@ async function allNames(argv: yargs.Arguments) {
 }
 
 function keyGen(argv: yargs.Arguments) {
-    const net = argv.testnet ? 'testnet' : 'main';
+    const net = argv.network;
     const ring = KeyRing.generate(net);
 
     const wif = ring.toSecret(net);
@@ -327,16 +328,17 @@ function keyInfo(argv: yargs.Arguments) {
     }
 
     const ring = KeyRing.fromSecret(data.trim());
-    const net = ring.network.toString();
-    if (net !== 'testnet' && net !== 'main') {
-        return error(`Unknown network ${net}`);
-    }
+    const net = argv.network;
 
     const pubKeyRaw = ring.getPublicKey();
 
     const encPK = bech32Encode(pubKeyRaw, net);
 
-    const addr = ring.getAddress().toBase58(net);
+    // bitcoind uses the same address constants for regtest and testnet
+    // bcoin does not, so we have to do a little modification
+    const shimNet = net === 'regtest' ? 'testnet' : net;
+
+    const addr = ring.getAddress().toBase58(shimNet);
 
     console.log(chalk`{blue pubk} ${encPK}\n{blue addr} ${addr}`);
 }
@@ -428,10 +430,6 @@ function main() {
                     type: 'string',
                     describe: 'the txid of the registering transaction',
                 })
-                .option('testnet', {
-                    type: 'boolean',
-                    describe: 'is this a testnet service?',
-                })
                 .option('wif', {
                     alias: 'w',
                     type: 'string',
@@ -452,10 +450,6 @@ function main() {
         }, allNames)
         .command('key-gen', 'generate a new priv/pub keypair', (yargsObj) => {
             return yargsObj
-                .option('testnet', {
-                    type: 'boolean',
-                    describe: 'whether to generate a testnet key',
-                })
                 .option('out', {
                     alias: 'o',
                     type: 'string',
@@ -469,6 +463,14 @@ function main() {
                     describe: 'the WIF file containing the private key',
                 });
         }, keyInfo)
+        .option('network', {
+            alias: 'n',
+            type: 'string',
+            describe: 'the network on which to operate',
+            choices: ['main', 'testnet', 'regtest'],
+            default: 'main',
+            global: true,
+        })
         .help()
         .argv;
 }
