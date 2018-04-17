@@ -243,20 +243,12 @@ async function getAllTX(addr: Address, network: string): Promise<TXList> {
 
     const unspents: {[addr: string]: {[txidOutput: string]: boolean}} = {};
 
-<<<<<<< c84bc196bfe886d3f53cd57ceb1f8416d69fde47
     const shimNet = network === 'regtest' ? 'testnet' : network;
 
     // Construct the unspents dictionary
     for (const tx of txs) {
         for (const out of tx.outputs) {
             const outAddrObj = out.getAddress();
-=======
-    // Iterate over all txs
-    const outputsSpent: boolean[][] = await Promise.all(txs.map(async (tx) => {
-        // Iterate over each output
-        return await Promise.all(tx.outputs.map(async (out, ind) => {
-            const outAddrObj = out.getAddress(); // TODO out.getNestedAddress();
->>>>>>> add todo comments for segwit migration
             if (outAddrObj === null) {
                 continue;
             }

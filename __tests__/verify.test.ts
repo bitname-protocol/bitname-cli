@@ -321,8 +321,8 @@ describe('transaction verification', () => {
 
             // Generate a script of any other kind
             const newScript = Script.fromMultisig(1, 2, [servicePubKey, otherKey]);
-            //TODO: then pass the multisig script to the ring?
-            //TODO: serviceRing.script = newScript;
+            // TODO: then pass the multisig script to the ring?
+            // TODO: serviceRing.script = newScript;
 
             const oldVal = mtx.outputs[1].value;
 

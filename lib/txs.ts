@@ -7,7 +7,7 @@ import {
     tx as TX,
     keyring as KeyRing,
     crypto,
-    Witness
+    Witness,
 } from 'bcoin';
 
 import randomBytes from 'randombytes';
@@ -277,7 +277,7 @@ function genCommitTx(coins: Coin[],
     // Add locked fee as output 2
     // Locks up the fee to register, the fee to be put in escrow, and enough for a 4kb tx at current rates
     lockTx.addOutput({
-        address: address,
+        address,
         value: registerFee + escrowFee + 4 * feeRate,
     });
 
@@ -378,7 +378,7 @@ function genLockTx(commitTX: TX,
 
     // Add locked fee as output 1
     lockTx.addOutput({
-        address: address,
+        address,
         value: lockedFee,
     });
 

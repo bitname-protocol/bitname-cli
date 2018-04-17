@@ -356,11 +356,8 @@ describe('tx generation', () => {
 
         const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
         const ring = KeyRing.fromSecret(wif);
-<<<<<<< c84bc196bfe886d3f53cd57ceb1f8416d69fde47
-=======
         // TODO ring.witness = true;
         const addr = ring.getAddress().toBase58('testnet');
->>>>>>> add todo comments for segwit migration
 
         const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
         const serviceRing = KeyRing.fromSecret(serviceWif);
@@ -389,11 +386,8 @@ describe('tx generation', () => {
         
         const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
         const serviceRing = KeyRing.fromSecret(serviceWif);
-<<<<<<< c84bc196bfe886d3f53cd57ceb1f8416d69fde47
-=======
-        // TODO serviceRing.witness = true;
+        // TODO serviceRing.witness = true
         const servicePubKey = serviceRing.getPublicKey();
->>>>>>> add todo comments for segwit migration
 
         const tx = genUnlockTx(lockTX, ctx, 1, true, serviceRing, userPubKey);
 

@@ -59,6 +59,7 @@ async function commit(argv: yargs.Arguments) {
 
     if (argv.witness) {
         ring.witness = true;
+        ring.nested = true;
     }
     const addr = ring.getAddress();
 
@@ -78,6 +79,7 @@ async function commit(argv: yargs.Arguments) {
     try {
         coins = await fundTx(addr, commitFee + registerFee + escrowFee + 8 * feeRate, net);
     } catch (err) {
+        console.log(err.toString());
         return error('Could not fund the transaction');
     }
 
@@ -353,7 +355,7 @@ function keyInfo(argv: yargs.Arguments) {
 
     // bitcoind uses the same address constants for regtest and testnet
     // bcoin does not, so we have to do a little modification
-    const shimNet = net === 'regtest' ? 'testnet' : net;
+    const shimNet = ring.network.toString() === 'regtest' ? 'testnet' : net;
 
     const addr = ring.getAddress().toBase58(shimNet);
 
@@ -422,7 +424,7 @@ function main() {
                 .option('push', {
                     type: 'boolean',
                     describe: 'whether to push this transaction to the network',
-                })                
+                })
                 .option('witness', {
                     type: 'boolean',
                     describe: 'whether to generate witness transaction',

@@ -234,7 +234,8 @@ declare module 'bcoin' {
 
     class keyring {
         public network: string;
-        // TODO public witness: boolean;
+        public witness: boolean;
+        public nested: boolean;
         static fromOptions(options: KeyRingOpts | hd, network: string): keyring;
 
         getNestedAddress(): address;

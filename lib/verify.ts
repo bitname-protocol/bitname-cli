@@ -52,10 +52,10 @@ function isValidOP_RETURN(output: Output): boolean {
  * @param name A name of at most 64 characters composed of URL-safe characters
  * @param locktime An absolute lock time, in blockheight
  */
-function verifyCommitTX(tx: TX, 
-                        userPubKey: Buffer, 
+function verifyCommitTX(tx: TX,
+                        userPubKey: Buffer,
                         servicePubKey: Buffer,
-                        name: string, 
+                        name: string,
                         locktime: number,
                         witness: boolean = false): boolean {
     if (tx.outputs.length < 3) {
@@ -77,7 +77,7 @@ function verifyCommitTX(tx: TX,
     const servicePKH = crypto.hash160(servicePubKey);
     const serviceAddr = Address.fromPubkeyhash(servicePKH);
     // TODO tx.outputs[1].getNestedAddress().toBase58('testnet')
-    if (tx.outputs[1].getAddress().toBase58('testnet') !== serviceAddr.toBase58('testnet')) { 
+    if (tx.outputs[1].getAddress().toBase58('testnet') !== serviceAddr.toBase58('testnet')) {
         return false;
     }
 
@@ -103,8 +103,8 @@ function verifyCommitTX(tx: TX,
  * @param commitTX The corresponding commit transaction.
  * @param servicePubKey service provider's public key
  */
-function verifyLockTX(tx: TX, 
-                      commitTX: TX, 
+function verifyLockTX(tx: TX,
+                      commitTX: TX,
                       servicePubKey: Buffer,
                       witness: boolean = false): boolean {
     if (tx.outputs.length < 2) {
