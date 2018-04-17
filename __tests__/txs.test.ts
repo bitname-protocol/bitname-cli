@@ -357,7 +357,7 @@ describe('tx generation', () => {
         const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
         const ring = KeyRing.fromSecret(wif);
         // TODO ring.witness = true;
-        const addr = ring.getAddress().toBase58('testnet');
+        // const addr = ring.getAddress().toBase58('testnet');
 
         const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
         const serviceRing = KeyRing.fromSecret(serviceWif);
@@ -383,11 +383,11 @@ describe('tx generation', () => {
         const ring = KeyRing.fromSecret(wif);
         // TODO ring.witness = true;
         const userPubKey = ring.getPublicKey();
-        
+
         const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
         const serviceRing = KeyRing.fromSecret(serviceWif);
         // TODO serviceRing.witness = true
-        const servicePubKey = serviceRing.getPublicKey();
+        // const servicePubKey = serviceRing.getPublicKey();
 
         const tx = genUnlockTx(lockTX, ctx, 1, true, serviceRing, userPubKey);
 
