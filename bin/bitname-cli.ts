@@ -59,7 +59,6 @@ async function commit(argv: yargs.Arguments) {
 
     if (argv.witness) {
         ring.witness = true;
-        ring.nested = true;
     }
     const addr = ring.getAddress();
 
@@ -343,7 +342,7 @@ function keyInfo(argv: yargs.Arguments) {
     }
 
     const ring = KeyRing.fromSecret(data.trim());
-    ring.witness = true;
+    // TODO: ring.witness = true;
     const net = ring.network.toString();
     if (net !== 'testnet' && net !== 'main') {
         return error(`Unknown network ${net}`);

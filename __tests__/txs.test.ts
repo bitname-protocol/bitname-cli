@@ -1,3 +1,4 @@
+/* tslint:disable:no-shadowed-variable */
 jest.mock('randombytes');
 
 import {
@@ -334,6 +335,11 @@ describe('tx generation', () => {
         const wif = 'cNJFgo1driFnPcBdBX8BrJrpxchBWXwXCvNH5SoSkdcF6JXXwHMm';
         const userRing = KeyRing.fromSecret(wif);
         // TODO userRing.witness = true;
+
+        // const commitFee = 10000;
+        const registerFee = 10000;
+        const escrowFee = 20000;
+        const feeRate = 1000;
 
         const ctxDataPath = path.resolve(__dirname, 'data', '04accc0d.tx');
         const ctxData = fs.readFileSync(ctxDataPath, 'utf8').trim();

@@ -1,3 +1,4 @@
+/* tslint:disable:no-unused-variable */
 import { verifyLockTX, verifyCommitTX } from '../lib/verify';
 import {
     genLockTx,
@@ -86,14 +87,11 @@ describe('transaction verification', () => {
             const txData = fs.readFileSync(txDataPath, 'utf8').trim();
             const mtx = MTX.fromRaw(txData, 'hex');
 
-<<<<<<< c84bc196bfe886d3f53cd57ceb1f8416d69fde47
-=======
             const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
-            const ring = KeyRing.fromSecret(wif);
+            // const ring = KeyRing.fromSecret(wif);
             // TODO ring.witness = true;
-            const userPubKey = ring.getPublicKey();
+            // const userPubKey = ring.getPublicKey();
 
->>>>>>> add todo comments for segwit migration
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);
             // TODO serviceRing.witness = true;
@@ -343,11 +341,8 @@ describe('transaction verification', () => {
         it('verifies generated locking txs', () => {
             const wif = 'cTV3FM3RfiFwmHfX6x43g4Xp8qeLbi15pNELuWF9sV3renVZ63nB';
             const ring = KeyRing.fromSecret(wif);
-<<<<<<< c84bc196bfe886d3f53cd57ceb1f8416d69fde47
-=======
             // TODO ring.witness = true;
-            const userPubKey = ring.getPublicKey();
->>>>>>> add todo comments for segwit migration
+            // const userPubKey = ring.getPublicKey();
 
             const serviceWif = 'cRMzGH4towfYVCref4Qz9iyfKaRkvfgVvZ2qk4hExMR7FcpzzVg6';
             const serviceRing = KeyRing.fromSecret(serviceWif);

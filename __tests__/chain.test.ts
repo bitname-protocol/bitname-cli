@@ -302,11 +302,9 @@ describe('chain state', () => {
         const servicePubKey = Buffer.from('03f000da94f60417c76832179fd82ebfc614f5df9e67ffbc1717542ec460e8054c', 'hex');
 
         const userRing = KeyRing.fromSecret('cUBuNVHb5HVpStD1XbHgafDH1QSRwcxUTJmueQLnyzwz1f5wmRZB');
-<<<<<<< c84bc196bfe886d3f53cd57ceb1f8416d69fde47
-=======
+
         // TODO userRing.witness = true;
-        const userPubKey = userRing.getPublicKey();
->>>>>>> add todo comments for segwit migration
+        // const userPubKey = userRing.getPublicKey();
 
         const commitFee = 10000;
         const registerFee = 10000;
