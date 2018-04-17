@@ -7,6 +7,7 @@ import {
     tx as TX,
     keyring as KeyRing,
     crypto,
+    Witness,
 } from 'bcoin';
 
 import randomBytes from 'randombytes';
@@ -113,6 +114,7 @@ function genCommitRedeemScript(userPubkey: Buffer, nonce: Buffer, name: string, 
     return script;
 }
 
+// TODO update to support P2WSH
 /**
  * Generate a P2SH address from a redeem script.
  * @param redeemScript The script to use.
@@ -122,6 +124,13 @@ function genP2shAddr(redeemScript: Script): Address {
     const p2shAddr = Address.fromScript(outputScript);
 
     return p2shAddr;
+}
+
+function genP2WshAddr(redeemScript: Script): Address {
+    const outputScript = Script.fromScripthash(redeemScript.sha256()); // P2WSH uses SHA256 not HASH160
+    const p2wshAddr = Address.fromScript(outputScript);
+
+    return p2wshAddr;
 }
 
 /**
@@ -218,7 +227,8 @@ function genCommitTx(coins: Coin[],
                      escrowFee: number,
                      feeRate: number,
                      userRing: KeyRing,
-                     servicePubKey: Buffer): TX {
+                     servicePubKey: Buffer,
+                     witness: boolean = false): TX {
     //
     // Validate name and the service public key
     if (name.length > 64) {
@@ -236,7 +246,7 @@ function genCommitTx(coins: Coin[],
     // Generate a P2SH address from a redeem script, using a random nonce
     const nonce = randomBytes(32);
     const redeemScript = genCommitRedeemScript(userRing.getPublicKey(), nonce, name, locktime);
-    const p2shAddr = genP2shAddr(redeemScript);
+    const address = witness ?  genP2WshAddr(redeemScript) : genP2shAddr(redeemScript);
 
     // Generate service address from service public key
     const servicePKH = crypto.hash160(servicePubKey);
@@ -267,13 +277,13 @@ function genCommitTx(coins: Coin[],
     // Add locked fee as output 2
     // Locks up the fee to register, the fee to be put in escrow, and enough for a 4kb tx at current rates
     lockTx.addOutput({
-        address: p2shAddr,
+        address,
         value: registerFee + escrowFee + 4 * feeRate,
     });
 
     // Add change output as 3
     lockTx.addOutput({
-        address: userRing.getAddress(),
+        address: witness ? userRing.getNestedAddress() : userRing.getAddress(),
         value: changeVal,
     });
 
@@ -316,7 +326,8 @@ function genLockTx(commitTX: TX,
                    feeRate: number,
                    userRing: KeyRing,
                    servicePubKey: Buffer,
-                   locktime: number): TX {
+                   locktime: number,
+                   witness: boolean = false): TX {
     //
     // Input validation
     if (locktime > 500000000) {
@@ -341,7 +352,7 @@ function genLockTx(commitTX: TX,
 
     // Generate a P2SH address from redeem script
     const redeemScript = genRedeemScript(userRing.getPublicKey(), servicePubKey, locktime);
-    const p2shAddr = genP2shAddr(redeemScript);
+    const address = witness ? genP2WshAddr(redeemScript) : genP2shAddr(redeemScript);
 
     // Generate address from service public key
     const servicePKH = crypto.hash160(servicePubKey);
@@ -367,13 +378,13 @@ function genLockTx(commitTX: TX,
 
     // Add locked fee as output 1
     lockTx.addOutput({
-        address: p2shAddr,
+        address,
         value: lockedFee,
     });
 
     // Add change output as 2
     lockTx.addOutput({
-        address: userRing.getAddress(),
+        address: witness ? userRing.getNestedAddress() : userRing.getAddress(), // TODO userRing.getNestedAddress(),
         value: changeVal,
     });
 
@@ -482,7 +493,8 @@ function genUnlockTx(lockTx: TX,
                      feeRate: number,
                      service: boolean,
                      ring: KeyRing,
-                     otherPubKey: Buffer): TX {
+                     otherPubKey: Buffer,
+                     witness: boolean = false): TX {
     // Disambiguate ring public key and the other public key
     const servicePubKey =  service ? ring.getPublicKey() : otherPubKey;
     const userPubKey    = !service ? ring.getPublicKey() : otherPubKey;
@@ -520,7 +532,7 @@ function genUnlockTx(lockTx: TX,
     }
 
     unlockTx.addOutput({
-        address: ring.getAddress(),
+        address: witness ? ring.getNestedAddress() : ring.getAddress(), // TODO ring.getNestedAddress(),
         value: val,
     });
 
@@ -531,7 +543,13 @@ function genUnlockTx(lockTx: TX,
     unlockScript.pushData(redeemScript.toRaw());
     unlockScript.compile();
 
-    unlockTx.inputs[0].script = unlockScript;
+    if (witness) {
+        unlockTx.inputs[0].witness = Witness.fromOptions({
+            redeem: unlockScript,
+        });
+    } else {
+        unlockTx.inputs[0].script = unlockScript;
+    }
 
     // Compute a fee by multiplying the size by the rate, then account for it
     const virtSize = unlockTx.getVirtualSize();
@@ -545,7 +563,13 @@ function genUnlockTx(lockTx: TX,
     unlockScript2.pushData(redeemScript.toRaw());
     unlockScript2.compile();
 
-    unlockTx.inputs[0].script = unlockScript2;
+    if (witness) {
+        unlockTx.inputs[0].witness = Witness.fromOptions({
+            redeem: unlockScript,
+        });
+    } else {
+        unlockTx.inputs[0].script = unlockScript2;
+    }
 
     return unlockTx.toTX();
 }

@@ -74,3 +74,5 @@ typings/
 # package-lock bc its specific to npm
 package-lock.json
 
+# editor config 
+.vscode/

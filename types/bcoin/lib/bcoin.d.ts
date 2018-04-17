@@ -133,7 +133,19 @@ declare module 'bcoin' {
     }
 
     // TODO: Define these
-    type Witness = any;
+    type NakedWitness = {
+        items: Buffer[]
+    }
+    
+    class Witness {
+        constructor(items: Buffer[] | NakedWitness);
+
+        public items: Buffer[];
+        public redeem: script;
+        public length: number;
+
+        static fromOptions(options: Object): Witness;
+    }
 
     class outpoint {
         constructor(hash?: Hash, index?: number);
@@ -155,6 +167,7 @@ declare module 'bcoin' {
 
         script: script;
         prevout: outpoint;
+        witness: Witness;
     }
 
     interface NakedOutput {
@@ -221,8 +234,11 @@ declare module 'bcoin' {
 
     class keyring {
         public network: string;
+        public witness: boolean;
+        public nested: boolean;
         static fromOptions(options: KeyRingOpts | hd, network: string): keyring;
 
+        getNestedAddress(): address;
         getAddress(): address;
         toSecret(network?: string): Base58String;
         getPrivateKey(enc?: string): Buffer;
@@ -231,7 +247,7 @@ declare module 'bcoin' {
         static fromSecret(secret: Base58String): keyring;
         static generate(network?: string): keyring;
     }
-
+    
     export {
         script,
         address,
@@ -247,6 +263,7 @@ declare module 'bcoin' {
         crypto,
         hd,
         utils,
+        Witness
     };
 
     // export {address} from './address';
