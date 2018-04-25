@@ -5,12 +5,14 @@ import {
     crypto,
 } from 'bcoin';
 import {
-    genRedeemScript,
-    genCommitRedeemScript,
     getLockTxName,
     getLockTxTime,
     getLockTxPubKey,
 } from './txs';
+import {
+    genRedeemScript,
+    genCommitRedeemScript,
+} from './tx-generate';
 
 /**
  * Returns a Boolean value that indicates if URI has and only has alphanumeric leteral and  '_',  '-', '.' '~'

@@ -45,7 +45,8 @@
     "n64": "^0.0.18",
     "node-fetch": "^1.7.3",
     "randombytes": "^2.0.5",
-    "yargs": "^10.0.3"
+    "yargs": "^10.0.3",
+    "yarn": "^1.5.1"
   },
   "scripts": {
     "build": "rollup -c",

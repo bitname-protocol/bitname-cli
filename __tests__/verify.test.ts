@@ -1,9 +1,9 @@
 import { verifyLockTX, verifyCommitTX } from '../lib/verify';
 import {
-    genLockTx,
-    genCommitTx,
     serializeCommitData,
 } from '../lib/txs';
+import { genCommitTx } from '../lib/tx-commit';
+import { genLockTx } from '../lib/tx-lock';
 import {
     keyring as KeyRing,
     coin as Coin,
