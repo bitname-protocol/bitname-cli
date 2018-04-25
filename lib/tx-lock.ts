@@ -6,7 +6,7 @@ import{
 import {
     genP2shAddr,
     serializeCommitData,    
-} from './txs.ts';
+} from './txs';
 
 import{
     script as Script,
