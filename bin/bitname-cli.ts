@@ -8,7 +8,7 @@ import {
     util,
 } from 'bcoin';
 import { genUnlockTx, genCommitTx, getLockTxPubKey } from '../lib/txs';
-import { genLockTx } from '../lib/tx-lock.ts
+import { genLockTx } from '../lib/tx-lock.ts';
 import { fundTx, getFeesSatoshiPerKB, getAllTX, getBlockHeight, getTX, postTX } from '../lib/net';
 import { extractInfo } from '../lib/chain';
 
