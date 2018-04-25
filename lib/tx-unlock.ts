@@ -11,7 +11,7 @@ import{
 
 import{
     getLockTxTime,
-} from './txs.ts';
+} from './txs';
 
 import{
     genRedeemScript,
