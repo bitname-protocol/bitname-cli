@@ -2,8 +2,8 @@ export {
     genCommitTx,
 } from './lib/tx-commit';
 export {
-	genLockTx,	
+	genLockTx,
 } from './lib/tx-lock';
 export {
-	genUnlockTx,	
+	genUnlockTx,
 } from './lib/tx-unlock';

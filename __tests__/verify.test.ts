@@ -2,10 +2,6 @@ import { verifyLockTX, verifyCommitTX } from '../lib/verify';
 import {
     serializeCommitData,
 } from '../lib/txs';
-import {
-    genRedeemScript,
-    genCommitRedeemScript,
-} from '../lib/tx-generate';
 import { genCommitTx } from '../lib/tx-commit';
 import { genLockTx } from '../lib/tx-lock';
 import {

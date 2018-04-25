@@ -17,7 +17,7 @@ import {
     genP2shAddr,
 } from './txs';
 
-import { isURISafe, } from './verify';
+import { isURISafe } from './verify';
 
 import randomBytes from 'randombytes';
 
