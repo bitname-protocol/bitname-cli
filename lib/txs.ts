@@ -138,13 +138,13 @@ function getLockTxPubKey(lockTx: TX): Buffer | null {
     const inputScript = lockTx.inputs[0].script;
 
     if (inputScript.code.length < 3) {
-        //return null;
+        return null;
     }
 
     const encumberScript = Script.fromRaw(inputScript.code[2].data);
 
     if (encumberScript.code.length < 7) {
-        //return null;
+        return null;
     }
 
     const pubKey: Buffer = encumberScript.code[6].data;
