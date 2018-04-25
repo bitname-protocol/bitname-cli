@@ -125,7 +125,7 @@ function getLockTxTime(lockTx: TX): number | null {
 
         return metadata.locktime;
     } catch (e) {
-        //return null;
+        return null;
     }
 }
 
