@@ -1,9 +1,5 @@
 import { verifyLockTX, verifyCommitTX } from '../lib/verify';
 import {
-    genP2shAddr,
-    getLockTxName,
-    getLockTxPubKey,
-    getLockTxTime,
     serializeCommitData,
 } from '../lib/txs';
 import {

@@ -17,7 +17,7 @@ import {
     genP2shAddr,
 } from './txs';
 
-import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
+import { isURISafe, } from './verify';
 
 import randomBytes from 'randombytes';
 

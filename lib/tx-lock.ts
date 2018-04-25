@@ -1,25 +1,23 @@
-import{
+import {
     genRedeemScript,
-    genCommitRedeemScript, 
+    genCommitRedeemScript,
 } from './tx-generate';
 
 import {
     genP2shAddr,
-    serializeCommitData,    
+    serializeCommitData,
 } from './txs';
 
-import{
+import {
     script as Script,
     address as Address,
-    output as Output,
     mtx as MTX,
-    coin as Coin,
     tx as TX,
     keyring as KeyRing,
     crypto,
 } from 'bcoin';
 
-import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
+import { isURISafe, verifyCommitTX } from './verify';
 
 /**
  * Generate a lock transaction.
@@ -129,6 +127,6 @@ function genLockTx(commitTX: TX,
 
     return lockTx.toTX();
 }
-export{
-    genLockTx
+export {
+    genLockTx,
 };

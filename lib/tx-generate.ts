@@ -1,6 +1,6 @@
 import {
-	script as Script,
-	crypto
+    script as Script,
+    crypto,
 } from 'bcoin';
 
 import {

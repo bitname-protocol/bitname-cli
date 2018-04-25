@@ -1,6 +1,5 @@
 export {
     genCommitTx,
-    
 } from './lib/tx-commit';
 export {
 	genLockTx,	
@@ -8,6 +7,3 @@ export {
 export {
 	genUnlockTx,	
 } from './lib/tx-unlock';
-
-    
-

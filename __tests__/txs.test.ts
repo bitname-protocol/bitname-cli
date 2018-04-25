@@ -24,7 +24,6 @@ import {
     genCommitTx,
 } from '../lib/tx-commit';
 
-
 import {
     genRedeemScript,
     genCommitRedeemScript,
