@@ -298,7 +298,7 @@ async function allNames(argv: yargs.Arguments) {
 }
 
 function keyGen(argv: yargs.Arguments) {
-    const net = argv.network;
+    const net = argv.network === 'regtest' ? 'testnet' : argv.network;
     const ring = KeyRing.generate(net);
 
     const wif = ring.toSecret(net);
