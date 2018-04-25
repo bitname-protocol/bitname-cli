@@ -1,28 +1,8 @@
 import {
     script as Script,
     address as Address,
-    output as Output,
-    mtx as MTX,
-    coin as Coin,
     tx as TX,
-    keyring as KeyRing,
-    crypto,
 } from 'bcoin';
-
-import randomBytes from 'randombytes';
-
-import {
-    genRedeemScript,
-    genCommitRedeemScript,
-} from './tx-generate';
-
-import {
-    BadUserPublicKeyError,
-    BadServicePublicKeyError,
-    BadLockTransactionError,
-} from './errors';
-
-import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
 
 /**
  * Generate a P2SH address from a redeem script.

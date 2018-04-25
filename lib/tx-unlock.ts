@@ -1,4 +1,4 @@
-import{
+import {
     script as Script,
     address as Address,
     output as Output,
@@ -9,20 +9,17 @@ import{
     crypto,
 } from 'bcoin';
 
-import{
+import {
     getLockTxTime,
 } from './txs';
 
-import{
+import {
     genRedeemScript,
-    genCommitRedeemScript, 
 } from './tx-generate';
 
-import { verifyLockTX, isURISafe, verifyCommitTX } from './verify';
+import { verifyLockTX } from './verify';
 
 import {
-    BadUserPublicKeyError,
-    BadServicePublicKeyError,
     BadLockTransactionError,
 } from './errors';
 
@@ -109,6 +106,5 @@ function genUnlockTx(lockTx: TX,
 }
 
 export {
-    
     genUnlockTx,
 };
