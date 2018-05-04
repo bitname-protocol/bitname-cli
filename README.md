@@ -13,6 +13,7 @@
     <a href="https://travis-ci.org/bitname-protocol/bitname-cli">
         <img src="https://img.shields.io/travis/bitname-protocol/bitname-cli/master.svg?style=for-the-badge" alt="Travis" />
     </a>
+<a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fbitname-protocol%2Fbitname-cli?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fbitname-protocol%2Fbitname-cli.svg?type=shield"/></a>
     <a href="https://codecov.io/gh/bitname-protocol/bitname-cli">
         <img src="https://img.shields.io/codecov/c/github/bitname-protocol/bitname-cli/master.svg?style=for-the-badge" alt="Codecov" />
     </a>
@@ -23,6 +24,9 @@
         <img src="https://img.shields.io/github/license/bitname-protocol/bitname-cli.svg?style=for-the-badge" alt="License" />
     </a>
 </p>
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fbitname-protocol%2Fbitname-cli.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fbitname-protocol%2Fbitname-cli?ref=badge_large)
 
 ## What is this?
 
@@ -144,4 +148,3 @@ Please do not contact any contributors privately to disclose a bug. Make an issu
 * BlockCypher's excellent REST API
 * jest for testing
 * chalk for pretty colors
-
